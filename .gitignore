@@ -14,3 +14,7 @@ data/tmp/
 # Secrets
 .env
 *.key
+
+*.txt
+*.ipynb
+*.vscode
