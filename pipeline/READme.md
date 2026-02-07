@@ -6,10 +6,11 @@
     - Orchestration Logic
     - Database collections
 
-pipeline/ 
- ├── faceitclient.py class for Faceit API Client, i.e. match, retrieve_ID_members
- ├── orch.py MongoDB Ingestion pipeline
- ├── runner.py Class for the runner script for collecting data in batches
+```pipeline/
+├── faceitclient.py   # Faceit API client (matches, member IDs)
+├── orch.py           # MongoDB ingestion pipeline
+└── runner.py         # Batch data collection runner
+```
 
 ### Workflow Diagram
 ![image.png](workflow.png)
