@@ -1,12 +1,12 @@
-# Faceit AI predictor Chrome extension
+# Faceit AI predictor Chrome extension 
+#### Version 
+Current Version: v0.1.1
 
 ### What this is
 Chrome extension that collects current team data at inference time and uses ML to do display conditional probabilities of a map from map pool.
 
 ### Current state
-- Data collection pipeline almost complete, script left.
-- ~48 hours of manual iteration
-- Model training: not started / baseline only
+- Data collection pipeline almost complete, runner left.
 
 ### Why this exists
 Learning and developing prediction for Faceit competitive players to reach higher elo using ML.
