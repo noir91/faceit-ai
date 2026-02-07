@@ -6,7 +6,8 @@
     - Orchestration Logic
     - Database collections
 
-```pipeline/
+```
+pipeline/
 ├── faceitclient.py   # Faceit API client (matches, member IDs)
 ├── orch.py           # MongoDB ingestion pipeline
 └── runner.py         # Batch data collection runner
