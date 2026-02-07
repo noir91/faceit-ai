@@ -7,9 +7,9 @@
     - Database collections
 
 pipeline/ 
-├── faceitclient.py class for Faceit API Client, i.e. match, retrieve_ID_members
-├── orch.py MongoDB Ingestion pipeline
-├── runner.py Class for the runner script for collecting data in batches
+ ├── faceitclient.py class for Faceit API Client, i.e. match, retrieve_ID_members
+ ├── orch.py MongoDB Ingestion pipeline
+ ├── runner.py Class for the runner script for collecting data in batches
 
 ### Workflow Diagram
 ![image.png](workflow.png)

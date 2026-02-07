@@ -16,7 +16,6 @@ data/tmp/
 *.key
 
 *.csv
-*.png
 *.txt
 *.ipynb
 *.vscode
