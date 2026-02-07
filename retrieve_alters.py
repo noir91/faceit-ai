@@ -1,7 +1,12 @@
 from ingestion.fetch import alter_function, match
 from pipeline.orch import getdata
+from dotenv import load_dotenv
+import os
 
-API_key = "000e8362-bcf1-4074-bb99-2593f979c8de"
+load_dotenv()
+
+API_KEY = os.environ['API_KEY']
+
 
 headers = {
     'Authorization': f"Bearer {API_key}",

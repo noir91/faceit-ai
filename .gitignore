@@ -15,6 +15,9 @@ data/tmp/
 .env
 *.key
 
+*.csv
+*.png
 *.txt
 *.ipynb
 *.vscode
+.testscripts
