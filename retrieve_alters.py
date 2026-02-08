@@ -1,4 +1,4 @@
-from ingestion.fetch import alter_function, match
+from pipeline.faceitclient import FaceitClient
 from pipeline.orch import getdata
 from dotenv import load_dotenv
 import os
@@ -9,7 +9,7 @@ API_KEY = os.environ['API_KEY']
 
 
 headers = {
-    'Authorization': f"Bearer {API_key}",
+    'Authorization': f"Bearer {API_KEY}",
     'Accept': "application/json"
 }
 
@@ -20,7 +20,8 @@ fpl_id = '27ccb2d1-2715-4f65-be3f-c5de635fcd31'
 falcons_diamond_id = "5259a84f-ceda-448e-a811-f465fe034419"
 player_id = '22531ed3-e6f6-4647-932f-52fd8af17073'
 
-alter_function(
+client = FaceitClient()
+client.alter_function(
     player_id = player_id ,
     headers = headers,
     host = host,

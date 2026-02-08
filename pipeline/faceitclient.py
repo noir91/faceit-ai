@@ -156,29 +156,6 @@ class FaceitClient():
 
             return player_ids, data['items']
         
-    def statistics_match_func(self, match_id):
-        """
-        Returns the statistics of a match for all players, will be used 
-        to store data into 'ratings' collection.
-        """
-
-        statistics_url = f"https://open.faceit.com/data/v4/matches/{match_id}/stats"
-
-        response = r.get(statistics_url, headers = self.headers)
-        data = response.json()
-
-        statistics = {}
-        players_list = []
-
-        for item in data.get('rounds', []):
-            for teams in item.get('teams', []):
-                for players in teams.get('players'):
-                    players_list.append(players)
-
-            statistics['_id'] = match_id
-            statistics['players'] = players_list
-        
-        return statistics
     
     def match_randomizer(self, match_ids:list, seed = 42):
         
@@ -219,38 +196,70 @@ class FaceitClient():
 
         return data.row(0, named = True)
 
-    def agg_team_func(self, match_data):
+    def statistics_transform(self, match_id):
         '''
-        Docstring for agg_team_func
+        Docstring for statistics transform
         
         Aggregate Team Function aggregates scores of 2 Factions (teams) within a match, a component of the pipeline 
         in delivering statistics to the database for collection
         
         The statistics stay as they are, just a new key is added per
         faction for the aggregates.
+
+        Returns the statistics of a match for all players, will be used 
+        to store data into 'ratings' collection.
         '''
+        statistics_url = f"https://open.faceit.com/data/v4/matches/{match_id}/stats"
+
+        response = r.get(statistics_url, headers = self.headers)
+        match_data = response.json()
+        print(match_data)
 
         # Temporary store for all player statistics dictionaries
         faction1 = []
         faction2 = []
+        players_list = []
+        statistics = {}
 
         for rounds in match_data.get("rounds"):
             for index, teams in enumerate(rounds.get("teams")):
                 for team_players in teams.get('players'):
+                    if ('Team' in teams['team_stats']) == True:
+                        del teams['team_stats']['Team']
+
+                    del team_players['nickname']
                     if index == 0:
+                        # Team(s) stats
+                        faction1_stats = teams['team_stats']
+
+                        # Player(s) stats
                         faction1.append(team_players['player_stats'])
                     else:
+                        # Team(s) stats
+                        faction2_stats = teams['team_stats']
+ 
+                        # Player(s) stats
                         faction2.append(team_players['player_stats'])
+                        
+                    players_list.append(team_players['player_id'])
 
-        stats = {
-            "faction1": self.convert_json(faction1),
-            "faction2": self.convert_json(faction2)
+        # Team(s) aggregates
+        faction1_agg = self.convert_json(faction1)
+        faction1_agg.update(faction1_stats)
+
+        faction2_agg = self.convert_json(faction1)
+        faction2_agg.update(faction2_stats)
+
+        agg = {
+            "faction1": faction1_agg,
+            "faction2": faction2_agg
         }
 
-        for rounds in match_data.get('rounds'):
-            rounds['teams'].append(stats)
+        statistics['_id'] = match_id
+        statistics['players'] = players_list
+        statistics['team_agg'] = agg
 
-        return match_data  
+        return statistics
 
     def retrieve_hub_members(self, hub_id):
         """
