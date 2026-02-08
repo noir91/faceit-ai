@@ -213,7 +213,6 @@ class FaceitClient():
 
         response = r.get(statistics_url, headers = self.headers)
         match_data = response.json()
-        print(match_data)
 
         # Temporary store for all player statistics dictionaries
         faction1 = []
