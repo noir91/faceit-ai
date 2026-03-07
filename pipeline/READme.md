@@ -144,29 +144,53 @@ Lets the pipeline resume from stored state of N players.
 This acts like DAG rote nood,
 everything fans out from here.
 
-### Statistics Match Function (`statistics_match_func`)
+### Statistics Transform Function (`statistics_transform`)
 
-*Fetches per-player statistics for a single match.*
+*Fetches match statistics and computes team-level aggregates for both factions.*
 
 **Step-by-step**
 
-- Calls Faceit match statistics endpoint
+- Calls the Faceit match statistics endpoint for a given `match_id`
+- Extracts `rounds` data from the API response
 - Iterates through:
-    - rounds → teams → players
+  - rounds → teams → players
+- Cleans incoming API data:
+  - Removes `Team` field from `team_stats`
+  - Removes `nickname` from player objects
+- Separates players into two temporary groups:
+  - `faction1`
+  - `faction2`
+- Collects:
+  - raw player objects into `players_list`
+  - player stat dictionaries into faction lists
+- Computes aggregated statistics using `convert_json` for:
+  - `faction1`
+  - `faction2`
+- Merges:
+  - aggregated player statistics
+  - existing `team_stats` from the API
+- Constructs the final statistics structure for database ingestion
 
-- Collects all player stat blobs
-- Returns:
+**Returns**
 
-```{
-  "_id": match_id,
-  "players": [...]
+{
+"_id": match_id,
+"players": [...],
+"team_agg": {
+"faction1": {...},
+"faction2": {...}
 }
-```
+}
 
+**Why it exists**
 
-**Why it exists**:
-This is the feature ingestion layer
-This feeds the ML side later.
+This function acts as the **statistics transformation layer** of the pipeline.  
+It prepares raw match statistics from the Faceit API and produces both:
+
+- **player-level statistics** for storage
+- **team-level aggregates** for downstream ML feature generation.
+
+The output is intended to be stored in the **`ratings` collection** and later consumed by the ML pipeline.
 
 ### Match (`match`)
 
@@ -208,20 +232,3 @@ almost everything depends on this function.
 **Why it exists**:
 Turns raw per-player stats into team-level features
 
-### Aggregate Team Function (`agg_team_func`)
-
-*Computes team-level aggregate statistics for each match.*
-
-**Step-by-step**
-
-- Iterates through rounds and teams
-- Separates players into:
-    - faction1
-    - faction2
-- Aggregates stats using convert_json
-- Appends aggregated stats back into match structure
-
-**Why it exists**:
-This is the feature engineering step, intended for ML purposes.
-
-**Note:** All functions mentioned in the markdown are **lowercase.**
