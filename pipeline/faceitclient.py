@@ -6,7 +6,9 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 import polars as pl
-
+from functools import partial
+import traceback
+import time
 
 class FaceitClient():
 
@@ -21,14 +23,64 @@ class FaceitClient():
 
         self.dbobj = dbobj
         self.headers = headers
+        self.error_flag = None
 
+    def retry_function(self, function, *args, **kwargs):
+
+        """
+        Docstring for retry_function
+        
+        :param self: 
+        :param function: an api client function used for retrying
+        """
+        attempt = 0
+        base_delay = 1
+        while True:
+
+            try:
+                retries = 4
+                if attempt == retries:
+                    break
+                    
+                else:
+                    result = function(*args, **kwargs)
+                    attempt += 1
+
+                    return result
+                                    
+            except (r.exceptions.ConnectionError, 
+                    r.exceptions.Timeout, 
+                    r.exceptions.HTTPError, 
+                    ValueError) as e:
+                
+                sleep_time = base_delay * (2 ** attempt)
+
+                print(f"Attempt {attempt+1}/nRetrying function after {sleep_time}")                
+                print(f"Error Type: {e}")
+                time.sleep(sleep_time)
+
+
+
+
+         #except Exception as e:
+        #    print(f"Error : {e}")
+        #    traceback.print_exc()
+
+        #except KeyboardInterrupt:
+        #    print("\nStopped by user.")
+        
+        #except TypeError as te:
+        #    print(f"\nTypeError: {te}")
+        
     def alter_function(self, player_id):
 
         print("-"*20,"Retrieving Alters and their matches:","-"*20)
 
         # Get Match and 10 player ids each
         alters, alter_data = self.match(player_id= player_id,
-                                                headers= self.headers, randomized= True)
+                                                randomized= True)
+        
+        alter_match_ids = [item['_id'] for item in alter_data]
 
         # Store player ids in mongodb 
 
@@ -39,16 +91,11 @@ class FaceitClient():
             return False
         else:
         
-        # Storing Alter raw match data from Faceit Data API        
-            self.dbobj.store_data(batch = alter_data, 
-                            collection = 'matches', 
-                            verbose = False)
+        # Storing Alter raw match data from Faceit Data API
+            self.dbobj.matches_batch.extend(alter_data)
+            self.dbobj.alters_batch.extend(alters)
 
-        
-            self.dbobj.store_data(batch = alters, 
-                            collection = 'alters', 
-                            verbose = True)
-            return True    
+            return alter_match_ids 
 
     def collect_N(self):
         """
@@ -59,7 +106,10 @@ class FaceitClient():
         players = self.dbobj.players
         players_id = [id['_id'] for id in players.find({}, {'_id': 1})]
 
-        return players_id
+        indices = {idx: value for idx, value in enumerate(players_id)}   
+        indices_array = np.array([i for i in indices.keys()])
+        
+        return indices_array, players_id
 
     def match(self, player_id, randomized = False):
         """
@@ -95,7 +145,8 @@ class FaceitClient():
 
             history_response = r.get(url = history_url,
                                     headers = self.headers,
-                                    params = params)
+                                    params = params,
+                                    timeout = 3)
         
             data = history_response.json()
             offset += limit        
@@ -111,7 +162,11 @@ class FaceitClient():
 
                     item['_id'] = item.pop('match_id')
                     all_data.append(item)
-                
+            
+            else:
+                history_response.raise_for_status()
+                self.error_flag = True
+
             if offset >= 200:
                 break
 
@@ -132,7 +187,7 @@ class FaceitClient():
             # getting alter_match_ids from data.json()
             for single_match_data in all_data:
                 if single_match_data.get('_id') in randomized_matches:
-                    # Extracting Match and Player Ids, assigning a dictionary
+                    # Extracting Match and Player ids, assigning a dictionary
                     alter_match_id = single_match_data['_id']
                     alter_match_ids.append(alter_match_id)
 
@@ -159,6 +214,8 @@ class FaceitClient():
     
     def match_randomizer(self, match_ids:list, seed = 42):
         
+        if not match_ids:
+            raise ValueError("There were no match IDs found! ")
         # Randomized Match Ids
         randomized_matches = set()
 
@@ -183,14 +240,14 @@ class FaceitClient():
 
         return randomized_matches
 
-    def convert_json(self, inc_json):
+    def convert_json(self, incoming_json):
         """
     uses polars for faster conversion
 
     Converts expected incoming JSON (Array of objects for faction in teams from statistics for a match api endpoint)
     to Dataframe, computes the aggregate and then coverts it back to json.
         """
-        data = (pl.DataFrame(inc_json)
+        data = (pl.DataFrame(incoming_json)
                 .cast(pl.Float32)
                 .mean())
 
@@ -211,7 +268,7 @@ class FaceitClient():
         '''
         statistics_url = f"https://open.faceit.com/data/v4/matches/{match_id}/stats"
 
-        response = r.get(statistics_url, headers = self.headers)
+        response = r.get(statistics_url, headers = self.headers, timeout = 3)
         match_data = response.json()
 
         # Temporary store for all player statistics dictionaries
@@ -220,9 +277,19 @@ class FaceitClient():
         players_list = []
         statistics = {}
 
-        for rounds in match_data.get("rounds"):
+        rounds_data = match_data.get("rounds")
+
+        print(f"Match loaded: {match_id} - Statistics found for game.")        
+
+        if not rounds_data:
+            print(f"Skipping match: {match_id} - Failure to get statistics for game.")
+            return None
+        
+        for rounds in rounds_data:
             for index, teams in enumerate(rounds.get("teams")):
                 for team_players in teams.get('players'):
+                    
+                    # Removes Team Name which is in string, data coming from API
                     if ('Team' in teams['team_stats']) == True:
                         del teams['team_stats']['Team']
 
@@ -232,22 +299,28 @@ class FaceitClient():
                         faction1_stats = teams['team_stats']
 
                         # Player(s) stats
+                        #individual_stats_1 = team_players
                         faction1.append(team_players['player_stats'])
                     else:
                         # Team(s) stats
                         faction2_stats = teams['team_stats']
  
                         # Player(s) stats
+                        #individual_stats_2 = team_players
+
                         faction2.append(team_players['player_stats'])
                         
-                    players_list.append(team_players['player_id'])
+                    players_list.append(team_players)
 
         # Team(s) aggregates
         faction1_agg = self.convert_json(faction1)
         faction1_agg.update(faction1_stats)
+        #faction1_agg.update(individual_stats_1)
 
-        faction2_agg = self.convert_json(faction1)
+        faction2_agg = self.convert_json(faction2)
         faction2_agg.update(faction2_stats)
+        #faction1_agg.update(individual_stats_2)
+
 
         agg = {
             "faction1": faction1_agg,
@@ -283,7 +356,9 @@ class FaceitClient():
             
             request = r.get(url = url,
                             headers = self.headers,
-                            params= params)
+                            params= params,
+                            timeout = 3
+                            )
             
             data = request.json()
 
@@ -331,7 +406,8 @@ class FaceitClient():
 
             ID_request = r.get(url = url,
                             headers = self.headers,
-                            params = params)
+                            params = params,
+                            timeout = 3)
             if status == True:
                 print(ID_request.status_code)
 

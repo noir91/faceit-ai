@@ -1,7 +1,8 @@
-
-from orch import getdata
+from itertools import islice
+from pipeline.orch import getdata
 import time
-from faceitclient import FaceitClient
+from pipeline.faceitclient import FaceitClient
+import sys
 
 class PipelineRunner():
     """
@@ -15,39 +16,85 @@ class PipelineRunner():
     - Handle failures + checkpoints
     """
 
-    def __init__(self):
-        self.client = FaceitClient()
-
-    def supermatch(self, headers, host, port):
+    def __init__(self, headers, host, port):
         # Connecting MongoDB 
-        data = getdata()
-        data.connect_db(host = host, port = port)
+        self.data = getdata()
+        self.data.connect_db(host = host, port = port)
+
+        self.client = FaceitClient(dbobj= self.data,
+                                   headers= headers)
+        # Assuming 72 players x 15 matches = 1080 matches
+        self.batch_size = 150
+        self.max_players = len(list(self.data.players.find({'_id': {"$exists": True}})))
+    
+    
+    def supermatch(self):
+
+        try:  
+            # Collect N player_ids
+            indices_array, player_ids = self.client.retry_function(self.client.collect_N)
+
+            # Get statistics of all the existing matches
+            players_stats = []
+
+            # accessing player ids for alter func
+            for idx in indices_array:
+                # 'success' acts as a flag and also contains alter_match_ids,
+                #  to be used by statistics function
+                alter_match_ids = self.client.retry_function(self.client.alter_function, 
+                                                    player_ids[idx])
+                
+                if alter_match_ids:
+                    success = True
+
+                for match_id in alter_match_ids:
+                    statistics = self.client.retry_function(
+                        self.client.statistics_transform, match_id
+                    )
+
+                    if statistics is not None:
+                        players_stats.append(statistics)
+                
+                # clearing player_stats prevents redundancy
+                self.data.ratings_batch.extend(players_stats)
+                players_stats.clear()
+
+                if success:
+                    self.batch_processor()
+                    print(f"({idx+1}) Ran player id :{player_ids[idx]}, alters and matches stored!")
+                else: 
+                    print(f"({idx+1}) Player ID skipped due lesser number of matches in the past 40d!!")
+
+        except Exception as e:
+            print(f"Error occured in supermatch: {e}")
+            
+    def chunked(self, iterable, batch_size):
+
+            iterables = iter(iterable)
+            while True:
+                batch = list(islice(iterables, batch_size))
+
+                if not batch:
+                    break
+                else:
+                    yield batch
+
+    def batch_processor(self):
+
+        data = {"alters":self.data.alters_batch,
+                "matches":self.data.matches_batch,
+                "ratings":self.data.ratings_batch,
+                "players":self.data.players_batch}
         
-        # Collect N player_ids
-        player_ids = self.collect_N(data = data)
+        for collection, batches in data.items():
+            if len(batches) >= self.batch_size or self.client.error_flag: # add >= not ==
+                for batch in self.chunked(batches, self.batch_size):
+                    self.data.store_data(batch = batch,
+                                        collection = collection,
+                                        verbose = True)
+                
+                batches.clear()
 
-        # accessing player ids for alter func
-        for i in range(len(player_ids)):
-            success = self.client.alter_function(player_id = player_ids[i],
-                        headers = headers,
-                        data = data)
-            if success == True:
-                print(f"({i+1}) Ran player id :{player_ids[i]}, alters and matches stored!")
-            else: 
-                print(f"({i+1}) Player ID skipped due lesser number of matches in the past 40d!!")
-            #time.sleep(0.7)
+    
 
-        # Get statistics of all the existing matches
 
-        # Fetching match_ids query
-        matches = data.matches
-        match_ids = [id['_id'] for id in matches.find({}, {'_id': 1})]
-        players_stats = []
-
-            # I THINK I SHOULD MOVE THIS TO MAIN SCRIPT
-        # Storing statistics of each player
-        for match_id in match_ids:
-            statistics = self.client.statistics_transform(match_id= match_id)
-            players_stats.append(statistics)
-            data.store_data(batch = players_stats,
-                            collection = 'ratings')

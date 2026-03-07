@@ -1,9 +1,10 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 import pandas as pd
 
 class getdata():
     def __init__(self):
-        pass
+        # Used for terminating the DataExporter loop --> runner.py
+        self.batch_flag = True
 
     def connect_db(self, host, port, connect = True):
 
@@ -28,6 +29,12 @@ class getdata():
         self.players = self.db['players']
         self.ratings = self.db['ratings']
         self.alters = self.db['alters']
+        
+        # Batches ready to be stored
+        self.matches_batch = []
+        self.players_batch = []
+        self.ratings_batch = []
+        self.alters_batch = []
 
 
     def store_data(self, batch, collection:str, verbose = False):
@@ -78,9 +85,14 @@ class getdata():
                     # skipping duplicates
                     ordered = False)
 
-        except Exception as e:
-            print("Table: ", {collection})
-            print(f"Error: {e}")
+        # Note: PyMongoError class exception isnt written
+
+        except errors.BulkWriteError as e:
+            print("\nTable: ", {collection})
+            errmsg = e.details['writeErrors'][0]['errmsg']
+            print(f"Error: {errmsg}\n")
+
+
 
     def getcol(self, db, col):
         """

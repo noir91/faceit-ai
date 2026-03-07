@@ -19,4 +19,5 @@ data/tmp/
 *.txt
 *.ipynb
 *.vscode
-.testscripts
+testscripts
+*__init__.py
