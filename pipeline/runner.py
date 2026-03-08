@@ -3,6 +3,7 @@ from pipeline.orch import getdata
 import time
 from pipeline.faceitclient import FaceitClient
 import sys
+import logging
 
 class PipelineRunner():
     """
@@ -17,6 +18,9 @@ class PipelineRunner():
     """
 
     def __init__(self, headers, host, port):
+
+        self.logger = logging.getLogger(__name__)
+
         # Connecting MongoDB 
         self.data = getdata()
         self.data.connect_db(host = host, port = port)
@@ -61,12 +65,12 @@ class PipelineRunner():
 
                 if success:
                     self.batch_processor()
-                    print(f"({idx+1}) Ran player id :{player_ids[idx]}, alters and matches stored!")
+                    self.logger.info(f"({idx+1}) Ran player id :{player_ids[idx]}, alters and matches stored!")
                 else: 
-                    print(f"({idx+1}) Player ID skipped due lesser number of matches in the past 40d!!")
+                    self.logger.warning(f"({idx+1}) Player ID skipped due lesser number of matches in the past 40d!!")
 
         except Exception as e:
-            print(f"Error occured in supermatch: {e}")
+            self.logger.error(f"Error occured in supermatch: {e}", exc_info= True)
             
     def chunked(self, iterable, batch_size):
 

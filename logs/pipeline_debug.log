@@ -1,0 +1,361 @@
+2026-03-08 22:11:09,012 | DEBUG | pymongo.topology | {"message": "Starting topology monitoring", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}}
+2026-03-08 22:11:09,012 | DEBUG | pymongo.topology | {"message": "Topology description changed", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "previousDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Unknown, servers: []>", "newDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>"}
+2026-03-08 22:11:09,012 | DEBUG | pymongo.topology | {"message": "Starting server monitoring", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,013 | DEBUG | pymongo.connection | {"message": "Connection pool created", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,013 | DEBUG | pymongo.serverSelection | {"message": "Server selection started", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}}
+2026-03-08 22:11:09,013 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverHost": "localhost", "serverPort": 27017, "awaited": false}
+2026-03-08 22:11:09,014 | DEBUG | pymongo.serverSelection | {"message": "Waiting for suitable server to become available", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "remainingTimeMS": 29999}
+2026-03-08 22:11:09,014 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": false, "durationMS": 0.27953599783359095, "reply": "{\"helloOk\": true, \"ismaster\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:11:09.014Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:11:09,014 | DEBUG | pymongo.connection | {"message": "Connection pool ready", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,014 | DEBUG | pymongo.topology | {"message": "Topology description changed", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "previousDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None>]>", "newDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>"}
+2026-03-08 22:11:09,015 | DEBUG | pymongo.serverSelection | {"message": "Server selection succeeded", "selector": "Primary()", "operation": "ping", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,015 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:11:09,015 | DEBUG | pymongo.connection | {"message": "Connection checkout started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,015 | DEBUG | pymongo.connection | {"message": "Connection created", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2026-03-08 22:11:09,016 | DEBUG | pymongo.connection | {"message": "Connection ready", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.00018805199943017215}
+2026-03-08 22:11:09,016 | DEBUG | pymongo.connection | {"message": "Connection checked out", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.0010242349999316502}
+2026-03-08 22:11:09,016 | DEBUG | pymongo.command | {"message": "Command started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "command": "{\"ping\": 1, \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"6Cn7Sj+FREm1rffnaO3pHw==\", \"subType\": \"04\"}}}, \"$db\": \"admin\"}", "commandName": "ping", "databaseName": "admin", "requestId": 1957747793, "operationId": 1957747793, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,017 | DEBUG | pymongo.command | {"message": "Command succeeded", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "durationMS": 0.31, "reply": "{\"ok\": 1.0}", "commandName": "ping", "databaseName": "admin", "requestId": 1957747793, "operationId": 1957747793, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,017 | DEBUG | pymongo.connection | {"message": "Connection checked in", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2026-03-08 22:11:09,017 | INFO | pipeline.orch | Connected to MongoDB
+2026-03-08 22:11:09,017 | DEBUG | pymongo.serverSelection | {"message": "Server selection started", "selector": "Primary()", "operation": "listDatabases", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}}
+2026-03-08 22:11:09,017 | DEBUG | pymongo.serverSelection | {"message": "Server selection succeeded", "selector": "Primary()", "operation": "listDatabases", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,018 | DEBUG | pymongo.connection | {"message": "Connection checkout started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,018 | DEBUG | pymongo.connection | {"message": "Connection checked out", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.00015202200302155688}
+2026-03-08 22:11:09,018 | DEBUG | pymongo.command | {"message": "Command started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "command": "{\"listDatabases\": 1, \"nameOnly\": true, \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"6Cn7Sj+FREm1rffnaO3pHw==\", \"subType\": \"04\"}}}, \"$db\": \"admin\"}", "commandName": "listDatabases", "databaseName": "admin", "requestId": 424238335, "operationId": 424238335, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,018 | DEBUG | pymongo.command | {"message": "Command succeeded", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "durationMS": 0.333, "reply": "{\"databases\": [{\"name\": \"FaceitDB\"}, {\"name\": \"admin\"}, {\"name\": \"config\"}, {\"name\": \"local\"}], \"ok\": 1.0}", "commandName": "listDatabases", "databaseName": "admin", "requestId": 424238335, "operationId": 424238335, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,019 | DEBUG | pymongo.connection | {"message": "Connection checked in", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2026-03-08 22:11:09,019 | INFO | pipeline.orch | List of Databases :['FaceitDB', 'admin', 'config', 'local']
+2026-03-08 22:11:09,019 | DEBUG | pymongo.serverSelection | {"message": "Server selection started", "selector": "Primary()", "operation": "find", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}}
+2026-03-08 22:11:09,019 | DEBUG | pymongo.serverSelection | {"message": "Server selection succeeded", "selector": "Primary()", "operation": "find", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,019 | DEBUG | pymongo.connection | {"message": "Connection checkout started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,020 | DEBUG | pymongo.connection | {"message": "Connection checked out", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.00013332000162336044}
+2026-03-08 22:11:09,020 | DEBUG | pymongo.command | {"message": "Command started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "command": "{\"find\": \"players\", \"filter\": {\"_id\": {\"$exists\": true}}, \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"6Cn7Sj+FREm1rffnaO3pHw==\", \"subType\": \"04\"}}}, \"$db\": \"FaceitDB\"}", "commandName": "find", "databaseName": "FaceitDB", "requestId": 719885386, "operationId": 719885386, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,020 | DEBUG | pymongo.command | {"message": "Command succeeded", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "durationMS": 0.6819999999999999, "reply": "{\"cursor\": {\"firstBatch\": [{\"_id\": \"000ce859-4da5-4388-b108-91b635ae2d67\", \"nickname\": \"-SLS\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/-SLS\"}, {\"_id\": \"0037b6ce-6652-49ff-bac7-5b29a6560c18\", \"nickname\": \"-zoOmerRR\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/-zoOmerRR\"}, {\"_id\": \"004cfd66-dbe2-4378-ba26-3d7617cd37aa\", \"nickname\": \"rain\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/rain\"}, {\"_id\": \"009623b1-dd6e-4551-959e-990a21657f93\", \"nickname\": \"Mzinho-H\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/Mzinho-H\"}, {\"_id\": \"009de0ef-d102-4323-8dac-d78561c43210\", \"nickname\": \"zeeeevy\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/zeeeevy\"}, {\"_id\": \"00c86d21-4bf6-4a56-a8bd-8aef2ecce8d8\", \"nickname\": \"whosantyx\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/whosantyx\"}, {\"_id\": \"00ca3bb8-5732-427b-936a-64a9da4dcc1e\", \"nickname\": \"GurkO_O\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/GurkO_O\"}, {\"_id\": \"0101b737-4bff-472b-ba...", "commandName": "find", "databaseName": "FaceitDB", "requestId": 719885386, "operationId": 719885386, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,021 | DEBUG | pymongo.connection | {"message": "Connection checked in", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2026-03-08 22:11:09,021 | DEBUG | pymongo.serverSelection | {"message": "Server selection started", "selector": "<function any_server_selector at 0x7684d96feb60>", "operation": "getMore", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}}
+2026-03-08 22:11:09,021 | DEBUG | pymongo.serverSelection | {"message": "Server selection succeeded", "selector": "<function any_server_selector at 0x7684d96feb60>", "operation": "getMore", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,022 | DEBUG | pymongo.connection | {"message": "Connection checkout started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,022 | DEBUG | pymongo.connection | {"message": "Connection checked out", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.00011570499918889254}
+2026-03-08 22:11:09,022 | DEBUG | pymongo.command | {"message": "Command started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "command": "{\"getMore\": 5622798068520678182, \"collection\": \"players\", \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"6Cn7Sj+FREm1rffnaO3pHw==\", \"subType\": \"04\"}}}, \"$db\": \"FaceitDB\"}", "commandName": "getMore", "databaseName": "FaceitDB", "requestId": 1649760492, "operationId": 1649760492, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,025 | DEBUG | pymongo.command | {"message": "Command succeeded", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "durationMS": 3.4979999999999998, "reply": "{\"cursor\": {\"nextBatch\": [{\"_id\": \"0bb156d3-b07f-4428-8990-a905fc4b3160\", \"nickname\": \"alchaapo\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/alchaapo\"}, {\"_id\": \"0bbd8bc1-3c85-464b-8133-64ea55125f98\", \"nickname\": \"realMer1t\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/realMer1t\"}, {\"_id\": \"0be34787-fc22-48c5-b026-63a40eff66b2\", \"nickname\": \"reapx-\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/reapx-\"}, {\"_id\": \"0c120bca-03c5-4718-9464-10beea62afd6\", \"nickname\": \"Showkilla\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/Showkilla\"}, {\"_id\": \"0c202fc4-5478-4d40-a5f5-42906b8d2973\", \"nickname\": \"D0nghun\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/D0nghun\"}, {\"_id\": \"0c3b0a17-f0f6-46fb-a7c9-49ab570a8748\", \"nickname\": \"rmn\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/rmn\"}, {\"_id\": \"0c47e92e-4376-4ea5-939d-fa25aa70e1ec\", \"nickname\": \"fenris_ow\", \"faceit_url\": \"https://www.faceit.com/{lang}/players/fenris_ow\"}, {\"_id\": \"0c6a6fec-a865-49...", "commandName": "getMore", "databaseName": "FaceitDB", "requestId": 1649760492, "operationId": 1649760492, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,026 | DEBUG | pymongo.connection | {"message": "Connection checked in", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2026-03-08 22:11:09,026 | DEBUG | pymongo.serverSelection | {"message": "Server selection started", "selector": "Primary()", "operation": "find", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}}
+2026-03-08 22:11:09,026 | DEBUG | pymongo.serverSelection | {"message": "Server selection succeeded", "selector": "Primary()", "operation": "find", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,027 | DEBUG | pymongo.connection | {"message": "Connection checkout started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,027 | DEBUG | pymongo.connection | {"message": "Connection checked out", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.00013045900050201453}
+2026-03-08 22:11:09,027 | DEBUG | pymongo.command | {"message": "Command started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "command": "{\"find\": \"players\", \"projection\": {\"_id\": 1}, \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"6Cn7Sj+FREm1rffnaO3pHw==\", \"subType\": \"04\"}}}, \"$db\": \"FaceitDB\"}", "commandName": "find", "databaseName": "FaceitDB", "requestId": 596516649, "operationId": 596516649, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,028 | DEBUG | pymongo.command | {"message": "Command succeeded", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "durationMS": 0.583, "reply": "{\"cursor\": {\"firstBatch\": [{\"_id\": \"9c0521d8-d323-41f2-91c3-3a79a331c43e\"}, {\"_id\": \"663a71f4-97dc-4a40-a7ea-467c1e6cae05\"}, {\"_id\": \"d9d38aa8-fe4d-47e3-b518-16463b823c80\"}, {\"_id\": \"1a24b352-77e5-454e-8dde-17ea2eeb4f85\"}, {\"_id\": \"765d2b9b-ea6e-4b67-bfb5-3d76d74ab95b\"}, {\"_id\": \"702c9dd5-c84d-42de-942e-58e921fd34d9\"}, {\"_id\": \"ae024156-2546-4b7a-a4e8-f518c35d3c72\"}, {\"_id\": \"06b83f3b-3b65-4de1-b556-ea02535050e8\"}, {\"_id\": \"bb9b1a15-7018-42fa-864b-48cc70e0d91b\"}, {\"_id\": \"c365e0fe-ae29-41d7-b331-ed8904e32d2b\"}, {\"_id\": \"648af157-90c5-4e69-b0c3-31ae037f4bae\"}, {\"_id\": \"bee6d48a-7048-49cf-8ee2-b10c2ea104ca\"}, {\"_id\": \"c6154c13-83dd-4d8d-997c-e8bbb8ae5199\"}, {\"_id\": \"19a920b6-5e98-47b7-aeda-00f273e40525\"}, {\"_id\": \"49411d69-e811-4163-8d29-21ab3a0cea7c\"}, {\"_id\": \"9e90daa5-432f-413f-bd49-30dbc36c13b8\"}, {\"_id\": \"9f689672-0886-4d26-a9d7-416cb5ab6115\"}, {\"_id\": \"544b4f6d-02cf-4f71-a38a-3e40ee91f3c9\"}, {\"_id\": \"91396c85-8498-429e-bf1a-5f8da3c2336b\"}, {\"_id\": \"9645c4ed-b24b-4bac-b793-f2f777379...", "commandName": "find", "databaseName": "FaceitDB", "requestId": 596516649, "operationId": 596516649, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,028 | DEBUG | pymongo.connection | {"message": "Connection checked in", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2026-03-08 22:11:09,028 | DEBUG | pymongo.serverSelection | {"message": "Server selection started", "selector": "<function any_server_selector at 0x7684d96feb60>", "operation": "getMore", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}}
+2026-03-08 22:11:09,028 | DEBUG | pymongo.serverSelection | {"message": "Server selection succeeded", "selector": "<function any_server_selector at 0x7684d96feb60>", "operation": "getMore", "topologyDescription": "<TopologyDescription id: 69adadad4e5a0bc2d77fc015, topology_type: Single, servers: [<ServerDescription ('localhost', 27017) server_type: Standalone, rtt: 0.00027953599783359095>]>", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,028 | DEBUG | pymongo.connection | {"message": "Connection checkout started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,029 | DEBUG | pymongo.connection | {"message": "Connection checked out", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1, "durationMS": 0.00019057199824601412}
+2026-03-08 22:11:09,029 | DEBUG | pymongo.command | {"message": "Command started", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "command": "{\"getMore\": 6288278572206195652, \"collection\": \"players\", \"lsid\": {\"id\": {\"$binary\": {\"base64\": \"6Cn7Sj+FREm1rffnaO3pHw==\", \"subType\": \"04\"}}}, \"$db\": \"FaceitDB\"}", "commandName": "getMore", "databaseName": "FaceitDB", "requestId": 1189641421, "operationId": 1189641421, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,030 | DEBUG | pymongo.command | {"message": "Command succeeded", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "durationMS": 1.399, "reply": "{\"cursor\": {\"nextBatch\": [{\"_id\": \"d80d6a3e-feac-4a95-8a30-f7b778ede62a\"}, {\"_id\": \"b2eebb3b-868c-4e25-8759-da096407f361\"}, {\"_id\": \"cd8d0f22-8dfb-4d88-a983-0721e63b93d0\"}, {\"_id\": \"ac6ed509-eabe-411f-8bc7-0a8cc702884b\"}, {\"_id\": \"b80d5294-8fb3-4299-8911-51637b1992ec\"}, {\"_id\": \"e6ffb1a4-22e1-45d5-8c26-3fe7c7e899af\"}, {\"_id\": \"14a05500-1118-48d8-8e23-262068bf0062\"}, {\"_id\": \"95f73c68-c323-4097-939e-397cc31a86af\"}, {\"_id\": \"568c9caa-a08d-4b2c-8441-c560ad0a8507\"}, {\"_id\": \"22164191-ca2b-4f73-9d17-dcdcbe9aa71d\"}, {\"_id\": \"045f9998-20dd-419f-9d23-3af2c5bed357\"}, {\"_id\": \"d7cfe3be-cb1c-4f42-9d18-029a3ad13d91\"}, {\"_id\": \"74de51b8-98cc-4182-913a-2255e4fa9dcf\"}, {\"_id\": \"278788be-ccc2-41fe-b6bf-3d4ffa0f9158\"}, {\"_id\": \"e7381561-42f6-4546-990d-e86ba99093aa\"}, {\"_id\": \"b302bd52-6621-4968-aa17-2e67fd5b93f2\"}, {\"_id\": \"056232a7-6889-4a78-8ad8-c98f5713f00a\"}, {\"_id\": \"837d251f-1ca7-47e6-a782-7c9f9f3d9013\"}, {\"_id\": \"b2bec587-0682-4768-8e79-a016b731ca75\"}, {\"_id\": \"29a0f3af-f2be-4a74-94dd-efb668ba4b...", "commandName": "getMore", "databaseName": "FaceitDB", "requestId": 1189641421, "operationId": 1189641421, "driverConnectionId": 1, "serverConnectionId": 54, "serverHost": "localhost", "serverPort": 27017}
+2026-03-08 22:11:09,030 | DEBUG | pymongo.connection | {"message": "Connection checked in", "clientId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "driverConnectionId": 1}
+2026-03-08 22:11:09,031 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-08 22:11:09,032 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:10,039 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/9c0521d8-d323-41f2-91c3-3a79a331c43e/history?game=cs2&from=2026-01-27+22%3A11%3A09.031705&to=2026-03-08+22%3A11%3A09.031709&offset=0&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:10,149 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:10,150 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:11,023 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/9c0521d8-d323-41f2-91c3-3a79a331c43e/history?game=cs2&from=2026-01-27+22%3A11%3A09.031705&to=2026-03-08+22%3A11%3A09.031709&offset=100&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:11,094 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:11,097 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:11,814 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-15cc7308-2deb-4b2e-a603-c6c39ca184dc/stats HTTP/1.1" 200 None
+2026-03-08 22:11:11,815 | INFO | pipeline.faceitclient | Match loaded: 1-15cc7308-2deb-4b2e-a603-c6c39ca184dc - Statistics found for game.
+2026-03-08 22:11:11,819 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:12,695 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a112e0a6-90ee-4a1c-bf81-f6ee3ac968b6/stats HTTP/1.1" 200 None
+2026-03-08 22:11:12,696 | INFO | pipeline.faceitclient | Match loaded: 1-a112e0a6-90ee-4a1c-bf81-f6ee3ac968b6 - Statistics found for game.
+2026-03-08 22:11:12,699 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:13,315 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-3a010da2-42ae-4e0b-815c-e5a2fb0d8dc7/stats HTTP/1.1" 200 None
+2026-03-08 22:11:13,315 | INFO | pipeline.faceitclient | Match loaded: 1-3a010da2-42ae-4e0b-815c-e5a2fb0d8dc7 - Statistics found for game.
+2026-03-08 22:11:13,318 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:14,745 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-f4bd9137-d259-46e4-90e2-c371a9e1eff9/stats HTTP/1.1" 200 None
+2026-03-08 22:11:14,746 | INFO | pipeline.faceitclient | Match loaded: 1-f4bd9137-d259-46e4-90e2-c371a9e1eff9 - Statistics found for game.
+2026-03-08 22:11:14,749 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:15,435 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-65c21301-a626-4f6f-a2a6-83d6ad6a72d8/stats HTTP/1.1" 200 None
+2026-03-08 22:11:15,436 | INFO | pipeline.faceitclient | Match loaded: 1-65c21301-a626-4f6f-a2a6-83d6ad6a72d8 - Statistics found for game.
+2026-03-08 22:11:15,438 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:16,050 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-5af895eb-3c7f-4c30-b2b2-8ef5808d0417/stats HTTP/1.1" 200 None
+2026-03-08 22:11:16,051 | INFO | pipeline.faceitclient | Match loaded: 1-5af895eb-3c7f-4c30-b2b2-8ef5808d0417 - Statistics found for game.
+2026-03-08 22:11:16,053 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:17,649 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-b26c2622-e13f-4d4e-b9fd-4692ca1b7f3f/stats HTTP/1.1" 200 None
+2026-03-08 22:11:17,650 | INFO | pipeline.faceitclient | Match loaded: 1-b26c2622-e13f-4d4e-b9fd-4692ca1b7f3f - Statistics found for game.
+2026-03-08 22:11:17,652 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:18,283 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-23b0be53-c35e-4946-bf65-8a1485032c1b/stats HTTP/1.1" 404 None
+2026-03-08 22:11:18,284 | INFO | pipeline.faceitclient | Match loaded: 1-23b0be53-c35e-4946-bf65-8a1485032c1b - Statistics found for game.
+2026-03-08 22:11:18,284 | WARNING | pipeline.faceitclient | Skipping match: 1-23b0be53-c35e-4946-bf65-8a1485032c1b - Failure to get statistics for game.
+2026-03-08 22:11:18,286 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:18,935 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-952d456c-2e5f-41d3-8201-80cca5d49a4c/stats HTTP/1.1" 200 None
+2026-03-08 22:11:18,936 | INFO | pipeline.faceitclient | Match loaded: 1-952d456c-2e5f-41d3-8201-80cca5d49a4c - Statistics found for game.
+2026-03-08 22:11:18,938 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:19,025 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 10009.647664002841, "reply": "{\"isWritablePrimary\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:11:19.025Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:11:19,025 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:11:19,555 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-86266822-4697-4461-a275-7874fe5b853b/stats HTTP/1.1" 200 None
+2026-03-08 22:11:19,556 | INFO | pipeline.faceitclient | Match loaded: 1-86266822-4697-4461-a275-7874fe5b853b - Statistics found for game.
+2026-03-08 22:11:19,558 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:20,180 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-65811b79-45d3-4276-8f9c-1e15f394a176/stats HTTP/1.1" 200 None
+2026-03-08 22:11:20,181 | INFO | pipeline.faceitclient | Match loaded: 1-65811b79-45d3-4276-8f9c-1e15f394a176 - Statistics found for game.
+2026-03-08 22:11:20,184 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:20,866 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a2a8ca20-aef3-4222-b6b5-c05b3a707c0c/stats HTTP/1.1" 200 None
+2026-03-08 22:11:20,867 | INFO | pipeline.faceitclient | Match loaded: 1-a2a8ca20-aef3-4222-b6b5-c05b3a707c0c - Statistics found for game.
+2026-03-08 22:11:20,870 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:21,721 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-11254d49-1ede-4b8c-816d-df715f904d89/stats HTTP/1.1" 200 None
+2026-03-08 22:11:21,721 | INFO | pipeline.faceitclient | Match loaded: 1-11254d49-1ede-4b8c-816d-df715f904d89 - Statistics found for game.
+2026-03-08 22:11:21,724 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:23,192 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-6f66be40-9730-4593-8a2d-a9b5f9144e65/stats HTTP/1.1" 200 None
+2026-03-08 22:11:23,193 | INFO | pipeline.faceitclient | Match loaded: 1-6f66be40-9730-4593-8a2d-a9b5f9144e65 - Statistics found for game.
+2026-03-08 22:11:23,195 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:23,815 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-965a7f53-4b50-45c8-b483-b97930a0e644/stats HTTP/1.1" 200 None
+2026-03-08 22:11:23,816 | INFO | pipeline.faceitclient | Match loaded: 1-965a7f53-4b50-45c8-b483-b97930a0e644 - Statistics found for game.
+2026-03-08 22:11:23,818 | INFO | pipeline.runner | (1) Ran player id :9c0521d8-d323-41f2-91c3-3a79a331c43e, alters and matches stored!
+2026-03-08 22:11:23,819 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-08 22:11:23,820 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:24,587 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/663a71f4-97dc-4a40-a7ea-467c1e6cae05/history?game=cs2&from=2026-01-27+22%3A11%3A23.819463&to=2026-03-08+22%3A11%3A23.819467&offset=0&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:24,645 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:24,647 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:26,045 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/663a71f4-97dc-4a40-a7ea-467c1e6cae05/history?game=cs2&from=2026-01-27+22%3A11%3A23.819463&to=2026-03-08+22%3A11%3A23.819467&offset=100&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:26,046 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:26,048 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:26,604 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-f53bea17-570a-4582-91aa-912e6e2352dc/stats HTTP/1.1" 200 None
+2026-03-08 22:11:26,605 | INFO | pipeline.faceitclient | Match loaded: 1-f53bea17-570a-4582-91aa-912e6e2352dc - Statistics found for game.
+2026-03-08 22:11:26,607 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:27,217 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-ab36d02d-22a6-40ce-a9a1-33c09abe9f03/stats HTTP/1.1" 200 None
+2026-03-08 22:11:27,218 | INFO | pipeline.faceitclient | Match loaded: 1-ab36d02d-22a6-40ce-a9a1-33c09abe9f03 - Statistics found for game.
+2026-03-08 22:11:27,221 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:27,906 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-61518b53-7a29-4e97-849c-da7b16587578/stats HTTP/1.1" 200 None
+2026-03-08 22:11:27,907 | INFO | pipeline.faceitclient | Match loaded: 1-61518b53-7a29-4e97-849c-da7b16587578 - Statistics found for game.
+2026-03-08 22:11:27,910 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:28,500 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-71c5d553-12c2-46f7-95c4-227f0fd12f74/stats HTTP/1.1" 200 None
+2026-03-08 22:11:28,500 | INFO | pipeline.faceitclient | Match loaded: 1-71c5d553-12c2-46f7-95c4-227f0fd12f74 - Statistics found for game.
+2026-03-08 22:11:28,503 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:29,035 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 10009.356599999592, "reply": "{\"isWritablePrimary\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:11:29.035Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:11:29,035 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:11:29,113 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-079507a1-6e9a-4c74-83a1-c687a9308708/stats HTTP/1.1" 200 None
+2026-03-08 22:11:29,113 | INFO | pipeline.faceitclient | Match loaded: 1-079507a1-6e9a-4c74-83a1-c687a9308708 - Statistics found for game.
+2026-03-08 22:11:29,116 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:29,698 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a2a8ca20-aef3-4222-b6b5-c05b3a707c0c/stats HTTP/1.1" 200 None
+2026-03-08 22:11:29,699 | INFO | pipeline.faceitclient | Match loaded: 1-a2a8ca20-aef3-4222-b6b5-c05b3a707c0c - Statistics found for game.
+2026-03-08 22:11:29,701 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:31,115 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-2665ba7f-f0cd-43f7-927e-c645bccaf87d/stats HTTP/1.1" 200 None
+2026-03-08 22:11:31,116 | INFO | pipeline.faceitclient | Match loaded: 1-2665ba7f-f0cd-43f7-927e-c645bccaf87d - Statistics found for game.
+2026-03-08 22:11:31,119 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:31,705 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-50218b19-4c48-4d08-b7e4-f8ebae397a63/stats HTTP/1.1" 200 None
+2026-03-08 22:11:31,706 | INFO | pipeline.faceitclient | Match loaded: 1-50218b19-4c48-4d08-b7e4-f8ebae397a63 - Statistics found for game.
+2026-03-08 22:11:31,709 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:32,313 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-e8b40cd7-6460-405e-8f2b-c42405907fc2/stats HTTP/1.1" 200 None
+2026-03-08 22:11:32,314 | INFO | pipeline.faceitclient | Match loaded: 1-e8b40cd7-6460-405e-8f2b-c42405907fc2 - Statistics found for game.
+2026-03-08 22:11:32,318 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:32,897 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-e44c23b6-1231-4743-9ef4-5a97ec3218bb/stats HTTP/1.1" 200 None
+2026-03-08 22:11:32,897 | INFO | pipeline.faceitclient | Match loaded: 1-e44c23b6-1231-4743-9ef4-5a97ec3218bb - Statistics found for game.
+2026-03-08 22:11:32,900 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:33,500 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-58611f15-7b89-4225-a153-18c511a9dc58/stats HTTP/1.1" 404 None
+2026-03-08 22:11:33,501 | INFO | pipeline.faceitclient | Match loaded: 1-58611f15-7b89-4225-a153-18c511a9dc58 - Statistics found for game.
+2026-03-08 22:11:33,501 | WARNING | pipeline.faceitclient | Skipping match: 1-58611f15-7b89-4225-a153-18c511a9dc58 - Failure to get statistics for game.
+2026-03-08 22:11:33,503 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:34,164 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-7d101d84-2191-4e26-a43b-9ec6856e6406/stats HTTP/1.1" 200 None
+2026-03-08 22:11:34,164 | INFO | pipeline.faceitclient | Match loaded: 1-7d101d84-2191-4e26-a43b-9ec6856e6406 - Statistics found for game.
+2026-03-08 22:11:34,167 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:34,758 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-5aa20978-55d7-441c-832d-34f8c8f1b94c/stats HTTP/1.1" 200 None
+2026-03-08 22:11:34,759 | INFO | pipeline.faceitclient | Match loaded: 1-5aa20978-55d7-441c-832d-34f8c8f1b94c - Statistics found for game.
+2026-03-08 22:11:34,761 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:35,410 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-f30ef99f-b79b-4da7-9f49-8f1136e1d157/stats HTTP/1.1" 200 None
+2026-03-08 22:11:35,411 | INFO | pipeline.faceitclient | Match loaded: 1-f30ef99f-b79b-4da7-9f49-8f1136e1d157 - Statistics found for game.
+2026-03-08 22:11:35,413 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:36,003 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-5f83298d-b515-472b-8158-aa2cf5d75cb6/stats HTTP/1.1" 200 None
+2026-03-08 22:11:36,004 | INFO | pipeline.faceitclient | Match loaded: 1-5f83298d-b515-472b-8158-aa2cf5d75cb6 - Statistics found for game.
+2026-03-08 22:11:36,006 | INFO | pipeline.runner | (2) Ran player id :663a71f4-97dc-4a40-a7ea-467c1e6cae05, alters and matches stored!
+2026-03-08 22:11:36,006 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-08 22:11:36,007 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:36,839 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/d9d38aa8-fe4d-47e3-b518-16463b823c80/history?game=cs2&from=2026-01-27+22%3A11%3A36.006710&to=2026-03-08+22%3A11%3A36.006714&offset=0&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:36,904 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:36,905 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:38,519 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/d9d38aa8-fe4d-47e3-b518-16463b823c80/history?game=cs2&from=2026-01-27+22%3A11%3A36.006710&to=2026-03-08+22%3A11%3A36.006714&offset=100&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:38,755 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:38,758 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:39,045 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 10009.504706998996, "reply": "{\"isWritablePrimary\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:11:39.045Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:11:39,046 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:11:39,341 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-d635e1e3-0663-446e-8073-2f12ac061dfc/stats HTTP/1.1" 404 None
+2026-03-08 22:11:39,342 | INFO | pipeline.faceitclient | Match loaded: 1-d635e1e3-0663-446e-8073-2f12ac061dfc - Statistics found for game.
+2026-03-08 22:11:39,342 | WARNING | pipeline.faceitclient | Skipping match: 1-d635e1e3-0663-446e-8073-2f12ac061dfc - Failure to get statistics for game.
+2026-03-08 22:11:39,343 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:39,946 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-76977e0c-d417-4346-92aa-9229264885c0/stats HTTP/1.1" 200 None
+2026-03-08 22:11:39,946 | INFO | pipeline.faceitclient | Match loaded: 1-76977e0c-d417-4346-92aa-9229264885c0 - Statistics found for game.
+2026-03-08 22:11:39,949 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:40,540 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a4d3ab0f-775e-4611-900f-be1c5d4ab475/stats HTTP/1.1" 404 None
+2026-03-08 22:11:40,540 | INFO | pipeline.faceitclient | Match loaded: 1-a4d3ab0f-775e-4611-900f-be1c5d4ab475 - Statistics found for game.
+2026-03-08 22:11:40,540 | WARNING | pipeline.faceitclient | Skipping match: 1-a4d3ab0f-775e-4611-900f-be1c5d4ab475 - Failure to get statistics for game.
+2026-03-08 22:11:40,542 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:41,963 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-31aec4fc-89c7-4f0e-9fc4-cb4e6f3c67aa/stats HTTP/1.1" 200 None
+2026-03-08 22:11:41,964 | INFO | pipeline.faceitclient | Match loaded: 1-31aec4fc-89c7-4f0e-9fc4-cb4e6f3c67aa - Statistics found for game.
+2026-03-08 22:11:41,967 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:43,408 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-72516f16-f731-48b9-ad45-c25cc67f34dd/stats HTTP/1.1" 200 None
+2026-03-08 22:11:43,409 | INFO | pipeline.faceitclient | Match loaded: 1-72516f16-f731-48b9-ad45-c25cc67f34dd - Statistics found for game.
+2026-03-08 22:11:43,411 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:44,014 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-de52f4f3-e172-431c-ad9d-2afd441fd1e4/stats HTTP/1.1" 200 None
+2026-03-08 22:11:44,015 | INFO | pipeline.faceitclient | Match loaded: 1-de52f4f3-e172-431c-ad9d-2afd441fd1e4 - Statistics found for game.
+2026-03-08 22:11:44,018 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:44,606 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a3c7f766-260d-40c3-8e7e-0a1cc15ba519/stats HTTP/1.1" 404 None
+2026-03-08 22:11:44,606 | INFO | pipeline.faceitclient | Match loaded: 1-a3c7f766-260d-40c3-8e7e-0a1cc15ba519 - Statistics found for game.
+2026-03-08 22:11:44,606 | WARNING | pipeline.faceitclient | Skipping match: 1-a3c7f766-260d-40c3-8e7e-0a1cc15ba519 - Failure to get statistics for game.
+2026-03-08 22:11:44,608 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:45,187 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a77e8386-3d07-4ebb-aede-f4ba23331bfb/stats HTTP/1.1" 404 None
+2026-03-08 22:11:45,188 | INFO | pipeline.faceitclient | Match loaded: 1-a77e8386-3d07-4ebb-aede-f4ba23331bfb - Statistics found for game.
+2026-03-08 22:11:45,188 | WARNING | pipeline.faceitclient | Skipping match: 1-a77e8386-3d07-4ebb-aede-f4ba23331bfb - Failure to get statistics for game.
+2026-03-08 22:11:45,190 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:45,789 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-ea3b7baf-3615-41f0-b442-c8e3b42653c3/stats HTTP/1.1" 200 None
+2026-03-08 22:11:45,790 | INFO | pipeline.faceitclient | Match loaded: 1-ea3b7baf-3615-41f0-b442-c8e3b42653c3 - Statistics found for game.
+2026-03-08 22:11:45,793 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:46,574 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-6c85e241-ae61-4fdc-9e0a-05149de0ff09/stats HTTP/1.1" 200 None
+2026-03-08 22:11:46,574 | INFO | pipeline.faceitclient | Match loaded: 1-6c85e241-ae61-4fdc-9e0a-05149de0ff09 - Statistics found for game.
+2026-03-08 22:11:46,577 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:47,964 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-6a792a10-1d64-493a-b1f7-855359f08b9c/stats HTTP/1.1" 200 None
+2026-03-08 22:11:47,964 | INFO | pipeline.faceitclient | Match loaded: 1-6a792a10-1d64-493a-b1f7-855359f08b9c - Statistics found for game.
+2026-03-08 22:11:47,967 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:48,577 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-718c20a4-bb4c-42be-99eb-886e499e2cf6/stats HTTP/1.1" 404 None
+2026-03-08 22:11:48,581 | INFO | pipeline.faceitclient | Match loaded: 1-718c20a4-bb4c-42be-99eb-886e499e2cf6 - Statistics found for game.
+2026-03-08 22:11:48,581 | WARNING | pipeline.faceitclient | Skipping match: 1-718c20a4-bb4c-42be-99eb-886e499e2cf6 - Failure to get statistics for game.
+2026-03-08 22:11:48,584 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:49,055 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 10009.192010998959, "reply": "{\"isWritablePrimary\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:11:49.055Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:11:49,055 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:11:49,186 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-af925583-239e-414a-b7c1-e3f0e1ca2d05/stats HTTP/1.1" 200 None
+2026-03-08 22:11:49,187 | INFO | pipeline.faceitclient | Match loaded: 1-af925583-239e-414a-b7c1-e3f0e1ca2d05 - Statistics found for game.
+2026-03-08 22:11:49,191 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:49,771 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-37602791-d25f-4348-960c-161ed9a8f146/stats HTTP/1.1" 200 None
+2026-03-08 22:11:49,772 | INFO | pipeline.faceitclient | Match loaded: 1-37602791-d25f-4348-960c-161ed9a8f146 - Statistics found for game.
+2026-03-08 22:11:49,774 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:50,457 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-4191d3bf-0bac-4df2-85c0-e71cae2c7685/stats HTTP/1.1" 200 None
+2026-03-08 22:11:50,458 | INFO | pipeline.faceitclient | Match loaded: 1-4191d3bf-0bac-4df2-85c0-e71cae2c7685 - Statistics found for game.
+2026-03-08 22:11:50,459 | INFO | pipeline.runner | (3) Ran player id :d9d38aa8-fe4d-47e3-b518-16463b823c80, alters and matches stored!
+2026-03-08 22:11:50,459 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-08 22:11:50,460 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:51,284 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/1a24b352-77e5-454e-8dde-17ea2eeb4f85/history?game=cs2&from=2026-01-27+22%3A11%3A50.460237&to=2026-03-08+22%3A11%3A50.460241&offset=0&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:51,377 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:51,378 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:52,951 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/1a24b352-77e5-454e-8dde-17ea2eeb4f85/history?game=cs2&from=2026-01-27+22%3A11%3A50.460237&to=2026-03-08+22%3A11%3A50.460241&offset=100&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:11:53,210 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:11:53,212 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:53,801 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-5bb157c2-96ba-4f98-b292-599688413f6a/stats HTTP/1.1" 200 None
+2026-03-08 22:11:53,802 | INFO | pipeline.faceitclient | Match loaded: 1-5bb157c2-96ba-4f98-b292-599688413f6a - Statistics found for game.
+2026-03-08 22:11:53,804 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:54,410 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-2cbf9b1c-6feb-41c9-8568-e33cca2d1924/stats HTTP/1.1" 200 None
+2026-03-08 22:11:54,411 | INFO | pipeline.faceitclient | Match loaded: 1-2cbf9b1c-6feb-41c9-8568-e33cca2d1924 - Statistics found for game.
+2026-03-08 22:11:54,414 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:55,046 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-150d0b33-5760-4a34-97ea-f5e857e855dd/stats HTTP/1.1" 200 None
+2026-03-08 22:11:55,047 | INFO | pipeline.faceitclient | Match loaded: 1-150d0b33-5760-4a34-97ea-f5e857e855dd - Statistics found for game.
+2026-03-08 22:11:55,049 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:55,634 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-24811f88-35cb-48c0-bd85-8c02f87cba8a/stats HTTP/1.1" 200 None
+2026-03-08 22:11:55,635 | INFO | pipeline.faceitclient | Match loaded: 1-24811f88-35cb-48c0-bd85-8c02f87cba8a - Statistics found for game.
+2026-03-08 22:11:55,637 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:56,250 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-0ff23a06-b375-4741-9fa0-04f44a7abab5/stats HTTP/1.1" 200 None
+2026-03-08 22:11:56,251 | INFO | pipeline.faceitclient | Match loaded: 1-0ff23a06-b375-4741-9fa0-04f44a7abab5 - Statistics found for game.
+2026-03-08 22:11:56,255 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:56,980 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a6be42ce-4d65-4b54-a155-97874732f131/stats HTTP/1.1" 200 None
+2026-03-08 22:11:56,981 | INFO | pipeline.faceitclient | Match loaded: 1-a6be42ce-4d65-4b54-a155-97874732f131 - Statistics found for game.
+2026-03-08 22:11:56,984 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:58,411 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-ebfc61f9-98b6-42d0-bcd9-f91bf1cbeffc/stats HTTP/1.1" 200 None
+2026-03-08 22:11:58,412 | INFO | pipeline.faceitclient | Match loaded: 1-ebfc61f9-98b6-42d0-bcd9-f91bf1cbeffc - Statistics found for game.
+2026-03-08 22:11:58,415 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:59,058 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-503e7ed7-e4aa-4c3d-9f85-d945bff20a45/stats HTTP/1.1" 200 None
+2026-03-08 22:11:59,059 | INFO | pipeline.faceitclient | Match loaded: 1-503e7ed7-e4aa-4c3d-9f85-d945bff20a45 - Statistics found for game.
+2026-03-08 22:11:59,063 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:11:59,065 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 10009.36150599955, "reply": "{\"isWritablePrimary\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:11:59.065Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:11:59,065 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:12:00,585 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-b8fca0bd-72a5-4286-b166-6622dc91fb91/stats HTTP/1.1" 200 None
+2026-03-08 22:12:00,586 | INFO | pipeline.faceitclient | Match loaded: 1-b8fca0bd-72a5-4286-b166-6622dc91fb91 - Statistics found for game.
+2026-03-08 22:12:00,589 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:01,204 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-c7c486d4-d501-4324-aaea-1cbdb18a2ad4/stats HTTP/1.1" 200 None
+2026-03-08 22:12:01,205 | INFO | pipeline.faceitclient | Match loaded: 1-c7c486d4-d501-4324-aaea-1cbdb18a2ad4 - Statistics found for game.
+2026-03-08 22:12:01,208 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:02,832 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-548776c9-57db-47c1-9dd1-239dc8b1ebc1/stats HTTP/1.1" 200 None
+2026-03-08 22:12:02,832 | INFO | pipeline.faceitclient | Match loaded: 1-548776c9-57db-47c1-9dd1-239dc8b1ebc1 - Statistics found for game.
+2026-03-08 22:12:02,835 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:03,492 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-231e4902-d551-46f0-be20-f205e7b34c5b/stats HTTP/1.1" 200 None
+2026-03-08 22:12:03,493 | INFO | pipeline.faceitclient | Match loaded: 1-231e4902-d551-46f0-be20-f205e7b34c5b - Statistics found for game.
+2026-03-08 22:12:03,496 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:04,101 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-6eaa911a-0aae-4538-8513-b2dd1e8772c7/stats HTTP/1.1" 200 None
+2026-03-08 22:12:04,102 | INFO | pipeline.faceitclient | Match loaded: 1-6eaa911a-0aae-4538-8513-b2dd1e8772c7 - Statistics found for game.
+2026-03-08 22:12:04,104 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:04,808 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-43beb44f-1b58-4c96-ba0f-760fb36a997e/stats HTTP/1.1" 200 None
+2026-03-08 22:12:04,809 | INFO | pipeline.faceitclient | Match loaded: 1-43beb44f-1b58-4c96-ba0f-760fb36a997e - Statistics found for game.
+2026-03-08 22:12:04,812 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:05,434 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-5dfe231f-04f3-413e-9980-3b3b0ad70d79/stats HTTP/1.1" 200 None
+2026-03-08 22:12:05,435 | INFO | pipeline.faceitclient | Match loaded: 1-5dfe231f-04f3-413e-9980-3b3b0ad70d79 - Statistics found for game.
+2026-03-08 22:12:05,437 | INFO | pipeline.runner | (4) Ran player id :1a24b352-77e5-454e-8dde-17ea2eeb4f85, alters and matches stored!
+2026-03-08 22:12:05,438 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-08 22:12:05,439 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:06,153 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/765d2b9b-ea6e-4b67-bfb5-3d76d74ab95b/history?game=cs2&from=2026-01-27+22%3A12%3A05.438513&to=2026-03-08+22%3A12%3A05.438518&offset=0&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:12:06,198 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:12:06,199 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:07,821 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/765d2b9b-ea6e-4b67-bfb5-3d76d74ab95b/history?game=cs2&from=2026-01-27+22%3A12%3A05.438513&to=2026-03-08+22%3A12%3A05.438518&offset=100&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:12:08,123 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:12:08,126 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:08,757 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-9b9e4e6f-4782-4a66-955e-1b10296e565f/stats HTTP/1.1" 200 None
+2026-03-08 22:12:08,757 | INFO | pipeline.faceitclient | Match loaded: 1-9b9e4e6f-4782-4a66-955e-1b10296e565f - Statistics found for game.
+2026-03-08 22:12:08,760 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:09,075 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 10009.433702001843, "reply": "{\"isWritablePrimary\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:12:09.075Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:12:09,075 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:12:09,370 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-e5fe3826-4c84-4389-957c-547073c4a4c9/stats HTTP/1.1" 200 None
+2026-03-08 22:12:09,371 | INFO | pipeline.faceitclient | Match loaded: 1-e5fe3826-4c84-4389-957c-547073c4a4c9 - Statistics found for game.
+2026-03-08 22:12:09,374 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:09,988 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-6435d4be-f7f7-4d54-ac6b-a199a0892757/stats HTTP/1.1" 200 None
+2026-03-08 22:12:09,989 | INFO | pipeline.faceitclient | Match loaded: 1-6435d4be-f7f7-4d54-ac6b-a199a0892757 - Statistics found for game.
+2026-03-08 22:12:09,993 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:11,397 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-12010096-c30d-4f64-bc5c-267ab740ca0a/stats HTTP/1.1" 200 None
+2026-03-08 22:12:11,398 | INFO | pipeline.faceitclient | Match loaded: 1-12010096-c30d-4f64-bc5c-267ab740ca0a - Statistics found for game.
+2026-03-08 22:12:11,401 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:12,825 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-a9670120-7d45-45c8-9192-12403b56934c/stats HTTP/1.1" 200 None
+2026-03-08 22:12:12,851 | INFO | pipeline.faceitclient | Match loaded: 1-a9670120-7d45-45c8-9192-12403b56934c - Statistics found for game.
+2026-03-08 22:12:12,854 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:13,468 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-fae71022-55d0-4c71-9be2-a22b04a4bac0/stats HTTP/1.1" 200 None
+2026-03-08 22:12:13,469 | INFO | pipeline.faceitclient | Match loaded: 1-fae71022-55d0-4c71-9be2-a22b04a4bac0 - Statistics found for game.
+2026-03-08 22:12:13,472 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:14,108 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-d45800df-1bbb-40e7-aa62-be1b1cc36282/stats HTTP/1.1" 200 None
+2026-03-08 22:12:14,109 | INFO | pipeline.faceitclient | Match loaded: 1-d45800df-1bbb-40e7-aa62-be1b1cc36282 - Statistics found for game.
+2026-03-08 22:12:14,112 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:15,541 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-32fdbe26-1969-4819-b949-ec584ab3c53b/stats HTTP/1.1" 200 None
+2026-03-08 22:12:15,542 | INFO | pipeline.faceitclient | Match loaded: 1-32fdbe26-1969-4819-b949-ec584ab3c53b - Statistics found for game.
+2026-03-08 22:12:15,545 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:16,989 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-2fb50648-ad00-4223-b227-dd21a0f84140/stats HTTP/1.1" 200 None
+2026-03-08 22:12:16,989 | INFO | pipeline.faceitclient | Match loaded: 1-2fb50648-ad00-4223-b227-dd21a0f84140 - Statistics found for game.
+2026-03-08 22:12:16,992 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:17,597 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-0649b52c-37a6-4dfe-8777-a7b85c4ee610/stats HTTP/1.1" 404 None
+2026-03-08 22:12:17,598 | INFO | pipeline.faceitclient | Match loaded: 1-0649b52c-37a6-4dfe-8777-a7b85c4ee610 - Statistics found for game.
+2026-03-08 22:12:17,598 | WARNING | pipeline.faceitclient | Skipping match: 1-0649b52c-37a6-4dfe-8777-a7b85c4ee610 - Failure to get statistics for game.
+2026-03-08 22:12:17,600 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:18,252 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-158f43e1-be36-4f6f-8adb-d7818151cec5/stats HTTP/1.1" 200 None
+2026-03-08 22:12:18,253 | INFO | pipeline.faceitclient | Match loaded: 1-158f43e1-be36-4f6f-8adb-d7818151cec5 - Statistics found for game.
+2026-03-08 22:12:18,256 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:19,085 | DEBUG | pymongo.topology | {"message": "Server heartbeat succeeded", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 10009.378359998664, "reply": "{\"isWritablePrimary\": true, \"topologyVersion\": {\"processId\": {\"$oid\": \"69ad6c6385c4b42f53553721\"}}, \"maxBsonObjectSize\": 16777216, \"maxMessageSizeBytes\": 48000000, \"maxWriteBatchSize\": 100000, \"localTime\": {\"$date\": \"2026-03-08T17:12:19.085Z\"}, \"logicalSessionTimeoutMinutes\": 30, \"connectionId\": 52, \"maxWireVersion\": 25, \"ok\": 1.0}"}
+2026-03-08 22:12:19,085 | DEBUG | pymongo.topology | {"message": "Server heartbeat started", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "driverConnectionId": 1, "serverConnectionId": 52, "serverHost": "localhost", "serverPort": 27017, "awaited": true}
+2026-03-08 22:12:19,680 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-15a1f6c4-2919-40a5-b1b3-70c8188b8d07/stats HTTP/1.1" 200 None
+2026-03-08 22:12:19,681 | INFO | pipeline.faceitclient | Match loaded: 1-15a1f6c4-2919-40a5-b1b3-70c8188b8d07 - Statistics found for game.
+2026-03-08 22:12:19,684 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:20,408 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-082e9f2f-9124-435c-bfad-288c2cdbd599/stats HTTP/1.1" 200 None
+2026-03-08 22:12:20,409 | INFO | pipeline.faceitclient | Match loaded: 1-082e9f2f-9124-435c-bfad-288c2cdbd599 - Statistics found for game.
+2026-03-08 22:12:20,412 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:21,015 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-7a33f85b-13d9-478f-8b8e-da0785a1f04a/stats HTTP/1.1" 200 None
+2026-03-08 22:12:21,016 | INFO | pipeline.faceitclient | Match loaded: 1-7a33f85b-13d9-478f-8b8e-da0785a1f04a - Statistics found for game.
+2026-03-08 22:12:21,019 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:21,645 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-f9df93b1-e21e-4451-9947-ea81f07ff7fb/stats HTTP/1.1" 200 None
+2026-03-08 22:12:21,646 | INFO | pipeline.faceitclient | Match loaded: 1-f9df93b1-e21e-4451-9947-ea81f07ff7fb - Statistics found for game.
+2026-03-08 22:12:21,649 | INFO | pipeline.runner | (5) Ran player id :765d2b9b-ea6e-4b67-bfb5-3d76d74ab95b, alters and matches stored!
+2026-03-08 22:12:21,649 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-08 22:12:21,649 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:22,501 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/702c9dd5-c84d-42de-942e-58e921fd34d9/history?game=cs2&from=2026-01-27+22%3A12%3A21.649438&to=2026-03-08+22%3A12%3A21.649444&offset=0&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:12:22,616 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:12:22,617 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:23,447 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/players/702c9dd5-c84d-42de-942e-58e921fd34d9/history?game=cs2&from=2026-01-27+22%3A12%3A21.649438&to=2026-03-08+22%3A12%3A21.649444&offset=100&limit=100 HTTP/1.1" 200 None
+2026-03-08 22:12:23,490 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-08 22:12:23,494 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:24,069 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-06357ecc-bf39-47ea-82a2-922cb294f34d/stats HTTP/1.1" 200 None
+2026-03-08 22:12:24,070 | INFO | pipeline.faceitclient | Match loaded: 1-06357ecc-bf39-47ea-82a2-922cb294f34d - Statistics found for game.
+2026-03-08 22:12:24,072 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:24,787 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-2e407fc7-f0e5-49be-ac96-8dbfd55573ec/stats HTTP/1.1" 200 None
+2026-03-08 22:12:24,788 | INFO | pipeline.faceitclient | Match loaded: 1-2e407fc7-f0e5-49be-ac96-8dbfd55573ec - Statistics found for game.
+2026-03-08 22:12:24,790 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:25,422 | DEBUG | urllib3.connectionpool | https://open.faceit.com:443 "GET /data/v4/matches/1-3b62f2b8-b355-42e5-a9f9-dfde1687ac1a/stats HTTP/1.1" 200 None
+2026-03-08 22:12:25,423 | INFO | pipeline.faceitclient | Match loaded: 1-3b62f2b8-b355-42e5-a9f9-dfde1687ac1a - Statistics found for game.
+2026-03-08 22:12:25,426 | DEBUG | urllib3.connectionpool | Starting new HTTPS connection (1): open.faceit.com:443
+2026-03-08 22:12:26,092 | DEBUG | pymongo.topology | {"message": "Server heartbeat failed", "topologyId": {"$oid": "69adadad4e5a0bc2d77fc015"}, "serverHost": "localhost", "serverPort": 27017, "awaited": true, "durationMS": 7007.126672000595, "failure": "\"_OperationCancelled('operation cancelled')\"", "driverConnectionId": 1}

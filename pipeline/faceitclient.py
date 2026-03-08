@@ -9,6 +9,10 @@ import polars as pl
 from functools import partial
 import traceback
 import time
+import logging
+
+class RetryExhausted(Exception):
+   pass
 
 class FaceitClient():
 
@@ -24,6 +28,7 @@ class FaceitClient():
         self.dbobj = dbobj
         self.headers = headers
         self.error_flag = None
+        self.logger = logging.getLogger(__name__)
 
     def retry_function(self, function, *args, **kwargs):
 
@@ -31,7 +36,7 @@ class FaceitClient():
         Docstring for retry_function
         
         :param self: 
-        :param function: an api client function used for retrying
+        :param function: an faceit api client function used for retrying
         """
         attempt = 0
         base_delay = 1
@@ -39,24 +44,29 @@ class FaceitClient():
 
             try:
                 retries = 4
-                if attempt == retries:
+                attempt += 1
+                if attempt > retries:
                     break
-                    
                 else:
                     result = function(*args, **kwargs)
-                    attempt += 1
 
-                    return result
-                                    
+                    if result == []:
+                        raise AssertionError("Fetched data from API is empty.")
+                    else:
+                        return result
+
+
             except (r.exceptions.ConnectionError, 
                     r.exceptions.Timeout, 
                     r.exceptions.HTTPError, 
-                    ValueError) as e:
+                    ValueError,
+                    AssertionError) as e:
                 
                 sleep_time = base_delay * (2 ** attempt)
 
-                print(f"Attempt {attempt+1}/nRetrying function after {sleep_time}")                
-                print(f"Error Type: {e}")
+                self.logger.warning("Attempt %s\nRetrying function after %s", attempt, sleep_time)                
+                self.logger.error("Error Type: %s",e)
+
                 time.sleep(sleep_time)
 
 
@@ -74,10 +84,10 @@ class FaceitClient():
         
     def alter_function(self, player_id):
 
-        print("-"*20,"Retrieving Alters and their matches:","-"*20)
+        self.logger.info("%s Retrieving Alters and their matches %s", "-"*20, "-"*20)
 
         # Get Match and 10 player ids each
-        alters, alter_data = self.match(player_id= player_id,
+        alters, alter_data = self.retry_function(self.match, player_id,
                                                 randomized= True)
         
         alter_match_ids = [item['_id'] for item in alter_data]
@@ -152,7 +162,7 @@ class FaceitClient():
             offset += limit        
 
             if history_response.status_code == 200:
-                print("GET", "status code: ", history_response.status_code)
+                self.logger.info("GET status code: %s", history_response.status_code)
                 for item in data.get("items", []):
                     match_id = item['match_id']
                     playing_players = item['playing_players']
@@ -205,7 +215,9 @@ class FaceitClient():
                 {"_id": alter_match_id, "player_ids": alter_id}
                 for alter_match_id, alter_id in zip(alter_match_ids, alter_ids)
             ]
-            print(len(alters))
+
+            #print(len(alters))
+
             return alters, alter_data 
         else:
 
@@ -279,10 +291,10 @@ class FaceitClient():
 
         rounds_data = match_data.get("rounds")
 
-        print(f"Match loaded: {match_id} - Statistics found for game.")        
+        self.logger.info(f"Match loaded: {match_id} - Statistics found for game.")        
 
         if not rounds_data:
-            print(f"Skipping match: {match_id} - Failure to get statistics for game.")
+            self.logger.warning(f"Skipping match: {match_id} - Failure to get statistics for game.")
             return None
         
         for rounds in rounds_data:
@@ -365,7 +377,7 @@ class FaceitClient():
             offset += limit
             for k in data:
                 if request.status_code == 200:
-                    print("GET", url, 'status code:', request.status_code)   
+                    self.logger.info("GET", url, 'status code:', request.status_code)   
                     
                     if k == 'start':
                         break
@@ -376,13 +388,13 @@ class FaceitClient():
                         
                         players_list.append(temps)
                 else:
-                    print(f"Request Error {request.status_code},\n {request.json()['errors']}")
+                    self.logger.error(f"Request Error {request.status_code},\n {request.json()['errors']}")
                     break
             
             if 'items' not in data:
                 csv = pd.DataFrame(players_list)
                 csv.to_csv('checkpoint_members.csv')
-                print(f"Checkpoint saved as csv: {os.getcwd()}")
+                self.logger.info(f"Checkpoint saved as csv: {os.getcwd()}")
                 break
 
         return players_list
@@ -409,7 +421,7 @@ class FaceitClient():
                             params = params,
                             timeout = 3)
             if status == True:
-                print(ID_request.status_code)
+                self.logger.info(f"retrieve_ID_members status code: {ID_request.status_code}")
 
             data = ID_request.json()
             if not data:
