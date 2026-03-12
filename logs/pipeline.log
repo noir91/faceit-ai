@@ -1,111 +1,563 @@
-2026-03-08 22:11:09,017 | INFO | pipeline.orch | Connected to MongoDB
-2026-03-08 22:11:09,019 | INFO | pipeline.orch | List of Databases :['FaceitDB', 'admin', 'config', 'local']
-2026-03-08 22:11:09,031 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
-2026-03-08 22:11:10,149 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:11,094 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:11,815 | INFO | pipeline.faceitclient | Match loaded: 1-15cc7308-2deb-4b2e-a603-c6c39ca184dc - Statistics found for game.
-2026-03-08 22:11:12,696 | INFO | pipeline.faceitclient | Match loaded: 1-a112e0a6-90ee-4a1c-bf81-f6ee3ac968b6 - Statistics found for game.
-2026-03-08 22:11:13,315 | INFO | pipeline.faceitclient | Match loaded: 1-3a010da2-42ae-4e0b-815c-e5a2fb0d8dc7 - Statistics found for game.
-2026-03-08 22:11:14,746 | INFO | pipeline.faceitclient | Match loaded: 1-f4bd9137-d259-46e4-90e2-c371a9e1eff9 - Statistics found for game.
-2026-03-08 22:11:15,436 | INFO | pipeline.faceitclient | Match loaded: 1-65c21301-a626-4f6f-a2a6-83d6ad6a72d8 - Statistics found for game.
-2026-03-08 22:11:16,051 | INFO | pipeline.faceitclient | Match loaded: 1-5af895eb-3c7f-4c30-b2b2-8ef5808d0417 - Statistics found for game.
-2026-03-08 22:11:17,650 | INFO | pipeline.faceitclient | Match loaded: 1-b26c2622-e13f-4d4e-b9fd-4692ca1b7f3f - Statistics found for game.
-2026-03-08 22:11:18,284 | INFO | pipeline.faceitclient | Match loaded: 1-23b0be53-c35e-4946-bf65-8a1485032c1b - Statistics found for game.
-2026-03-08 22:11:18,284 | WARNING | pipeline.faceitclient | Skipping match: 1-23b0be53-c35e-4946-bf65-8a1485032c1b - Failure to get statistics for game.
-2026-03-08 22:11:18,936 | INFO | pipeline.faceitclient | Match loaded: 1-952d456c-2e5f-41d3-8201-80cca5d49a4c - Statistics found for game.
-2026-03-08 22:11:19,556 | INFO | pipeline.faceitclient | Match loaded: 1-86266822-4697-4461-a275-7874fe5b853b - Statistics found for game.
-2026-03-08 22:11:20,181 | INFO | pipeline.faceitclient | Match loaded: 1-65811b79-45d3-4276-8f9c-1e15f394a176 - Statistics found for game.
-2026-03-08 22:11:20,867 | INFO | pipeline.faceitclient | Match loaded: 1-a2a8ca20-aef3-4222-b6b5-c05b3a707c0c - Statistics found for game.
-2026-03-08 22:11:21,721 | INFO | pipeline.faceitclient | Match loaded: 1-11254d49-1ede-4b8c-816d-df715f904d89 - Statistics found for game.
-2026-03-08 22:11:23,193 | INFO | pipeline.faceitclient | Match loaded: 1-6f66be40-9730-4593-8a2d-a9b5f9144e65 - Statistics found for game.
-2026-03-08 22:11:23,816 | INFO | pipeline.faceitclient | Match loaded: 1-965a7f53-4b50-45c8-b483-b97930a0e644 - Statistics found for game.
-2026-03-08 22:11:23,818 | INFO | pipeline.runner | (1) Ran player id :9c0521d8-d323-41f2-91c3-3a79a331c43e, alters and matches stored!
-2026-03-08 22:11:23,819 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
-2026-03-08 22:11:24,645 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:26,046 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:26,605 | INFO | pipeline.faceitclient | Match loaded: 1-f53bea17-570a-4582-91aa-912e6e2352dc - Statistics found for game.
-2026-03-08 22:11:27,218 | INFO | pipeline.faceitclient | Match loaded: 1-ab36d02d-22a6-40ce-a9a1-33c09abe9f03 - Statistics found for game.
-2026-03-08 22:11:27,907 | INFO | pipeline.faceitclient | Match loaded: 1-61518b53-7a29-4e97-849c-da7b16587578 - Statistics found for game.
-2026-03-08 22:11:28,500 | INFO | pipeline.faceitclient | Match loaded: 1-71c5d553-12c2-46f7-95c4-227f0fd12f74 - Statistics found for game.
-2026-03-08 22:11:29,113 | INFO | pipeline.faceitclient | Match loaded: 1-079507a1-6e9a-4c74-83a1-c687a9308708 - Statistics found for game.
-2026-03-08 22:11:29,699 | INFO | pipeline.faceitclient | Match loaded: 1-a2a8ca20-aef3-4222-b6b5-c05b3a707c0c - Statistics found for game.
-2026-03-08 22:11:31,116 | INFO | pipeline.faceitclient | Match loaded: 1-2665ba7f-f0cd-43f7-927e-c645bccaf87d - Statistics found for game.
-2026-03-08 22:11:31,706 | INFO | pipeline.faceitclient | Match loaded: 1-50218b19-4c48-4d08-b7e4-f8ebae397a63 - Statistics found for game.
-2026-03-08 22:11:32,314 | INFO | pipeline.faceitclient | Match loaded: 1-e8b40cd7-6460-405e-8f2b-c42405907fc2 - Statistics found for game.
-2026-03-08 22:11:32,897 | INFO | pipeline.faceitclient | Match loaded: 1-e44c23b6-1231-4743-9ef4-5a97ec3218bb - Statistics found for game.
-2026-03-08 22:11:33,501 | INFO | pipeline.faceitclient | Match loaded: 1-58611f15-7b89-4225-a153-18c511a9dc58 - Statistics found for game.
-2026-03-08 22:11:33,501 | WARNING | pipeline.faceitclient | Skipping match: 1-58611f15-7b89-4225-a153-18c511a9dc58 - Failure to get statistics for game.
-2026-03-08 22:11:34,164 | INFO | pipeline.faceitclient | Match loaded: 1-7d101d84-2191-4e26-a43b-9ec6856e6406 - Statistics found for game.
-2026-03-08 22:11:34,759 | INFO | pipeline.faceitclient | Match loaded: 1-5aa20978-55d7-441c-832d-34f8c8f1b94c - Statistics found for game.
-2026-03-08 22:11:35,411 | INFO | pipeline.faceitclient | Match loaded: 1-f30ef99f-b79b-4da7-9f49-8f1136e1d157 - Statistics found for game.
-2026-03-08 22:11:36,004 | INFO | pipeline.faceitclient | Match loaded: 1-5f83298d-b515-472b-8158-aa2cf5d75cb6 - Statistics found for game.
-2026-03-08 22:11:36,006 | INFO | pipeline.runner | (2) Ran player id :663a71f4-97dc-4a40-a7ea-467c1e6cae05, alters and matches stored!
-2026-03-08 22:11:36,006 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
-2026-03-08 22:11:36,904 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:38,755 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:39,342 | INFO | pipeline.faceitclient | Match loaded: 1-d635e1e3-0663-446e-8073-2f12ac061dfc - Statistics found for game.
-2026-03-08 22:11:39,342 | WARNING | pipeline.faceitclient | Skipping match: 1-d635e1e3-0663-446e-8073-2f12ac061dfc - Failure to get statistics for game.
-2026-03-08 22:11:39,946 | INFO | pipeline.faceitclient | Match loaded: 1-76977e0c-d417-4346-92aa-9229264885c0 - Statistics found for game.
-2026-03-08 22:11:40,540 | INFO | pipeline.faceitclient | Match loaded: 1-a4d3ab0f-775e-4611-900f-be1c5d4ab475 - Statistics found for game.
-2026-03-08 22:11:40,540 | WARNING | pipeline.faceitclient | Skipping match: 1-a4d3ab0f-775e-4611-900f-be1c5d4ab475 - Failure to get statistics for game.
-2026-03-08 22:11:41,964 | INFO | pipeline.faceitclient | Match loaded: 1-31aec4fc-89c7-4f0e-9fc4-cb4e6f3c67aa - Statistics found for game.
-2026-03-08 22:11:43,409 | INFO | pipeline.faceitclient | Match loaded: 1-72516f16-f731-48b9-ad45-c25cc67f34dd - Statistics found for game.
-2026-03-08 22:11:44,015 | INFO | pipeline.faceitclient | Match loaded: 1-de52f4f3-e172-431c-ad9d-2afd441fd1e4 - Statistics found for game.
-2026-03-08 22:11:44,606 | INFO | pipeline.faceitclient | Match loaded: 1-a3c7f766-260d-40c3-8e7e-0a1cc15ba519 - Statistics found for game.
-2026-03-08 22:11:44,606 | WARNING | pipeline.faceitclient | Skipping match: 1-a3c7f766-260d-40c3-8e7e-0a1cc15ba519 - Failure to get statistics for game.
-2026-03-08 22:11:45,188 | INFO | pipeline.faceitclient | Match loaded: 1-a77e8386-3d07-4ebb-aede-f4ba23331bfb - Statistics found for game.
-2026-03-08 22:11:45,188 | WARNING | pipeline.faceitclient | Skipping match: 1-a77e8386-3d07-4ebb-aede-f4ba23331bfb - Failure to get statistics for game.
-2026-03-08 22:11:45,790 | INFO | pipeline.faceitclient | Match loaded: 1-ea3b7baf-3615-41f0-b442-c8e3b42653c3 - Statistics found for game.
-2026-03-08 22:11:46,574 | INFO | pipeline.faceitclient | Match loaded: 1-6c85e241-ae61-4fdc-9e0a-05149de0ff09 - Statistics found for game.
-2026-03-08 22:11:47,964 | INFO | pipeline.faceitclient | Match loaded: 1-6a792a10-1d64-493a-b1f7-855359f08b9c - Statistics found for game.
-2026-03-08 22:11:48,581 | INFO | pipeline.faceitclient | Match loaded: 1-718c20a4-bb4c-42be-99eb-886e499e2cf6 - Statistics found for game.
-2026-03-08 22:11:48,581 | WARNING | pipeline.faceitclient | Skipping match: 1-718c20a4-bb4c-42be-99eb-886e499e2cf6 - Failure to get statistics for game.
-2026-03-08 22:11:49,187 | INFO | pipeline.faceitclient | Match loaded: 1-af925583-239e-414a-b7c1-e3f0e1ca2d05 - Statistics found for game.
-2026-03-08 22:11:49,772 | INFO | pipeline.faceitclient | Match loaded: 1-37602791-d25f-4348-960c-161ed9a8f146 - Statistics found for game.
-2026-03-08 22:11:50,458 | INFO | pipeline.faceitclient | Match loaded: 1-4191d3bf-0bac-4df2-85c0-e71cae2c7685 - Statistics found for game.
-2026-03-08 22:11:50,459 | INFO | pipeline.runner | (3) Ran player id :d9d38aa8-fe4d-47e3-b518-16463b823c80, alters and matches stored!
-2026-03-08 22:11:50,459 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
-2026-03-08 22:11:51,377 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:53,210 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:11:53,802 | INFO | pipeline.faceitclient | Match loaded: 1-5bb157c2-96ba-4f98-b292-599688413f6a - Statistics found for game.
-2026-03-08 22:11:54,411 | INFO | pipeline.faceitclient | Match loaded: 1-2cbf9b1c-6feb-41c9-8568-e33cca2d1924 - Statistics found for game.
-2026-03-08 22:11:55,047 | INFO | pipeline.faceitclient | Match loaded: 1-150d0b33-5760-4a34-97ea-f5e857e855dd - Statistics found for game.
-2026-03-08 22:11:55,635 | INFO | pipeline.faceitclient | Match loaded: 1-24811f88-35cb-48c0-bd85-8c02f87cba8a - Statistics found for game.
-2026-03-08 22:11:56,251 | INFO | pipeline.faceitclient | Match loaded: 1-0ff23a06-b375-4741-9fa0-04f44a7abab5 - Statistics found for game.
-2026-03-08 22:11:56,981 | INFO | pipeline.faceitclient | Match loaded: 1-a6be42ce-4d65-4b54-a155-97874732f131 - Statistics found for game.
-2026-03-08 22:11:58,412 | INFO | pipeline.faceitclient | Match loaded: 1-ebfc61f9-98b6-42d0-bcd9-f91bf1cbeffc - Statistics found for game.
-2026-03-08 22:11:59,059 | INFO | pipeline.faceitclient | Match loaded: 1-503e7ed7-e4aa-4c3d-9f85-d945bff20a45 - Statistics found for game.
-2026-03-08 22:12:00,586 | INFO | pipeline.faceitclient | Match loaded: 1-b8fca0bd-72a5-4286-b166-6622dc91fb91 - Statistics found for game.
-2026-03-08 22:12:01,205 | INFO | pipeline.faceitclient | Match loaded: 1-c7c486d4-d501-4324-aaea-1cbdb18a2ad4 - Statistics found for game.
-2026-03-08 22:12:02,832 | INFO | pipeline.faceitclient | Match loaded: 1-548776c9-57db-47c1-9dd1-239dc8b1ebc1 - Statistics found for game.
-2026-03-08 22:12:03,493 | INFO | pipeline.faceitclient | Match loaded: 1-231e4902-d551-46f0-be20-f205e7b34c5b - Statistics found for game.
-2026-03-08 22:12:04,102 | INFO | pipeline.faceitclient | Match loaded: 1-6eaa911a-0aae-4538-8513-b2dd1e8772c7 - Statistics found for game.
-2026-03-08 22:12:04,809 | INFO | pipeline.faceitclient | Match loaded: 1-43beb44f-1b58-4c96-ba0f-760fb36a997e - Statistics found for game.
-2026-03-08 22:12:05,435 | INFO | pipeline.faceitclient | Match loaded: 1-5dfe231f-04f3-413e-9980-3b3b0ad70d79 - Statistics found for game.
-2026-03-08 22:12:05,437 | INFO | pipeline.runner | (4) Ran player id :1a24b352-77e5-454e-8dde-17ea2eeb4f85, alters and matches stored!
-2026-03-08 22:12:05,438 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
-2026-03-08 22:12:06,198 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:12:08,123 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:12:08,757 | INFO | pipeline.faceitclient | Match loaded: 1-9b9e4e6f-4782-4a66-955e-1b10296e565f - Statistics found for game.
-2026-03-08 22:12:09,371 | INFO | pipeline.faceitclient | Match loaded: 1-e5fe3826-4c84-4389-957c-547073c4a4c9 - Statistics found for game.
-2026-03-08 22:12:09,989 | INFO | pipeline.faceitclient | Match loaded: 1-6435d4be-f7f7-4d54-ac6b-a199a0892757 - Statistics found for game.
-2026-03-08 22:12:11,398 | INFO | pipeline.faceitclient | Match loaded: 1-12010096-c30d-4f64-bc5c-267ab740ca0a - Statistics found for game.
-2026-03-08 22:12:12,851 | INFO | pipeline.faceitclient | Match loaded: 1-a9670120-7d45-45c8-9192-12403b56934c - Statistics found for game.
-2026-03-08 22:12:13,469 | INFO | pipeline.faceitclient | Match loaded: 1-fae71022-55d0-4c71-9be2-a22b04a4bac0 - Statistics found for game.
-2026-03-08 22:12:14,109 | INFO | pipeline.faceitclient | Match loaded: 1-d45800df-1bbb-40e7-aa62-be1b1cc36282 - Statistics found for game.
-2026-03-08 22:12:15,542 | INFO | pipeline.faceitclient | Match loaded: 1-32fdbe26-1969-4819-b949-ec584ab3c53b - Statistics found for game.
-2026-03-08 22:12:16,989 | INFO | pipeline.faceitclient | Match loaded: 1-2fb50648-ad00-4223-b227-dd21a0f84140 - Statistics found for game.
-2026-03-08 22:12:17,598 | INFO | pipeline.faceitclient | Match loaded: 1-0649b52c-37a6-4dfe-8777-a7b85c4ee610 - Statistics found for game.
-2026-03-08 22:12:17,598 | WARNING | pipeline.faceitclient | Skipping match: 1-0649b52c-37a6-4dfe-8777-a7b85c4ee610 - Failure to get statistics for game.
-2026-03-08 22:12:18,253 | INFO | pipeline.faceitclient | Match loaded: 1-158f43e1-be36-4f6f-8adb-d7818151cec5 - Statistics found for game.
-2026-03-08 22:12:19,681 | INFO | pipeline.faceitclient | Match loaded: 1-15a1f6c4-2919-40a5-b1b3-70c8188b8d07 - Statistics found for game.
-2026-03-08 22:12:20,409 | INFO | pipeline.faceitclient | Match loaded: 1-082e9f2f-9124-435c-bfad-288c2cdbd599 - Statistics found for game.
-2026-03-08 22:12:21,016 | INFO | pipeline.faceitclient | Match loaded: 1-7a33f85b-13d9-478f-8b8e-da0785a1f04a - Statistics found for game.
-2026-03-08 22:12:21,646 | INFO | pipeline.faceitclient | Match loaded: 1-f9df93b1-e21e-4451-9947-ea81f07ff7fb - Statistics found for game.
-2026-03-08 22:12:21,649 | INFO | pipeline.runner | (5) Ran player id :765d2b9b-ea6e-4b67-bfb5-3d76d74ab95b, alters and matches stored!
-2026-03-08 22:12:21,649 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
-2026-03-08 22:12:22,616 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:12:23,490 | INFO | pipeline.faceitclient | GET status code: 200
-2026-03-08 22:12:24,070 | INFO | pipeline.faceitclient | Match loaded: 1-06357ecc-bf39-47ea-82a2-922cb294f34d - Statistics found for game.
-2026-03-08 22:12:24,788 | INFO | pipeline.faceitclient | Match loaded: 1-2e407fc7-f0e5-49be-ac96-8dbfd55573ec - Statistics found for game.
-2026-03-08 22:12:25,423 | INFO | pipeline.faceitclient | Match loaded: 1-3b62f2b8-b355-42e5-a9f9-dfde1687ac1a - Statistics found for game.
+2026-03-12 22:01:16,783 | INFO | pipeline.orch | Connected to MongoDB
+2026-03-12 22:01:16,784 | INFO | pipeline.orch | List of Databases :['FaceitDB', 'admin', 'config', 'local', 'matches']
+2026-03-12 22:01:16,814 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:01:17,315 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:17,811 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:18,224 | INFO | pipeline.faceitclient | Match loaded: 1-98159832-45ac-4b7b-839d-294fd60c5e5b - Statistics found for game.
+2026-03-12 22:01:18,573 | INFO | pipeline.faceitclient | Match loaded: 1-d08736f4-529a-443d-8d09-fe9fd337955a - Statistics found for game.
+2026-03-12 22:01:18,971 | INFO | pipeline.faceitclient | Match loaded: 1-d4cb55da-e267-412a-b63e-9d0692165800 - Statistics found for game.
+2026-03-12 22:01:19,294 | INFO | pipeline.faceitclient | Match loaded: 1-0ea20782-31f2-408f-bf1f-4c6eac0193d1 - Statistics found for game.
+2026-03-12 22:01:19,628 | INFO | pipeline.faceitclient | Match loaded: 1-afc6716a-6500-468f-9b90-0a174b77a6d1 - Statistics found for game.
+2026-03-12 22:01:19,946 | INFO | pipeline.faceitclient | Match loaded: 1-a56779a6-0947-4581-8251-dc0a662d7db4 - Statistics found for game.
+2026-03-12 22:01:20,267 | INFO | pipeline.faceitclient | Match loaded: 1-b4e2303b-aedb-46a9-867b-dc162bdf7605 - Statistics found for game.
+2026-03-12 22:01:20,698 | INFO | pipeline.faceitclient | Match loaded: 1-1d9445d7-bdc9-460d-b0b5-33996e053f71 - Statistics found for game.
+2026-03-12 22:01:21,151 | INFO | pipeline.faceitclient | Match loaded: 1-904a98a0-33b4-4c75-83d5-e77ee74b1ebb - Statistics found for game.
+2026-03-12 22:01:21,559 | INFO | pipeline.faceitclient | Match loaded: 1-b8b54414-dfa4-4f19-8af9-2e852ef5f6c3 - Statistics found for game.
+2026-03-12 22:01:21,973 | INFO | pipeline.faceitclient | Match loaded: 1-c951ad0e-8162-43e5-a908-4703bd9a2762 - Statistics found for game.
+2026-03-12 22:01:22,287 | INFO | pipeline.faceitclient | Match loaded: 1-3777ea16-fa8a-4914-94fc-9c59a77a7385 - Statistics found for game.
+2026-03-12 22:01:22,728 | INFO | pipeline.faceitclient | Match loaded: 1-7382330a-db5d-45f2-b9c7-ded32e43fd93 - Statistics found for game.
+2026-03-12 22:01:23,060 | INFO | pipeline.faceitclient | Match loaded: 1-ac3cd0db-fe10-443b-8e59-65b9e9817c06 - Statistics found for game.
+2026-03-12 22:01:23,457 | INFO | pipeline.faceitclient | Match loaded: 1-f96422c9-9dd6-4688-9975-d16fa015ae95 - Statistics found for game.
+2026-03-12 22:01:23,460 | INFO | pipeline.runner | (8) Ran player id :49411d69-e811-4163-8d29-21ab3a0cea7c, alters and matches stored!
+2026-03-12 22:01:23,461 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:01:23,933 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:24,471 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:24,806 | INFO | pipeline.faceitclient | Match loaded: 1-49037734-e857-4420-8c48-0cfdab48d987 - Statistics found for game.
+2026-03-12 22:01:25,210 | INFO | pipeline.faceitclient | Match loaded: 1-80b586c1-8bb4-4437-9f46-1ec0d9d60264 - Statistics found for game.
+2026-03-12 22:01:25,613 | INFO | pipeline.faceitclient | Match loaded: 1-4302ccff-2b81-4b08-9900-df6afe645781 - Statistics found for game.
+2026-03-12 22:01:25,923 | INFO | pipeline.faceitclient | Match loaded: 1-9365c4d9-7e8a-4e8a-8387-05b101df1fff - Statistics found for game.
+2026-03-12 22:01:25,924 | WARNING | pipeline.faceitclient | Skipping match: 1-9365c4d9-7e8a-4e8a-8387-05b101df1fff - Failure to get statistics for game.
+2026-03-12 22:01:26,244 | INFO | pipeline.faceitclient | Match loaded: 1-bc1f3962-977f-4bf7-a2b7-e14a800aab3a - Statistics found for game.
+2026-03-12 22:01:26,608 | INFO | pipeline.faceitclient | Match loaded: 1-b66a48b7-030c-4957-8a91-4afbce1c69e1 - Statistics found for game.
+2026-03-12 22:01:26,985 | INFO | pipeline.faceitclient | Match loaded: 1-77c5de50-59be-4cb8-89ae-6bc32adbf2db - Statistics found for game.
+2026-03-12 22:01:27,335 | INFO | pipeline.faceitclient | Match loaded: 1-95b596d5-a2b9-432f-b45c-61597cda1300 - Statistics found for game.
+2026-03-12 22:01:27,662 | INFO | pipeline.faceitclient | Match loaded: 1-7db7b1e5-3d75-4cc0-b415-c47fcfc3f6e4 - Statistics found for game.
+2026-03-12 22:01:28,055 | INFO | pipeline.faceitclient | Match loaded: 1-1feeb169-cb0b-41dd-9be9-1967d34f4c41 - Statistics found for game.
+2026-03-12 22:01:28,445 | INFO | pipeline.faceitclient | Match loaded: 1-612b5ad7-55bc-41e0-a6a9-7214f60b710b - Statistics found for game.
+2026-03-12 22:01:28,871 | INFO | pipeline.faceitclient | Match loaded: 1-2ba78ed9-e410-46e7-9638-4d5cbf728fbf - Statistics found for game.
+2026-03-12 22:01:29,199 | INFO | pipeline.faceitclient | Match loaded: 1-4453edcd-1bf1-4959-94c2-699015a3ca02 - Statistics found for game.
+2026-03-12 22:01:29,605 | INFO | pipeline.faceitclient | Match loaded: 1-b64c54d2-7760-4e9a-bf15-4fee8c0d5eaa - Statistics found for game.
+2026-03-12 22:01:29,990 | INFO | pipeline.faceitclient | Match loaded: 1-8ea48afd-1447-46f4-bd30-76a2316b5c59 - Statistics found for game.
+2026-03-12 22:01:29,996 | INFO | pipeline.runner | (9) Ran player id :9e90daa5-432f-413f-bd49-30dbc36c13b8, alters and matches stored!
+2026-03-12 22:01:29,998 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:01:30,421 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:31,031 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:31,346 | INFO | pipeline.faceitclient | Match loaded: 1-ee242234-4dbc-4778-93d2-acc682b2d4c3 - Statistics found for game.
+2026-03-12 22:01:31,760 | INFO | pipeline.faceitclient | Match loaded: 1-f16180ac-f09b-475b-a8c0-f836dcd67540 - Statistics found for game.
+2026-03-12 22:01:32,153 | INFO | pipeline.faceitclient | Match loaded: 1-7672c13a-95fe-496c-9727-28fa4ed37fef - Statistics found for game.
+2026-03-12 22:01:32,570 | INFO | pipeline.faceitclient | Match loaded: 1-ce782e01-9552-440c-a289-6e1370dbaf39 - Statistics found for game.
+2026-03-12 22:01:32,891 | INFO | pipeline.faceitclient | Match loaded: 1-18907346-2717-49cc-98ee-c3bce3b78aac - Statistics found for game.
+2026-03-12 22:01:33,267 | INFO | pipeline.faceitclient | Match loaded: 1-9eaf6cc4-fc59-48c8-8e26-cdcf9355f15f - Statistics found for game.
+2026-03-12 22:01:33,575 | INFO | pipeline.faceitclient | Match loaded: 1-0c73d177-d29b-402e-93d9-76f1d8e11ba6 - Statistics found for game.
+2026-03-12 22:01:34,002 | INFO | pipeline.faceitclient | Match loaded: 1-a9473fd7-a238-48e1-bad5-07624af2bddf - Statistics found for game.
+2026-03-12 22:01:34,416 | INFO | pipeline.faceitclient | Match loaded: 1-cc351ab3-43a1-4f2f-8d4a-6703ff132873 - Statistics found for game.
+2026-03-12 22:01:34,827 | INFO | pipeline.faceitclient | Match loaded: 1-e578755a-bf09-4b25-8ec4-e90c28c20e54 - Statistics found for game.
+2026-03-12 22:01:35,148 | INFO | pipeline.faceitclient | Match loaded: 1-376b04d8-2ebf-4dcf-8494-20fe0174e342 - Statistics found for game.
+2026-03-12 22:01:35,796 | INFO | pipeline.faceitclient | Match loaded: 1-39abb5fd-be1f-40de-80bf-818dd1bf0d5f - Statistics found for game.
+2026-03-12 22:01:36,213 | INFO | pipeline.faceitclient | Match loaded: 1-52554777-5acf-4aed-9d9c-fb973e177735 - Statistics found for game.
+2026-03-12 22:01:36,606 | INFO | pipeline.faceitclient | Match loaded: 1-61176b2d-7a4f-4d0c-bd88-84f74c606647 - Statistics found for game.
+2026-03-12 22:01:36,905 | INFO | pipeline.faceitclient | Match loaded: 1-cd01158d-dd77-4126-8e0e-9e6c4f6bee95 - Statistics found for game.
+2026-03-12 22:01:36,912 | INFO | pipeline.runner | (10) Ran player id :9f689672-0886-4d26-a9d7-416cb5ab6115, alters and matches stored!
+2026-03-12 22:01:36,913 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:01:37,433 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:37,972 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:38,254 | INFO | pipeline.faceitclient | Match loaded: 1-9dabd983-fa00-47a0-844b-37e72c375f22 - Statistics found for game.
+2026-03-12 22:01:38,255 | WARNING | pipeline.faceitclient | Skipping match: 1-9dabd983-fa00-47a0-844b-37e72c375f22 - Failure to get statistics for game.
+2026-03-12 22:01:38,670 | INFO | pipeline.faceitclient | Match loaded: 1-72fd7d6c-5209-4e31-a451-a31ab598b0e8 - Statistics found for game.
+2026-03-12 22:01:39,045 | INFO | pipeline.faceitclient | Match loaded: 1-1e408771-dafb-4e77-8d3d-51bd126e607c - Statistics found for game.
+2026-03-12 22:01:39,372 | INFO | pipeline.faceitclient | Match loaded: 1-86980495-af9d-4067-aa59-50b8f7fec414 - Statistics found for game.
+2026-03-12 22:01:39,785 | INFO | pipeline.faceitclient | Match loaded: 1-0a51d70f-46ad-47e2-992b-3cfbef835af5 - Statistics found for game.
+2026-03-12 22:01:40,186 | INFO | pipeline.faceitclient | Match loaded: 1-f50e8397-ed52-4725-8895-5ba9219febed - Statistics found for game.
+2026-03-12 22:01:40,543 | INFO | pipeline.faceitclient | Match loaded: 1-6d05733e-ce1e-4b68-a4fd-f132a41e5116 - Statistics found for game.
+2026-03-12 22:01:40,861 | INFO | pipeline.faceitclient | Match loaded: 1-5a42ffa5-4ec3-4dfc-b9ac-b67bc4f77c23 - Statistics found for game.
+2026-03-12 22:01:41,451 | INFO | pipeline.faceitclient | Match loaded: 1-0827e8eb-2f24-494f-98e0-60d4cf0f04c8 - Statistics found for game.
+2026-03-12 22:01:41,760 | INFO | pipeline.faceitclient | Match loaded: 1-7c60ef1e-77f2-45f3-8b69-d9bdba9332d0 - Statistics found for game.
+2026-03-12 22:01:42,162 | INFO | pipeline.faceitclient | Match loaded: 1-ef22aea9-ba46-46de-9a7d-416ec28c1369 - Statistics found for game.
+2026-03-12 22:01:42,561 | INFO | pipeline.faceitclient | Match loaded: 1-560aa685-1e0d-4089-8bf1-260e04f79938 - Statistics found for game.
+2026-03-12 22:01:42,977 | INFO | pipeline.faceitclient | Match loaded: 1-016c0883-1b7a-48ff-b309-81a13d087f4c - Statistics found for game.
+2026-03-12 22:01:43,447 | INFO | pipeline.faceitclient | Match loaded: 1-21c303df-c3a9-4c26-bbaf-4655928a6a04 - Statistics found for game.
+2026-03-12 22:01:43,776 | INFO | pipeline.faceitclient | Match loaded: 1-49234df5-307b-465c-b84a-5aacab34bbee - Statistics found for game.
+2026-03-12 22:01:43,783 | INFO | pipeline.runner | (11) Ran player id :544b4f6d-02cf-4f71-a38a-3e40ee91f3c9, alters and matches stored!
+2026-03-12 22:01:43,785 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:01:44,314 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:44,848 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:45,171 | INFO | pipeline.faceitclient | Match loaded: 1-f954b398-648c-4f45-8aad-8481b01f363f - Statistics found for game.
+2026-03-12 22:01:45,558 | INFO | pipeline.faceitclient | Match loaded: 1-f8a851b1-138b-46af-a3b1-c7cc0caef8ed - Statistics found for game.
+2026-03-12 22:01:46,230 | INFO | pipeline.faceitclient | Match loaded: 1-49987037-ba43-4b4d-8dc4-7765b4076521 - Statistics found for game.
+2026-03-12 22:01:46,586 | INFO | pipeline.faceitclient | Match loaded: 1-dbe0708c-a3a3-4dd8-a33f-1430899e3d6a - Statistics found for game.
+2026-03-12 22:01:46,983 | INFO | pipeline.faceitclient | Match loaded: 1-e5fe3826-4c84-4389-957c-547073c4a4c9 - Statistics found for game.
+2026-03-12 22:01:47,326 | INFO | pipeline.faceitclient | Match loaded: 1-25180db8-5378-4895-ba5c-a96fd22db981 - Statistics found for game.
+2026-03-12 22:01:47,640 | INFO | pipeline.faceitclient | Match loaded: 1-6f8ed74f-8e97-4d85-a0fa-98d261ee9e08 - Statistics found for game.
+2026-03-12 22:01:47,973 | INFO | pipeline.faceitclient | Match loaded: 1-6ab4c0d5-42fe-4837-9101-a231981e8d41 - Statistics found for game.
+2026-03-12 22:01:48,308 | INFO | pipeline.faceitclient | Match loaded: 1-8da00519-fe4d-46bf-8058-e31fc1e7224e - Statistics found for game.
+2026-03-12 22:01:48,653 | INFO | pipeline.faceitclient | Match loaded: 1-128f0d73-972e-4180-a126-956306494f9e - Statistics found for game.
+2026-03-12 22:01:48,994 | INFO | pipeline.faceitclient | Match loaded: 1-763253d4-8b3c-431d-a2c4-ce70379db58e - Statistics found for game.
+2026-03-12 22:01:49,427 | INFO | pipeline.faceitclient | Match loaded: 1-8f30a25f-525c-4b73-90f1-e4d114fa7e58 - Statistics found for game.
+2026-03-12 22:01:49,725 | INFO | pipeline.faceitclient | Match loaded: 1-2beca4b7-0275-4246-8e2c-d51e489ffd4b - Statistics found for game.
+2026-03-12 22:01:50,058 | INFO | pipeline.faceitclient | Match loaded: 1-eec2946f-bf93-4ed4-9226-f38bca7a2f67 - Statistics found for game.
+2026-03-12 22:01:50,460 | INFO | pipeline.faceitclient | Match loaded: 1-6a7207c1-52b5-41a7-890e-557331f27950 - Statistics found for game.
+2026-03-12 22:01:50,462 | INFO | pipeline.runner | (12) Ran player id :91396c85-8498-429e-bf1a-5f8da3c2336b, alters and matches stored!
+2026-03-12 22:01:50,463 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:01:50,924 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:51,416 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:51,720 | INFO | pipeline.faceitclient | Match loaded: 1-0801c03a-1b71-4d23-b570-7e381e2bcadc - Statistics found for game.
+2026-03-12 22:01:52,063 | INFO | pipeline.faceitclient | Match loaded: 1-939a6773-5727-4a9a-8776-48decbd39416 - Statistics found for game.
+2026-03-12 22:01:52,468 | INFO | pipeline.faceitclient | Match loaded: 1-c60e882b-f616-4837-ba6e-916235167008 - Statistics found for game.
+2026-03-12 22:01:52,805 | INFO | pipeline.faceitclient | Match loaded: 1-4a9dd3ab-58df-4179-b937-7a4177d5835a - Statistics found for game.
+2026-03-12 22:01:53,269 | INFO | pipeline.faceitclient | Match loaded: 1-96a6e14d-de5f-405e-b01f-21a2c7e20511 - Statistics found for game.
+2026-03-12 22:01:53,646 | INFO | pipeline.faceitclient | Match loaded: 1-307e5331-6b48-4068-86c5-0e5252c10a64 - Statistics found for game.
+2026-03-12 22:01:53,933 | INFO | pipeline.faceitclient | Match loaded: 1-da423bdf-9800-4f85-964f-941d41fa4873 - Statistics found for game.
+2026-03-12 22:01:53,934 | WARNING | pipeline.faceitclient | Skipping match: 1-da423bdf-9800-4f85-964f-941d41fa4873 - Failure to get statistics for game.
+2026-03-12 22:01:54,318 | INFO | pipeline.faceitclient | Match loaded: 1-ff99154d-1b74-492d-ae8e-c3ff1f18b1a9 - Statistics found for game.
+2026-03-12 22:01:54,669 | INFO | pipeline.faceitclient | Match loaded: 1-55c39310-1049-4515-ab14-68ad03045cb0 - Statistics found for game.
+2026-03-12 22:01:55,073 | INFO | pipeline.faceitclient | Match loaded: 1-3973ce53-60d0-4a79-8f11-4ed24ef0a236 - Statistics found for game.
+2026-03-12 22:01:55,383 | INFO | pipeline.faceitclient | Match loaded: 1-2b3b32c3-d6b8-409a-890b-81263f2605ea - Statistics found for game.
+2026-03-12 22:01:55,384 | WARNING | pipeline.faceitclient | Skipping match: 1-2b3b32c3-d6b8-409a-890b-81263f2605ea - Failure to get statistics for game.
+2026-03-12 22:01:55,684 | INFO | pipeline.faceitclient | Match loaded: 1-7d94c1de-3a98-4f36-8c1f-8a6c0b8b26f5 - Statistics found for game.
+2026-03-12 22:01:55,684 | WARNING | pipeline.faceitclient | Skipping match: 1-7d94c1de-3a98-4f36-8c1f-8a6c0b8b26f5 - Failure to get statistics for game.
+2026-03-12 22:01:56,003 | INFO | pipeline.faceitclient | Match loaded: 1-551d7324-0f02-4c4b-a52e-5728bd3e76fd - Statistics found for game.
+2026-03-12 22:01:56,424 | INFO | pipeline.faceitclient | Match loaded: 1-fc2c04c5-ae9f-4042-b647-33c48c8e2687 - Statistics found for game.
+2026-03-12 22:01:56,739 | INFO | pipeline.faceitclient | Match loaded: 1-1d9b6531-a4a4-4420-8fb5-4621f96523f5 - Statistics found for game.
+2026-03-12 22:01:56,742 | INFO | pipeline.runner | (13) Ran player id :9645c4ed-b24b-4bac-b793-f2f777379325, alters and matches stored!
+2026-03-12 22:01:56,743 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:01:57,262 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:57,726 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:01:58,146 | INFO | pipeline.faceitclient | Match loaded: 1-da171cf4-d3a0-4835-af65-1878e9b181b6 - Statistics found for game.
+2026-03-12 22:01:58,551 | INFO | pipeline.faceitclient | Match loaded: 1-9524cf02-ffcc-441a-a45e-ca0917f4cf3d - Statistics found for game.
+2026-03-12 22:01:58,861 | INFO | pipeline.faceitclient | Match loaded: 1-475f38a6-077b-40b9-a499-54770ba89603 - Statistics found for game.
+2026-03-12 22:01:59,241 | INFO | pipeline.faceitclient | Match loaded: 1-f6965aa7-4874-4efa-982c-e909968b7a6d - Statistics found for game.
+2026-03-12 22:01:59,563 | INFO | pipeline.faceitclient | Match loaded: 1-90b8babf-6e44-4fc5-9582-50236eb5c90d - Statistics found for game.
+2026-03-12 22:01:59,963 | INFO | pipeline.faceitclient | Match loaded: 1-1f0cc60b-3ffb-4ea9-bfbb-a83368f02efc - Statistics found for game.
+2026-03-12 22:02:00,277 | INFO | pipeline.faceitclient | Match loaded: 1-46f62fcf-6730-4931-ba0f-3491d5ae1f73 - Statistics found for game.
+2026-03-12 22:02:00,584 | INFO | pipeline.faceitclient | Match loaded: 1-da82ff17-8332-4a7d-bd26-95ef5fb5d4be - Statistics found for game.
+2026-03-12 22:02:01,003 | INFO | pipeline.faceitclient | Match loaded: 1-cd4d9b16-42d2-4857-b5e3-2f8b17714353 - Statistics found for game.
+2026-03-12 22:02:01,321 | INFO | pipeline.faceitclient | Match loaded: 1-b26dabbc-7ee8-4645-a84a-dc7493453af9 - Statistics found for game.
+2026-03-12 22:02:01,690 | INFO | pipeline.faceitclient | Match loaded: 1-2571bf88-c0d0-4eeb-afb9-e5c62fd7fe97 - Statistics found for game.
+2026-03-12 22:02:02,137 | INFO | pipeline.faceitclient | Match loaded: 1-7d2059ec-58a8-4a8e-9a14-b8074c4b728a - Statistics found for game.
+2026-03-12 22:02:02,569 | INFO | pipeline.faceitclient | Match loaded: 1-16375cd2-41bd-4cce-ace7-f6e2b87cb2f0 - Statistics found for game.
+2026-03-12 22:02:02,908 | INFO | pipeline.faceitclient | Match loaded: 1-314dc7b9-ec5a-4480-9b12-80304ed734d8 - Statistics found for game.
+2026-03-12 22:02:03,308 | INFO | pipeline.faceitclient | Match loaded: 1-5c1f04bd-5334-422a-b2ee-a00cdad2aae3 - Statistics found for game.
+2026-03-12 22:02:03,315 | INFO | pipeline.runner | (14) Ran player id :45cd23f1-9213-4d93-87b9-26b4bf8720c4, alters and matches stored!
+2026-03-12 22:02:03,316 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:04,035 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:04,523 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:04,957 | INFO | pipeline.faceitclient | Match loaded: 1-5b161e01-c7f1-4da9-8fce-3ff335f2e95b - Statistics found for game.
+2026-03-12 22:02:05,336 | INFO | pipeline.faceitclient | Match loaded: 1-ce5cfafa-239b-417b-a70e-0cf6dacabff7 - Statistics found for game.
+2026-03-12 22:02:05,768 | INFO | pipeline.faceitclient | Match loaded: 1-0d2fd473-6051-49d0-9c21-bb11cb7a2eb6 - Statistics found for game.
+2026-03-12 22:02:06,091 | INFO | pipeline.faceitclient | Match loaded: 1-cf07d644-fe8a-425f-adb0-f752b2a78af6 - Statistics found for game.
+2026-03-12 22:02:06,645 | INFO | pipeline.faceitclient | Match loaded: 1-b47701e4-22f9-45cf-a654-06c13a3380c9 - Statistics found for game.
+2026-03-12 22:02:07,127 | INFO | pipeline.faceitclient | Match loaded: 1-e0d63761-19bc-4dc6-84f3-31c3b70686e6 - Statistics found for game.
+2026-03-12 22:02:07,475 | INFO | pipeline.faceitclient | Match loaded: 1-3d4643c5-ab0e-4bac-b0a7-ef88000d2cff - Statistics found for game.
+2026-03-12 22:02:07,802 | INFO | pipeline.faceitclient | Match loaded: 1-62cfc8bd-e69e-4a68-9758-03bce1d3ced5 - Statistics found for game.
+2026-03-12 22:02:08,137 | INFO | pipeline.faceitclient | Match loaded: 1-fcd513ae-95a7-4f5a-9b23-4cfaa5ff837a - Statistics found for game.
+2026-03-12 22:02:08,598 | INFO | pipeline.faceitclient | Match loaded: 1-5cdf4614-b0ee-49d8-b234-709f4bc3e910 - Statistics found for game.
+2026-03-12 22:02:08,937 | INFO | pipeline.faceitclient | Match loaded: 1-0432f6fd-5178-49ab-be3d-f5c439780c01 - Statistics found for game.
+2026-03-12 22:02:09,327 | INFO | pipeline.faceitclient | Match loaded: 1-68a973e5-a076-44fd-adef-807fbd954aaa - Statistics found for game.
+2026-03-12 22:02:09,327 | WARNING | pipeline.faceitclient | Skipping match: 1-68a973e5-a076-44fd-adef-807fbd954aaa - Failure to get statistics for game.
+2026-03-12 22:02:09,697 | INFO | pipeline.faceitclient | Match loaded: 1-a4c603d6-f780-4b04-8edf-7dd8b4276744 - Statistics found for game.
+2026-03-12 22:02:10,059 | INFO | pipeline.faceitclient | Match loaded: 1-e2f48bff-69be-4e3a-ac2b-057eafce7ad8 - Statistics found for game.
+2026-03-12 22:02:10,554 | INFO | pipeline.faceitclient | Match loaded: 1-c9dca4eb-3c08-4cda-95fa-d56cfcf24776 - Statistics found for game.
+2026-03-12 22:02:10,557 | INFO | pipeline.runner | (15) Ran player id :35086d74-6e47-4367-8d56-422f03f037e0, alters and matches stored!
+2026-03-12 22:02:10,557 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:10,988 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:11,514 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:11,824 | INFO | pipeline.faceitclient | Match loaded: 1-3fcb45a9-8e0c-40a1-9fa5-9463358cf963 - Statistics found for game.
+2026-03-12 22:02:12,150 | INFO | pipeline.faceitclient | Match loaded: 1-f3ed16cf-c353-4084-b264-01d417f7cb07 - Statistics found for game.
+2026-03-12 22:02:12,636 | INFO | pipeline.faceitclient | Match loaded: 1-acb8f881-f326-4511-bfef-28cd881f006a - Statistics found for game.
+2026-03-12 22:02:12,986 | INFO | pipeline.faceitclient | Match loaded: 1-5db5f6cd-e253-4110-8ae6-1e38972d10e4 - Statistics found for game.
+2026-03-12 22:02:13,345 | INFO | pipeline.faceitclient | Match loaded: 1-64099b11-632d-4e69-8159-cb8ff89619e2 - Statistics found for game.
+2026-03-12 22:02:13,687 | INFO | pipeline.faceitclient | Match loaded: 1-cd35d391-939a-4a97-8d91-42739178912d - Statistics found for game.
+2026-03-12 22:02:14,035 | INFO | pipeline.faceitclient | Match loaded: 1-3c80af0e-a796-4ec0-9bf3-b24f08b2dacd - Statistics found for game.
+2026-03-12 22:02:14,400 | INFO | pipeline.faceitclient | Match loaded: 1-e2989a66-ff84-4b8a-8915-1f43f7089211 - Statistics found for game.
+2026-03-12 22:02:14,713 | INFO | pipeline.faceitclient | Match loaded: 1-b6757997-3ac2-424b-a318-ba82d745046c - Statistics found for game.
+2026-03-12 22:02:15,138 | INFO | pipeline.faceitclient | Match loaded: 1-562b5397-00f8-4a02-a419-6fcf3a436daf - Statistics found for game.
+2026-03-12 22:02:15,462 | INFO | pipeline.faceitclient | Match loaded: 1-52e8dbe7-d0eb-47f1-af12-26a23c7d9088 - Statistics found for game.
+2026-03-12 22:02:15,771 | INFO | pipeline.faceitclient | Match loaded: 1-06ff8215-69a9-4125-a87b-34248d14917f - Statistics found for game.
+2026-03-12 22:02:16,130 | INFO | pipeline.faceitclient | Match loaded: 1-c3930877-79b6-416a-bd8e-59bc868483a1 - Statistics found for game.
+2026-03-12 22:02:16,457 | INFO | pipeline.faceitclient | Match loaded: 1-79ce2cab-0c03-497b-9c98-e3e6aab73809 - Statistics found for game.
+2026-03-12 22:02:16,877 | INFO | pipeline.faceitclient | Match loaded: 1-5815e239-1a5d-4d47-9a17-4224c3464f66 - Statistics found for game.
+2026-03-12 22:02:16,898 | INFO | pipeline.runner | (16) Ran player id :b5c3e65c-bb6c-49d1-ad75-3823b52ce576, alters and matches stored!
+2026-03-12 22:02:16,900 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:17,380 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:18,200 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:18,679 | INFO | pipeline.faceitclient | Match loaded: 1-b633355f-1d89-4601-88be-35b26332daf4 - Statistics found for game.
+2026-03-12 22:02:19,051 | INFO | pipeline.faceitclient | Match loaded: 1-c61a2cae-6d8a-49ad-9743-f51e3577ee57 - Statistics found for game.
+2026-03-12 22:02:19,373 | INFO | pipeline.faceitclient | Match loaded: 1-f41cf1ca-ba72-401a-9e72-0428a3bc065a - Statistics found for game.
+2026-03-12 22:02:19,663 | INFO | pipeline.faceitclient | Match loaded: 1-08aeec7b-3e39-4136-8d84-046a045785f7 - Statistics found for game.
+2026-03-12 22:02:20,069 | INFO | pipeline.faceitclient | Match loaded: 1-e2989a66-ff84-4b8a-8915-1f43f7089211 - Statistics found for game.
+2026-03-12 22:02:20,396 | INFO | pipeline.faceitclient | Match loaded: 1-7a069b1d-979f-41f5-82ff-30fbb347f7bd - Statistics found for game.
+2026-03-12 22:02:20,700 | INFO | pipeline.faceitclient | Match loaded: 1-09756cd0-510b-4c1d-b138-7d555fc00719 - Statistics found for game.
+2026-03-12 22:02:21,074 | INFO | pipeline.faceitclient | Match loaded: 1-1d6e827c-2429-49d6-8326-c166cf9ef7c8 - Statistics found for game.
+2026-03-12 22:02:21,414 | INFO | pipeline.faceitclient | Match loaded: 1-50011ada-324d-4098-8d31-bb1851d000a0 - Statistics found for game.
+2026-03-12 22:02:21,843 | INFO | pipeline.faceitclient | Match loaded: 1-a04652e1-efe6-407e-a85f-fe70045049f7 - Statistics found for game.
+2026-03-12 22:02:22,230 | INFO | pipeline.faceitclient | Match loaded: 1-b6aae4c5-0b10-4ee2-8845-6cf8b4bdb2f8 - Statistics found for game.
+2026-03-12 22:02:22,655 | INFO | pipeline.faceitclient | Match loaded: 1-e9acd715-c553-458f-b859-470a50f22d59 - Statistics found for game.
+2026-03-12 22:02:22,974 | INFO | pipeline.faceitclient | Match loaded: 1-508260df-a0ff-44bc-a5d8-698dcda29b24 - Statistics found for game.
+2026-03-12 22:02:23,278 | INFO | pipeline.faceitclient | Match loaded: 1-de023bc2-e804-4bc0-983d-8ab7de1cb2bd - Statistics found for game.
+2026-03-12 22:02:23,665 | INFO | pipeline.faceitclient | Match loaded: 1-a062c74f-1f5b-41ff-9818-d1c0008ffa5b - Statistics found for game.
+2026-03-12 22:02:23,948 | ERROR | pipeline.orch | 
+Table: alters
+2026-03-12 22:02:24,181 | ERROR | pipeline.orch | 
+Table: matches
+2026-03-12 22:02:24,187 | INFO | pipeline.runner | (17) Ran player id :0a38e0a3-03a1-4aea-8c24-396ad8d802c1, alters and matches stored!
+2026-03-12 22:02:24,189 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:24,756 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:25,208 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:25,627 | INFO | pipeline.faceitclient | Match loaded: 1-5f4b87cb-f6c3-4c49-899c-29425c42d371 - Statistics found for game.
+2026-03-12 22:02:25,934 | INFO | pipeline.faceitclient | Match loaded: 1-bb2443b6-a456-4e02-9780-64e8a9518cea - Statistics found for game.
+2026-03-12 22:02:26,296 | INFO | pipeline.faceitclient | Match loaded: 1-a4eb052c-7816-45c4-a2c2-cd05a14da473 - Statistics found for game.
+2026-03-12 22:02:26,695 | INFO | pipeline.faceitclient | Match loaded: 1-5b9f9c4c-8374-4c6f-9f54-6aeedd53459c - Statistics found for game.
+2026-03-12 22:02:27,100 | INFO | pipeline.faceitclient | Match loaded: 1-6b83631f-8330-4631-b7b8-1e5c736d0e05 - Statistics found for game.
+2026-03-12 22:02:27,477 | INFO | pipeline.faceitclient | Match loaded: 1-99c674df-fcf2-4fde-b2c1-f7f2a8bd675c - Statistics found for game.
+2026-03-12 22:02:27,825 | INFO | pipeline.faceitclient | Match loaded: 1-62bb3be2-21f1-4039-8eb4-a77d584d59c8 - Statistics found for game.
+2026-03-12 22:02:28,255 | INFO | pipeline.faceitclient | Match loaded: 1-bc3f68b5-ed94-4fed-a04e-3cf5558edbb3 - Statistics found for game.
+2026-03-12 22:02:28,797 | INFO | pipeline.faceitclient | Match loaded: 1-b93efe0b-67c8-4010-a164-6f57acf7151f - Statistics found for game.
+2026-03-12 22:02:29,232 | INFO | pipeline.faceitclient | Match loaded: 1-90bbb60b-cdf2-4f3a-b12f-152d0e0f885d - Statistics found for game.
+2026-03-12 22:02:29,647 | INFO | pipeline.faceitclient | Match loaded: 1-312b7e6e-c5e9-41fe-9af4-ae6b969a42d2 - Statistics found for game.
+2026-03-12 22:02:29,969 | INFO | pipeline.faceitclient | Match loaded: 1-1e485bd8-bb86-4c27-9537-7512bb76faf7 - Statistics found for game.
+2026-03-12 22:02:30,350 | INFO | pipeline.faceitclient | Match loaded: 1-d97b167f-99b6-4fc3-ba8c-a1529455728b - Statistics found for game.
+2026-03-12 22:02:30,682 | INFO | pipeline.faceitclient | Match loaded: 1-2ffa6ec0-51d3-401e-b9d0-570f6e7d0376 - Statistics found for game.
+2026-03-12 22:02:31,076 | INFO | pipeline.faceitclient | Match loaded: 1-54256423-4977-48bd-bbed-1243ceec2edd - Statistics found for game.
+2026-03-12 22:02:31,324 | ERROR | pipeline.orch | 
+Table: ratings
+2026-03-12 22:02:31,405 | ERROR | pipeline.orch | 
+Table: ratings
+2026-03-12 22:02:31,411 | INFO | pipeline.runner | (18) Ran player id :c58c4e47-645a-4a40-a208-01bfdbcdeadd, alters and matches stored!
+2026-03-12 22:02:31,414 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:32,089 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:32,546 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:33,283 | INFO | pipeline.faceitclient | Match loaded: 1-2fbe83c6-b86a-43c1-b038-a5e153cbaa05 - Statistics found for game.
+2026-03-12 22:02:33,718 | INFO | pipeline.faceitclient | Match loaded: 1-9e666383-7452-4750-adc9-630dd7b40535 - Statistics found for game.
+2026-03-12 22:02:34,106 | INFO | pipeline.faceitclient | Match loaded: 1-f1dfd907-965a-4e96-952f-548e3aeb279e - Statistics found for game.
+2026-03-12 22:02:34,526 | INFO | pipeline.faceitclient | Match loaded: 1-e70db7a2-9a44-4a8c-9b74-033fc35dbbfd - Statistics found for game.
+2026-03-12 22:02:34,934 | INFO | pipeline.faceitclient | Match loaded: 1-85691152-ff45-4e80-87c4-87c2820eeaac - Statistics found for game.
+2026-03-12 22:02:35,300 | INFO | pipeline.faceitclient | Match loaded: 1-1e4a7d8b-2be6-44f2-b3b4-28cc488d0847 - Statistics found for game.
+2026-03-12 22:02:35,713 | INFO | pipeline.faceitclient | Match loaded: 1-0897036c-749a-41cf-8266-daf682aaa596 - Statistics found for game.
+2026-03-12 22:02:36,029 | INFO | pipeline.faceitclient | Match loaded: 1-ce8b6f43-5892-4f63-a528-53cae051f80c - Statistics found for game.
+2026-03-12 22:02:36,365 | INFO | pipeline.faceitclient | Match loaded: 1-bca74272-9630-4a3c-a4ae-f451336936ea - Statistics found for game.
+2026-03-12 22:02:36,736 | INFO | pipeline.faceitclient | Match loaded: 1-7ec20281-31dc-4a36-a1bc-c051b8178f20 - Statistics found for game.
+2026-03-12 22:02:37,092 | INFO | pipeline.faceitclient | Match loaded: 1-c1aacbaa-1b37-4334-bcc6-df130b20538e - Statistics found for game.
+2026-03-12 22:02:37,515 | INFO | pipeline.faceitclient | Match loaded: 1-8c287807-ef6c-42f6-8b15-70407c4b38e1 - Statistics found for game.
+2026-03-12 22:02:37,896 | INFO | pipeline.faceitclient | Match loaded: 1-13922ddf-2836-427d-a159-725ae7dd975c - Statistics found for game.
+2026-03-12 22:02:38,236 | INFO | pipeline.faceitclient | Match loaded: 1-c932e249-fdcb-46bd-8d88-bd00c2b196ba - Statistics found for game.
+2026-03-12 22:02:38,553 | INFO | pipeline.faceitclient | Match loaded: 1-b0d679aa-167a-4dc1-bf61-71b1ac253a2d - Statistics found for game.
+2026-03-12 22:02:38,559 | INFO | pipeline.runner | (19) Ran player id :eff87bef-d56c-4922-a000-549479b5720d, alters and matches stored!
+2026-03-12 22:02:38,561 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:38,979 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:39,535 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:39,955 | INFO | pipeline.faceitclient | Match loaded: 1-ddd08385-84e3-401d-8d0a-6cefe39995ed - Statistics found for game.
+2026-03-12 22:02:40,259 | INFO | pipeline.faceitclient | Match loaded: 1-134f8b5f-846f-4fe2-8815-6ff5a91d6ced - Statistics found for game.
+2026-03-12 22:02:40,573 | INFO | pipeline.faceitclient | Match loaded: 1-02d2f35a-22de-45e1-95dc-5d597236b5f5 - Statistics found for game.
+2026-03-12 22:02:40,885 | INFO | pipeline.faceitclient | Match loaded: 1-743114c9-e23b-4fd8-8155-0d89b1dd97af - Statistics found for game.
+2026-03-12 22:02:41,182 | INFO | pipeline.faceitclient | Match loaded: 1-14610162-f5d3-445e-b055-c9dbbf2522cb - Statistics found for game.
+2026-03-12 22:02:41,608 | INFO | pipeline.faceitclient | Match loaded: 1-39728422-0ad9-49bb-8522-27f76dc8f730 - Statistics found for game.
+2026-03-12 22:02:41,918 | INFO | pipeline.faceitclient | Match loaded: 1-834d4a40-97fa-437e-bd9c-8b9c8f247217 - Statistics found for game.
+2026-03-12 22:02:42,311 | INFO | pipeline.faceitclient | Match loaded: 1-feb069ec-b5a7-4b49-9ccd-05696dc64b32 - Statistics found for game.
+2026-03-12 22:02:42,311 | WARNING | pipeline.faceitclient | Skipping match: 1-feb069ec-b5a7-4b49-9ccd-05696dc64b32 - Failure to get statistics for game.
+2026-03-12 22:02:42,697 | INFO | pipeline.faceitclient | Match loaded: 1-644b8479-d5b4-467f-bb2c-8f95667283fb - Statistics found for game.
+2026-03-12 22:02:42,697 | WARNING | pipeline.faceitclient | Skipping match: 1-644b8479-d5b4-467f-bb2c-8f95667283fb - Failure to get statistics for game.
+2026-03-12 22:02:43,065 | INFO | pipeline.faceitclient | Match loaded: 1-6de2eefb-7014-4f6f-af7e-95dece10d8cb - Statistics found for game.
+2026-03-12 22:02:43,455 | INFO | pipeline.faceitclient | Match loaded: 1-6c12c7ae-c3d2-4e81-a834-c2c1487ae5b9 - Statistics found for game.
+2026-03-12 22:02:43,760 | INFO | pipeline.faceitclient | Match loaded: 1-01910052-2f3a-41df-ac8a-85f193086916 - Statistics found for game.
+2026-03-12 22:02:44,071 | INFO | pipeline.faceitclient | Match loaded: 1-2f05d656-f0fc-4ab3-b00b-ef990f760aa8 - Statistics found for game.
+2026-03-12 22:02:44,427 | INFO | pipeline.faceitclient | Match loaded: 1-188d5fbb-63f9-4b10-b33e-cf75b34c3dc9 - Statistics found for game.
+2026-03-12 22:02:44,814 | INFO | pipeline.faceitclient | Match loaded: 1-3ced41c6-a2f5-47f8-88a4-187842c28efc - Statistics found for game.
+2026-03-12 22:02:44,819 | INFO | pipeline.runner | (20) Ran player id :3119c6de-c32b-4989-88d6-c9a7d81599d0, alters and matches stored!
+2026-03-12 22:02:44,823 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:45,339 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:45,819 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:46,189 | INFO | pipeline.faceitclient | Match loaded: 1-b25d50f7-531a-45dc-8401-fdec28c6f215 - Statistics found for game.
+2026-03-12 22:02:46,504 | INFO | pipeline.faceitclient | Match loaded: 1-11573aa2-24bd-42be-9678-13b685dc1f9e - Statistics found for game.
+2026-03-12 22:02:46,852 | INFO | pipeline.faceitclient | Match loaded: 1-ae5a3c76-4381-4404-b285-1fea14eea946 - Statistics found for game.
+2026-03-12 22:02:47,174 | INFO | pipeline.faceitclient | Match loaded: 1-a918af6a-4e21-4500-81bf-f7ddc14cf437 - Statistics found for game.
+2026-03-12 22:02:47,559 | INFO | pipeline.faceitclient | Match loaded: 1-0ee317af-7f93-41ea-a992-2f443070256f - Statistics found for game.
+2026-03-12 22:02:47,560 | WARNING | pipeline.faceitclient | Skipping match: 1-0ee317af-7f93-41ea-a992-2f443070256f - Failure to get statistics for game.
+2026-03-12 22:02:47,978 | INFO | pipeline.faceitclient | Match loaded: 1-416c8c30-6699-40b0-8a6a-e58c65580b42 - Statistics found for game.
+2026-03-12 22:02:48,303 | INFO | pipeline.faceitclient | Match loaded: 1-79cb03d6-9a66-452b-8779-1bf485a77ec3 - Statistics found for game.
+2026-03-12 22:02:48,612 | INFO | pipeline.faceitclient | Match loaded: 1-1d2f243c-0ead-44cd-9f18-0a49cfcbac01 - Statistics found for game.
+2026-03-12 22:02:48,932 | INFO | pipeline.faceitclient | Match loaded: 1-ae49813b-af95-47bc-9733-e47b5f515fff - Statistics found for game.
+2026-03-12 22:02:49,339 | INFO | pipeline.faceitclient | Match loaded: 1-5d3ca1e7-22c0-4fe6-bc34-9a1e930810bd - Statistics found for game.
+2026-03-12 22:02:49,744 | INFO | pipeline.faceitclient | Match loaded: 1-4ba152e5-87fa-47f7-bd46-513fbd63e580 - Statistics found for game.
+2026-03-12 22:02:50,477 | INFO | pipeline.faceitclient | Match loaded: 1-4a03adfd-3542-47d5-a3f2-817888aef9ee - Statistics found for game.
+2026-03-12 22:02:50,916 | INFO | pipeline.faceitclient | Match loaded: 1-837eac14-ebf1-40fd-b284-a9aae247015a - Statistics found for game.
+2026-03-12 22:02:51,323 | INFO | pipeline.faceitclient | Match loaded: 1-9ec8b89e-3e4c-4b4c-9c63-9cc665253b7c - Statistics found for game.
+2026-03-12 22:02:51,843 | INFO | pipeline.faceitclient | Match loaded: 1-1407d201-e2cb-4e5b-9d12-2a1ef4281682 - Statistics found for game.
+2026-03-12 22:02:51,846 | INFO | pipeline.runner | (21) Ran player id :a5fa9e4c-0beb-4b4b-94bf-fbda21fe9fe4, alters and matches stored!
+2026-03-12 22:02:51,846 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:52,340 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:52,783 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:53,124 | INFO | pipeline.faceitclient | Match loaded: 1-004fce51-aa48-47dc-8a50-3d21533c9bb7 - Statistics found for game.
+2026-03-12 22:02:53,526 | INFO | pipeline.faceitclient | Match loaded: 1-c1ebc6fa-fe69-4748-bbf0-fc47c6b614c9 - Statistics found for game.
+2026-03-12 22:02:53,843 | INFO | pipeline.faceitclient | Match loaded: 1-45d50afc-9a61-4794-89f9-be7c4eaab6d5 - Statistics found for game.
+2026-03-12 22:02:54,257 | INFO | pipeline.faceitclient | Match loaded: 1-55597223-7214-42ea-866f-b6de5a152678 - Statistics found for game.
+2026-03-12 22:02:54,661 | INFO | pipeline.faceitclient | Match loaded: 1-f26a31dc-4165-41e6-ba21-bccb13f88c4c - Statistics found for game.
+2026-03-12 22:02:55,024 | INFO | pipeline.faceitclient | Match loaded: 1-8237665d-c2d6-4af4-86a6-89445fc54d6a - Statistics found for game.
+2026-03-12 22:02:55,432 | INFO | pipeline.faceitclient | Match loaded: 1-47e2eb64-ad14-4dc8-ba27-e3464caf2acf - Statistics found for game.
+2026-03-12 22:02:55,780 | INFO | pipeline.faceitclient | Match loaded: 1-abebae6d-e890-4711-bffb-1026485630ea - Statistics found for game.
+2026-03-12 22:02:56,226 | INFO | pipeline.faceitclient | Match loaded: 1-183d4ac4-6ced-4ae2-be33-4b35cf51bb48 - Statistics found for game.
+2026-03-12 22:02:56,541 | INFO | pipeline.faceitclient | Match loaded: 1-cbe1a859-e535-4054-9bf7-9a02de4bfa86 - Statistics found for game.
+2026-03-12 22:02:57,052 | INFO | pipeline.faceitclient | Match loaded: 1-e41e6978-0229-4076-8ae0-a2410a33b507 - Statistics found for game.
+2026-03-12 22:02:57,370 | INFO | pipeline.faceitclient | Match loaded: 1-fa7fcd16-4c87-4b69-af7f-126910117daf - Statistics found for game.
+2026-03-12 22:02:57,700 | INFO | pipeline.faceitclient | Match loaded: 1-1ebecf37-c454-40d6-84f1-f75276473c85 - Statistics found for game.
+2026-03-12 22:02:58,047 | INFO | pipeline.faceitclient | Match loaded: 1-841498e5-eea4-484f-b090-8e351ab8af77 - Statistics found for game.
+2026-03-12 22:02:58,420 | INFO | pipeline.faceitclient | Match loaded: 1-f2431686-9e88-45bd-9057-12e9b290efa0 - Statistics found for game.
+2026-03-12 22:02:58,425 | INFO | pipeline.runner | (22) Ran player id :08b354e6-c7f5-4e64-9feb-cba6baea4ebc, alters and matches stored!
+2026-03-12 22:02:58,426 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:02:59,002 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:59,502 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:02:59,822 | INFO | pipeline.faceitclient | Match loaded: 1-352b994a-312a-4f3b-995c-c25eb8904a53 - Statistics found for game.
+2026-03-12 22:03:00,203 | INFO | pipeline.faceitclient | Match loaded: 1-d93bdbd7-6b63-4694-8882-f05b4ea5ab98 - Statistics found for game.
+2026-03-12 22:03:00,523 | INFO | pipeline.faceitclient | Match loaded: 1-8c3badbb-3df2-452c-8c21-e92cdae79d4f - Statistics found for game.
+2026-03-12 22:03:00,861 | INFO | pipeline.faceitclient | Match loaded: 1-1c38fa3b-2e71-4683-8ad1-70d733f5b9c8 - Statistics found for game.
+2026-03-12 22:03:01,296 | INFO | pipeline.faceitclient | Match loaded: 1-611a58cb-62a7-4ab5-85ba-ba0a317fc11f - Statistics found for game.
+2026-03-12 22:03:01,691 | INFO | pipeline.faceitclient | Match loaded: 1-3692f27d-ce4f-43e2-ba70-dfa8af9e5a95 - Statistics found for game.
+2026-03-12 22:03:02,018 | INFO | pipeline.faceitclient | Match loaded: 1-1c00661d-6915-4d72-af8c-baf01636b202 - Statistics found for game.
+2026-03-12 22:03:02,554 | INFO | pipeline.faceitclient | Match loaded: 1-03ca9e7b-97e7-4ddc-9e2b-555b479c6dc4 - Statistics found for game.
+2026-03-12 22:03:02,954 | INFO | pipeline.faceitclient | Match loaded: 1-9b437d39-3e46-42ab-9948-a2f9d994fd89 - Statistics found for game.
+2026-03-12 22:03:03,313 | INFO | pipeline.faceitclient | Match loaded: 1-85e25b0c-3d2d-493b-acb1-7c5869564e4c - Statistics found for game.
+2026-03-12 22:03:03,631 | INFO | pipeline.faceitclient | Match loaded: 1-c207824e-2d4b-4f16-b94d-55ed798331ce - Statistics found for game.
+2026-03-12 22:03:04,135 | INFO | pipeline.faceitclient | Match loaded: 1-7bd32945-9939-4e79-adff-b9313cfc660a - Statistics found for game.
+2026-03-12 22:03:04,538 | INFO | pipeline.faceitclient | Match loaded: 1-58d7d1b6-5c12-4bd9-885c-029d3d50fb8e - Statistics found for game.
+2026-03-12 22:03:04,864 | INFO | pipeline.faceitclient | Match loaded: 1-9ee45392-22a7-412d-ae98-dd1de5a5844f - Statistics found for game.
+2026-03-12 22:03:04,865 | WARNING | pipeline.faceitclient | Skipping match: 1-9ee45392-22a7-412d-ae98-dd1de5a5844f - Failure to get statistics for game.
+2026-03-12 22:03:05,188 | INFO | pipeline.faceitclient | Match loaded: 1-615e6702-c062-42f0-9ab8-ecb1ba048f23 - Statistics found for game.
+2026-03-12 22:03:05,193 | INFO | pipeline.runner | (23) Ran player id :e58b6957-f54c-409f-ad80-dc4649399dd1, alters and matches stored!
+2026-03-12 22:03:05,195 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:05,740 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:06,214 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:06,631 | INFO | pipeline.faceitclient | Match loaded: 1-c0073b46-2cbb-4fad-bf41-3eda3f611a95 - Statistics found for game.
+2026-03-12 22:03:06,987 | INFO | pipeline.faceitclient | Match loaded: 1-9b5aeb5d-d39b-4d40-a3c5-ba46a16e0ea9 - Statistics found for game.
+2026-03-12 22:03:07,440 | INFO | pipeline.faceitclient | Match loaded: 1-dc9b30b0-06bc-43d1-bc2d-c84a016f3d8f - Statistics found for game.
+2026-03-12 22:03:07,805 | INFO | pipeline.faceitclient | Match loaded: 1-edf231c3-3a9e-4612-ac8f-7a922b92e28a - Statistics found for game.
+2026-03-12 22:03:08,140 | INFO | pipeline.faceitclient | Match loaded: 1-9c2320a4-104e-4bd6-bbe0-ecbeb2338cd7 - Statistics found for game.
+2026-03-12 22:03:08,464 | INFO | pipeline.faceitclient | Match loaded: 1-a7a1d493-a7c6-4ffe-bded-12e20e463437 - Statistics found for game.
+2026-03-12 22:03:08,793 | INFO | pipeline.faceitclient | Match loaded: 1-d6e9b947-b07c-4051-83a0-e3e133ad305f - Statistics found for game.
+2026-03-12 22:03:09,567 | INFO | pipeline.faceitclient | Match loaded: 1-aa3df16f-2623-4a0b-9b05-9b3e38a18864 - Statistics found for game.
+2026-03-12 22:03:10,009 | INFO | pipeline.faceitclient | Match loaded: 1-f34f19d8-e9e3-4d4a-ac41-4a7762715927 - Statistics found for game.
+2026-03-12 22:03:10,343 | INFO | pipeline.faceitclient | Match loaded: 1-015b25fe-c543-4f5c-8d92-f717cae67484 - Statistics found for game.
+2026-03-12 22:03:10,756 | INFO | pipeline.faceitclient | Match loaded: 1-e935a43e-b6f5-4d01-a6b4-044d91ae2a62 - Statistics found for game.
+2026-03-12 22:03:11,113 | INFO | pipeline.faceitclient | Match loaded: 1-da18abd8-a494-4787-90e1-9319a550fae6 - Statistics found for game.
+2026-03-12 22:03:11,543 | INFO | pipeline.faceitclient | Match loaded: 1-44691afd-b429-4a05-aff4-45b9b2bbf922 - Statistics found for game.
+2026-03-12 22:03:11,934 | INFO | pipeline.faceitclient | Match loaded: 1-e43a069c-9e61-43e7-a6db-8050f92d7e0b - Statistics found for game.
+2026-03-12 22:03:12,284 | INFO | pipeline.faceitclient | Match loaded: 1-75f4a707-90e0-403b-8b48-21b77cb75e41 - Statistics found for game.
+2026-03-12 22:03:12,292 | INFO | pipeline.runner | (24) Ran player id :38dc1f9b-1b5c-47e8-b76e-a51688a882e0, alters and matches stored!
+2026-03-12 22:03:12,293 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:12,765 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:13,268 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:13,599 | INFO | pipeline.faceitclient | Match loaded: 1-0294efdd-c3ec-4b03-bca4-1fde56b61944 - Statistics found for game.
+2026-03-12 22:03:13,999 | INFO | pipeline.faceitclient | Match loaded: 1-ae6f866b-2ddc-41ed-8ae4-bdd9e9707929 - Statistics found for game.
+2026-03-12 22:03:13,999 | WARNING | pipeline.faceitclient | Skipping match: 1-ae6f866b-2ddc-41ed-8ae4-bdd9e9707929 - Failure to get statistics for game.
+2026-03-12 22:03:14,400 | INFO | pipeline.faceitclient | Match loaded: 1-983b09f1-8b43-4406-bf66-504542f0ea40 - Statistics found for game.
+2026-03-12 22:03:14,754 | INFO | pipeline.faceitclient | Match loaded: 1-39719d15-9563-4f20-a8ec-bd8204af185d - Statistics found for game.
+2026-03-12 22:03:14,755 | WARNING | pipeline.faceitclient | Skipping match: 1-39719d15-9563-4f20-a8ec-bd8204af185d - Failure to get statistics for game.
+2026-03-12 22:03:15,114 | INFO | pipeline.faceitclient | Match loaded: 1-11666605-4a65-4b40-899b-d6612ebb1ccb - Statistics found for game.
+2026-03-12 22:03:15,432 | INFO | pipeline.faceitclient | Match loaded: 1-4ab00be0-2f50-480e-b6d5-0a1671257672 - Statistics found for game.
+2026-03-12 22:03:15,873 | INFO | pipeline.faceitclient | Match loaded: 1-297a1468-dcfa-4126-8aee-ce2b098ff347 - Statistics found for game.
+2026-03-12 22:03:16,209 | INFO | pipeline.faceitclient | Match loaded: 1-91c29f8d-d05d-4f94-aaf9-9d662ecbc68a - Statistics found for game.
+2026-03-12 22:03:16,554 | INFO | pipeline.faceitclient | Match loaded: 1-6ff10d16-1e6f-4408-b9c3-d38f40cc9e18 - Statistics found for game.
+2026-03-12 22:03:16,555 | WARNING | pipeline.faceitclient | Skipping match: 1-6ff10d16-1e6f-4408-b9c3-d38f40cc9e18 - Failure to get statistics for game.
+2026-03-12 22:03:16,885 | INFO | pipeline.faceitclient | Match loaded: 1-42d6598e-a6fd-4543-824d-d47f8c2ae147 - Statistics found for game.
+2026-03-12 22:03:16,886 | WARNING | pipeline.faceitclient | Skipping match: 1-42d6598e-a6fd-4543-824d-d47f8c2ae147 - Failure to get statistics for game.
+2026-03-12 22:03:17,333 | INFO | pipeline.faceitclient | Match loaded: 1-0f4e4f13-1770-4a68-adb8-483989e913a4 - Statistics found for game.
+2026-03-12 22:03:17,796 | INFO | pipeline.faceitclient | Match loaded: 1-509f3fb5-a939-4f41-bf4b-f42373532191 - Statistics found for game.
+2026-03-12 22:03:18,203 | INFO | pipeline.faceitclient | Match loaded: 1-de5d222b-f5f9-42de-8b03-b80586548d56 - Statistics found for game.
+2026-03-12 22:03:18,533 | INFO | pipeline.faceitclient | Match loaded: 1-5b1d60a2-c8fe-4964-a37c-26a64b89f611 - Statistics found for game.
+2026-03-12 22:03:18,902 | INFO | pipeline.faceitclient | Match loaded: 1-86e65e11-b090-4a06-b602-8d75f00ef6a9 - Statistics found for game.
+2026-03-12 22:03:18,906 | INFO | pipeline.runner | (25) Ran player id :c0d03737-ae6b-4589-8efb-fb272d84deb4, alters and matches stored!
+2026-03-12 22:03:18,906 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:19,379 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:19,942 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:20,336 | INFO | pipeline.faceitclient | Match loaded: 1-20a9aad0-9950-4325-8db9-f030d8af0ec4 - Statistics found for game.
+2026-03-12 22:03:20,665 | INFO | pipeline.faceitclient | Match loaded: 1-02b5eac4-c9af-48af-8121-b762a8c6ff70 - Statistics found for game.
+2026-03-12 22:03:21,112 | INFO | pipeline.faceitclient | Match loaded: 1-4a8f5f44-71e7-419d-b815-ab21a33185bb - Statistics found for game.
+2026-03-12 22:03:21,660 | INFO | pipeline.faceitclient | Match loaded: 1-084fd4ed-0c56-4469-b588-cb09181add07 - Statistics found for game.
+2026-03-12 22:03:22,056 | INFO | pipeline.faceitclient | Match loaded: 1-5181d823-0ba6-42f4-b483-4a7056eaa8f9 - Statistics found for game.
+2026-03-12 22:03:22,397 | INFO | pipeline.faceitclient | Match loaded: 1-8455e1ea-1412-4ba6-90fb-052d5bd243f6 - Statistics found for game.
+2026-03-12 22:03:22,933 | INFO | pipeline.faceitclient | Match loaded: 1-67700ecf-8b3b-47fd-bce6-223d0aa1836e - Statistics found for game.
+2026-03-12 22:03:23,359 | INFO | pipeline.faceitclient | Match loaded: 1-24386ecd-8ed8-46dc-bb3b-59be68e83efb - Statistics found for game.
+2026-03-12 22:03:23,678 | INFO | pipeline.faceitclient | Match loaded: 1-e453c45f-0994-45ad-84a4-d334790dfa06 - Statistics found for game.
+2026-03-12 22:03:23,987 | INFO | pipeline.faceitclient | Match loaded: 1-557d1ca1-f8a0-457a-b46a-2711acd266f3 - Statistics found for game.
+2026-03-12 22:03:24,324 | INFO | pipeline.faceitclient | Match loaded: 1-8391ec7e-d681-484e-89f7-5aecbb8ce130 - Statistics found for game.
+2026-03-12 22:03:24,649 | INFO | pipeline.faceitclient | Match loaded: 1-e91f7f61-6f0e-4757-92a4-18b2749fa832 - Statistics found for game.
+2026-03-12 22:03:25,033 | INFO | pipeline.faceitclient | Match loaded: 1-cc0c7689-5d4a-4ef8-ad13-28f6d75c937f - Statistics found for game.
+2026-03-12 22:03:25,378 | INFO | pipeline.faceitclient | Match loaded: 1-4f05ceb4-05ef-4295-b6f8-7684d9e32b94 - Statistics found for game.
+2026-03-12 22:03:25,787 | INFO | pipeline.faceitclient | Match loaded: 1-23eb53dd-1287-4581-93e6-96a563791fd4 - Statistics found for game.
+2026-03-12 22:03:25,800 | INFO | pipeline.runner | (26) Ran player id :e50676d1-ea6c-4876-893f-53aac4b6dc6f, alters and matches stored!
+2026-03-12 22:03:25,803 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:26,319 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:26,917 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:27,286 | INFO | pipeline.faceitclient | Match loaded: 1-13ebbbcb-398c-44f5-984b-86937618d359 - Statistics found for game.
+2026-03-12 22:03:27,623 | INFO | pipeline.faceitclient | Match loaded: 1-36b70409-d83c-4b38-93f6-f1bb20141ffd - Statistics found for game.
+2026-03-12 22:03:28,009 | INFO | pipeline.faceitclient | Match loaded: 1-b68e3c95-b8ad-4b81-b90f-ee8f89105419 - Statistics found for game.
+2026-03-12 22:03:28,320 | INFO | pipeline.faceitclient | Match loaded: 1-6de2eefb-7014-4f6f-af7e-95dece10d8cb - Statistics found for game.
+2026-03-12 22:03:28,658 | INFO | pipeline.faceitclient | Match loaded: 1-368f1b7f-17f6-420a-bdde-57d87370260d - Statistics found for game.
+2026-03-12 22:03:29,057 | INFO | pipeline.faceitclient | Match loaded: 1-3b081a65-275b-41ba-9a61-1a7cfab0e7ee - Statistics found for game.
+2026-03-12 22:03:29,382 | INFO | pipeline.faceitclient | Match loaded: 1-d315f254-5297-4980-be0d-48f9a4775c4f - Statistics found for game.
+2026-03-12 22:03:29,382 | WARNING | pipeline.faceitclient | Skipping match: 1-d315f254-5297-4980-be0d-48f9a4775c4f - Failure to get statistics for game.
+2026-03-12 22:03:29,688 | INFO | pipeline.faceitclient | Match loaded: 1-4fbbd213-dd04-4212-b091-7580b2cbe380 - Statistics found for game.
+2026-03-12 22:03:30,119 | INFO | pipeline.faceitclient | Match loaded: 1-4705f9c3-3354-431e-b2f9-75fb994e213a - Statistics found for game.
+2026-03-12 22:03:30,458 | INFO | pipeline.faceitclient | Match loaded: 1-82b922ff-a62c-46bb-a4c1-ac6bca2615d7 - Statistics found for game.
+2026-03-12 22:03:30,764 | INFO | pipeline.faceitclient | Match loaded: 1-e2cdb348-b441-44cd-9c68-658b15e57a1e - Statistics found for game.
+2026-03-12 22:03:31,086 | INFO | pipeline.faceitclient | Match loaded: 1-87b4a2a7-fc32-4674-82d6-745b920442f0 - Statistics found for game.
+2026-03-12 22:03:31,494 | INFO | pipeline.faceitclient | Match loaded: 1-1457b713-8dc0-4861-b9cb-287bdc77eba9 - Statistics found for game.
+2026-03-12 22:03:31,834 | INFO | pipeline.faceitclient | Match loaded: 1-8be589db-6e83-4e78-a6b9-b9480e652912 - Statistics found for game.
+2026-03-12 22:03:32,259 | INFO | pipeline.faceitclient | Match loaded: 1-8bdd35eb-aade-42e9-951e-7b772ed617ce - Statistics found for game.
+2026-03-12 22:03:32,260 | WARNING | pipeline.faceitclient | Skipping match: 1-8bdd35eb-aade-42e9-951e-7b772ed617ce - Failure to get statistics for game.
+2026-03-12 22:03:32,314 | ERROR | pipeline.orch | 
+Table: alters
+2026-03-12 22:03:32,347 | ERROR | pipeline.orch | 
+Table: matches
+2026-03-12 22:03:32,349 | INFO | pipeline.runner | (27) Ran player id :48211fe6-6deb-4b55-b662-fcec37db3bca, alters and matches stored!
+2026-03-12 22:03:32,350 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:32,888 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:33,372 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:33,782 | INFO | pipeline.faceitclient | Match loaded: 1-cbb81263-e9dc-4724-b34f-88dabf87bb87 - Statistics found for game.
+2026-03-12 22:03:34,195 | INFO | pipeline.faceitclient | Match loaded: 1-4f07cd48-4049-496c-b888-39573f4e3112 - Statistics found for game.
+2026-03-12 22:03:34,531 | INFO | pipeline.faceitclient | Match loaded: 1-9ddeb3cf-7009-4625-82ee-a6cce88ed090 - Statistics found for game.
+2026-03-12 22:03:34,858 | INFO | pipeline.faceitclient | Match loaded: 1-1780de3b-108c-4948-8fcd-57962a79783c - Statistics found for game.
+2026-03-12 22:03:35,194 | INFO | pipeline.faceitclient | Match loaded: 1-1fa3c33d-ddab-4e27-bf6b-87e759186d48 - Statistics found for game.
+2026-03-12 22:03:35,600 | INFO | pipeline.faceitclient | Match loaded: 1-6d9eb7c5-9e57-45ae-a366-d57f2a54b6a0 - Statistics found for game.
+2026-03-12 22:03:36,004 | INFO | pipeline.faceitclient | Match loaded: 1-3ad2f340-c90f-4f69-a47f-fb25d5c02516 - Statistics found for game.
+2026-03-12 22:03:36,343 | INFO | pipeline.faceitclient | Match loaded: 1-1d3f95e2-d1cb-48ba-8485-b3d2abd17ba5 - Statistics found for game.
+2026-03-12 22:03:36,733 | INFO | pipeline.faceitclient | Match loaded: 1-e62646ff-6523-4107-a04a-312e3101a465 - Statistics found for game.
+2026-03-12 22:03:37,072 | INFO | pipeline.faceitclient | Match loaded: 1-30f1555c-99a7-4b88-bd05-0630e200f9bc - Statistics found for game.
+2026-03-12 22:03:37,395 | INFO | pipeline.faceitclient | Match loaded: 1-6aabd797-69dd-497c-966b-86a6be23bd04 - Statistics found for game.
+2026-03-12 22:03:37,744 | INFO | pipeline.faceitclient | Match loaded: 1-a6a4091f-ae6a-41f0-89a5-70086c39e6ca - Statistics found for game.
+2026-03-12 22:03:38,072 | INFO | pipeline.faceitclient | Match loaded: 1-811877af-f82d-413b-9eed-fc7c33c58669 - Statistics found for game.
+2026-03-12 22:03:38,391 | INFO | pipeline.faceitclient | Match loaded: 1-036694c5-42ab-452e-9ea1-6539816997a0 - Statistics found for game.
+2026-03-12 22:03:38,801 | INFO | pipeline.faceitclient | Match loaded: 1-2e3845b7-d193-47f8-8f70-70853551fcc7 - Statistics found for game.
+2026-03-12 22:03:38,806 | INFO | pipeline.runner | (28) Ran player id :49285fa7-74d5-4490-89aa-766c38a45fb5, alters and matches stored!
+2026-03-12 22:03:38,808 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:39,461 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:40,063 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:40,393 | INFO | pipeline.faceitclient | Match loaded: 1-0294efdd-c3ec-4b03-bca4-1fde56b61944 - Statistics found for game.
+2026-03-12 22:03:40,716 | INFO | pipeline.faceitclient | Match loaded: 1-4406f8f9-5c31-43cd-bbc9-ca3c47cabe73 - Statistics found for game.
+2026-03-12 22:03:40,716 | WARNING | pipeline.faceitclient | Skipping match: 1-4406f8f9-5c31-43cd-bbc9-ca3c47cabe73 - Failure to get statistics for game.
+2026-03-12 22:03:41,167 | INFO | pipeline.faceitclient | Match loaded: 1-95707930-b28e-44f7-9e3a-21eff8f4e3f1 - Statistics found for game.
+2026-03-12 22:03:41,567 | INFO | pipeline.faceitclient | Match loaded: 1-53f9ec1f-9027-496a-a139-602dd22e2d38 - Statistics found for game.
+2026-03-12 22:03:41,907 | INFO | pipeline.faceitclient | Match loaded: 1-e93f95bd-7958-4ef1-bb19-138b2aefb273 - Statistics found for game.
+2026-03-12 22:03:42,248 | INFO | pipeline.faceitclient | Match loaded: 1-510fe605-e864-45cc-bcf5-0f33cb8e96f1 - Statistics found for game.
+2026-03-12 22:03:42,655 | INFO | pipeline.faceitclient | Match loaded: 1-bfa45292-fc7e-4de2-81a6-90ba439404c9 - Statistics found for game.
+2026-03-12 22:03:43,054 | INFO | pipeline.faceitclient | Match loaded: 1-e76a76bb-280e-43f1-b1b7-cc057f9049d7 - Statistics found for game.
+2026-03-12 22:03:43,481 | INFO | pipeline.faceitclient | Match loaded: 1-7bcc6ac3-354e-44be-9813-3bde9ca1b122 - Statistics found for game.
+2026-03-12 22:03:43,811 | INFO | pipeline.faceitclient | Match loaded: 1-c37dea91-837f-4e96-9563-045bb529e50c - Statistics found for game.
+2026-03-12 22:03:44,244 | INFO | pipeline.faceitclient | Match loaded: 1-9e71a3d3-f0ba-41ab-80a8-8c039987eaf9 - Statistics found for game.
+2026-03-12 22:03:44,584 | INFO | pipeline.faceitclient | Match loaded: 1-7398e509-d0f8-4f86-8fde-62b33a859823 - Statistics found for game.
+2026-03-12 22:03:45,030 | INFO | pipeline.faceitclient | Match loaded: 1-9bf9b4ef-1c9c-4bd4-868d-65658ae6f464 - Statistics found for game.
+2026-03-12 22:03:45,507 | INFO | pipeline.faceitclient | Match loaded: 1-b905dff6-af19-4236-a085-a13867287a32 - Statistics found for game.
+2026-03-12 22:03:45,897 | INFO | pipeline.faceitclient | Match loaded: 1-e8e00f71-f3fb-472a-a326-cfd347047092 - Statistics found for game.
+2026-03-12 22:03:46,056 | ERROR | pipeline.orch | 
+Table: ratings
+2026-03-12 22:03:46,089 | ERROR | pipeline.orch | 
+Table: ratings
+2026-03-12 22:03:46,092 | INFO | pipeline.runner | (29) Ran player id :7d90eabe-88be-4371-9a53-5a31064f9eee, alters and matches stored!
+2026-03-12 22:03:46,092 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:46,556 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:47,026 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:47,418 | INFO | pipeline.faceitclient | Match loaded: 1-f06c6277-1e14-47b4-873e-64d274236110 - Statistics found for game.
+2026-03-12 22:03:47,736 | INFO | pipeline.faceitclient | Match loaded: 1-307f943b-1cfe-4df3-91fd-c98da2615ffd - Statistics found for game.
+2026-03-12 22:03:48,064 | INFO | pipeline.faceitclient | Match loaded: 1-5f919fd5-1e05-4414-8541-dcc65098fce8 - Statistics found for game.
+2026-03-12 22:03:48,441 | INFO | pipeline.faceitclient | Match loaded: 1-4c935a43-df62-4cfb-912a-b35fdb2e7956 - Statistics found for game.
+2026-03-12 22:03:48,767 | INFO | pipeline.faceitclient | Match loaded: 1-742adc43-fafd-45bb-8924-8d80c45da84c - Statistics found for game.
+2026-03-12 22:03:49,151 | INFO | pipeline.faceitclient | Match loaded: 1-a90d3f2e-4bc5-40e1-b9c1-44e9a74ac2e1 - Statistics found for game.
+2026-03-12 22:03:49,497 | INFO | pipeline.faceitclient | Match loaded: 1-32c3776d-f418-4fcb-9c1c-55f887a34284 - Statistics found for game.
+2026-03-12 22:03:49,909 | INFO | pipeline.faceitclient | Match loaded: 1-afb9b635-0e9d-4bcb-a200-d0712df1140f - Statistics found for game.
+2026-03-12 22:03:50,224 | INFO | pipeline.faceitclient | Match loaded: 1-aa49f5a0-8b19-4137-8938-84d714bc0e13 - Statistics found for game.
+2026-03-12 22:03:50,616 | INFO | pipeline.faceitclient | Match loaded: 1-6f05597e-62b0-40ba-858a-364de40c82a8 - Statistics found for game.
+2026-03-12 22:03:51,086 | INFO | pipeline.faceitclient | Match loaded: 1-788cce0a-ead5-4a28-be75-2c1fae546c68 - Statistics found for game.
+2026-03-12 22:03:51,438 | INFO | pipeline.faceitclient | Match loaded: 1-ee922d2f-424c-4e77-94c0-cda2777a3012 - Statistics found for game.
+2026-03-12 22:03:51,809 | INFO | pipeline.faceitclient | Match loaded: 1-f7e507fa-6847-4743-a3fd-9ccd9195a1bb - Statistics found for game.
+2026-03-12 22:03:52,174 | INFO | pipeline.faceitclient | Match loaded: 1-337e4209-9d57-4f4c-a1fe-f56400f52189 - Statistics found for game.
+2026-03-12 22:03:52,538 | INFO | pipeline.faceitclient | Match loaded: 1-0fd1a569-60ba-489f-931e-485ce5a57eab - Statistics found for game.
+2026-03-12 22:03:52,542 | INFO | pipeline.runner | (30) Ran player id :53f6c5ae-9276-4e2e-85bf-3549406ab358, alters and matches stored!
+2026-03-12 22:03:52,543 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:03:53,268 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:53,910 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:03:54,263 | INFO | pipeline.faceitclient | Match loaded: 1-1b894870-536d-423e-a41a-c14eb01a8bb5 - Statistics found for game.
+2026-03-12 22:03:54,651 | INFO | pipeline.faceitclient | Match loaded: 1-52eb1a3e-54ce-4fbf-9610-dc2be63b8df9 - Statistics found for game.
+2026-03-12 22:03:55,271 | INFO | pipeline.faceitclient | Match loaded: 1-beef64a5-d892-41a2-9c22-a5042d064228 - Statistics found for game.
+2026-03-12 22:03:55,650 | INFO | pipeline.faceitclient | Match loaded: 1-a74f1e6d-5db4-4e0b-928d-0128496cc510 - Statistics found for game.
+2026-03-12 22:03:56,037 | INFO | pipeline.faceitclient | Match loaded: 1-cbe97f62-539d-419a-881e-856a6ae3541c - Statistics found for game.
+2026-03-12 22:03:56,466 | INFO | pipeline.faceitclient | Match loaded: 1-2f8815e2-3bae-4a3e-87b7-ce298f20136f - Statistics found for game.
+2026-03-12 22:03:56,789 | INFO | pipeline.faceitclient | Match loaded: 1-11767fc1-d59b-4af8-acaa-7329f31f8695 - Statistics found for game.
+2026-03-12 22:03:57,190 | INFO | pipeline.faceitclient | Match loaded: 1-44561b05-9009-4121-9dbc-46d36967e2b6 - Statistics found for game.
+2026-03-12 22:03:57,595 | INFO | pipeline.faceitclient | Match loaded: 1-1ccaf9a9-03f8-4d41-9a1b-d61a38a9b713 - Statistics found for game.
+2026-03-12 22:03:58,001 | INFO | pipeline.faceitclient | Match loaded: 1-d56e8610-3ce0-421c-891c-af717e24b44d - Statistics found for game.
+2026-03-12 22:03:58,335 | INFO | pipeline.faceitclient | Match loaded: 1-bbf5ffba-fd2a-4a93-99d0-ab699041de73 - Statistics found for game.
+2026-03-12 22:03:58,646 | INFO | pipeline.faceitclient | Match loaded: 1-557d1ca1-f8a0-457a-b46a-2711acd266f3 - Statistics found for game.
+2026-03-12 22:03:59,024 | INFO | pipeline.faceitclient | Match loaded: 1-644b8479-d5b4-467f-bb2c-8f95667283fb - Statistics found for game.
+2026-03-12 22:03:59,025 | WARNING | pipeline.faceitclient | Skipping match: 1-644b8479-d5b4-467f-bb2c-8f95667283fb - Failure to get statistics for game.
+2026-03-12 22:03:59,348 | INFO | pipeline.faceitclient | Match loaded: 1-b9ffa9d5-6c5c-49e3-b2eb-15aa491a44ae - Statistics found for game.
+2026-03-12 22:03:59,666 | INFO | pipeline.faceitclient | Match loaded: 1-535458a2-f1f4-4aa7-a18f-9605b76cd830 - Statistics found for game.
+2026-03-12 22:03:59,671 | INFO | pipeline.runner | (31) Ran player id :d01968b9-6b62-4fd8-abd4-69e3ac09926b, alters and matches stored!
+2026-03-12 22:03:59,672 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:04:00,184 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:04:00,732 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:04:01,046 | INFO | pipeline.faceitclient | Match loaded: 1-ac4ef919-6b08-46d5-9776-4e385eae0ea2 - Statistics found for game.
+2026-03-12 22:04:01,372 | INFO | pipeline.faceitclient | Match loaded: 1-b7a03c62-2f8f-4132-bd88-4f06cfeb0278 - Statistics found for game.
+2026-03-12 22:04:01,793 | INFO | pipeline.faceitclient | Match loaded: 1-2e37e72c-42e2-4d17-b17a-81a2ec5dddf8 - Statistics found for game.
+2026-03-12 22:04:02,189 | INFO | pipeline.faceitclient | Match loaded: 1-61f5003b-e871-410a-8b8b-c81a45ba02ea - Statistics found for game.
+2026-03-12 22:04:02,604 | INFO | pipeline.faceitclient | Match loaded: 1-839d5b41-2038-4e1b-b93c-1ac5c5b51d57 - Statistics found for game.
+2026-03-12 22:04:03,010 | INFO | pipeline.faceitclient | Match loaded: 1-3421b319-1775-4f5e-8c6e-806fadb71f3c - Statistics found for game.
+2026-03-12 22:04:03,355 | INFO | pipeline.faceitclient | Match loaded: 1-062eb7fe-af53-4897-a981-90d62926a455 - Statistics found for game.
+2026-03-12 22:04:03,356 | WARNING | pipeline.faceitclient | Skipping match: 1-062eb7fe-af53-4897-a981-90d62926a455 - Failure to get statistics for game.
+2026-03-12 22:04:03,795 | INFO | pipeline.faceitclient | Match loaded: 1-783e86d8-9e9f-441d-94c6-0c6b55413700 - Statistics found for game.
+2026-03-12 22:04:04,232 | INFO | pipeline.faceitclient | Match loaded: 1-78840d16-13d5-4ea6-8eb5-c19e5c4c9bcb - Statistics found for game.
+2026-03-12 22:04:04,549 | INFO | pipeline.faceitclient | Match loaded: 1-4800c860-2cb1-46b5-a185-37530c2bfcf9 - Statistics found for game.
+2026-03-12 22:04:04,920 | INFO | pipeline.faceitclient | Match loaded: 1-b4ad8355-41ef-491f-8a3d-e495cb338a40 - Statistics found for game.
+2026-03-12 22:04:05,315 | INFO | pipeline.faceitclient | Match loaded: 1-aca65742-d452-4976-a293-45b5e8b154ee - Statistics found for game.
+2026-03-12 22:04:05,653 | INFO | pipeline.faceitclient | Match loaded: 1-a3a282e5-9fba-468f-8e25-15499fe7a8a8 - Statistics found for game.
+2026-03-12 22:04:05,655 | WARNING | pipeline.faceitclient | Attempt 1
+Retrying function after 3
+2026-03-12 22:04:05,655 | ERROR | pipeline.faceitclient | Error Type: Failed to find aggregates of an empty sequence!
+2026-03-12 22:04:08,974 | INFO | pipeline.faceitclient | Match loaded: 1-a3a282e5-9fba-468f-8e25-15499fe7a8a8 - Statistics found for game.
+2026-03-12 22:04:08,975 | WARNING | pipeline.faceitclient | Attempt 2
+Retrying function after 9
+2026-03-12 22:04:08,975 | ERROR | pipeline.faceitclient | Error Type: Failed to find aggregates of an empty sequence!
+2026-03-12 22:04:18,274 | INFO | pipeline.faceitclient | Match loaded: 1-a3a282e5-9fba-468f-8e25-15499fe7a8a8 - Statistics found for game.
+2026-03-12 22:04:18,278 | WARNING | pipeline.faceitclient | Attempt 3
+Retrying function after 27
+2026-03-12 22:04:18,279 | ERROR | pipeline.faceitclient | Error Type: Failed to find aggregates of an empty sequence!
+2026-03-12 22:04:45,605 | INFO | pipeline.faceitclient | Match loaded: 1-a3a282e5-9fba-468f-8e25-15499fe7a8a8 - Statistics found for game.
+2026-03-12 22:04:45,607 | WARNING | pipeline.faceitclient | Attempt 4
+Retrying function after 81
+2026-03-12 22:04:45,608 | ERROR | pipeline.faceitclient | Error Type: Failed to find aggregates of an empty sequence!
+2026-03-12 22:06:07,716 | INFO | pipeline.faceitclient | Match loaded: 1-a3a282e5-9fba-468f-8e25-15499fe7a8a8 - Statistics found for game.
+2026-03-12 22:06:07,720 | WARNING | pipeline.faceitclient | Attempt 5
+Retrying function after 243
+2026-03-12 22:06:07,720 | ERROR | pipeline.faceitclient | Error Type: Failed to find aggregates of an empty sequence!
+2026-03-12 22:10:11,047 | INFO | pipeline.faceitclient | Match loaded: 1-fc0d312f-bd5a-43e3-b7e1-32d21c86565d - Statistics found for game.
+2026-03-12 22:10:11,048 | WARNING | pipeline.faceitclient | Skipping match: 1-fc0d312f-bd5a-43e3-b7e1-32d21c86565d - Failure to get statistics for game.
+2026-03-12 22:10:11,365 | INFO | pipeline.faceitclient | Match loaded: 1-c7d6c2cc-025f-42ed-92d3-7c4b8e4af4e7 - Statistics found for game.
+2026-03-12 22:10:11,370 | INFO | pipeline.runner | (32) Ran player id :e91edead-4164-49a8-a7e2-5fdfb1cb2544, alters and matches stored!
+2026-03-12 22:10:11,372 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:10:11,805 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:10:12,328 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:10:12,656 | INFO | pipeline.faceitclient | Match loaded: 1-1ed1a410-6b87-4cf1-abae-154221cf8a71 - Statistics found for game.
+2026-03-12 22:10:12,992 | INFO | pipeline.faceitclient | Match loaded: 1-31417a7a-47fd-4b77-ac75-3837b0d4949d - Statistics found for game.
+2026-03-12 22:10:13,322 | INFO | pipeline.faceitclient | Match loaded: 1-a16be760-04e8-4f41-8f01-e786a6e12dfa - Statistics found for game.
+2026-03-12 22:10:13,733 | INFO | pipeline.faceitclient | Match loaded: 1-6cba4d06-a60b-4343-b8c2-32d245ed24c1 - Statistics found for game.
+2026-03-12 22:10:14,076 | INFO | pipeline.faceitclient | Match loaded: 1-3b04eeb4-543a-41c9-ba38-000ac7ecb132 - Statistics found for game.
+2026-03-12 22:10:14,481 | INFO | pipeline.faceitclient | Match loaded: 1-c0a1bc4c-a25e-4d06-ae97-6e06e1cfccdc - Statistics found for game.
+2026-03-12 22:10:14,827 | INFO | pipeline.faceitclient | Match loaded: 1-87639af5-6560-49ae-a6c9-77c65896c194 - Statistics found for game.
+2026-03-12 22:10:15,286 | INFO | pipeline.faceitclient | Match loaded: 1-a360c5dd-922d-4a4b-a557-522c72cc3269 - Statistics found for game.
+2026-03-12 22:10:15,712 | INFO | pipeline.faceitclient | Match loaded: 1-de541468-98fe-44b1-93cc-e7d998092896 - Statistics found for game.
+2026-03-12 22:10:16,001 | INFO | pipeline.faceitclient | Match loaded: 1-2db18876-bafa-4356-be9c-cb52de0b838c - Statistics found for game.
+2026-03-12 22:10:16,001 | WARNING | pipeline.faceitclient | Skipping match: 1-2db18876-bafa-4356-be9c-cb52de0b838c - Failure to get statistics for game.
+2026-03-12 22:10:16,390 | INFO | pipeline.faceitclient | Match loaded: 1-ccbb8f92-e3a3-4d50-84cd-57703de4216a - Statistics found for game.
+2026-03-12 22:10:16,391 | WARNING | pipeline.faceitclient | Skipping match: 1-ccbb8f92-e3a3-4d50-84cd-57703de4216a - Failure to get statistics for game.
+2026-03-12 22:10:16,808 | INFO | pipeline.faceitclient | Match loaded: 1-caee3e76-720d-421b-84a3-b87307d54e07 - Statistics found for game.
+2026-03-12 22:10:17,233 | INFO | pipeline.faceitclient | Match loaded: 1-f6f60533-193d-4b2d-896d-53111f4bfb49 - Statistics found for game.
+2026-03-12 22:10:17,597 | INFO | pipeline.faceitclient | Match loaded: 1-85cdf7e2-a0c0-48b6-b420-a40dc45162cd - Statistics found for game.
+2026-03-12 22:10:17,912 | INFO | pipeline.faceitclient | Match loaded: 1-0db7a1a0-f5dd-4bd5-881a-2f022e48b014 - Statistics found for game.
+2026-03-12 22:10:17,917 | INFO | pipeline.runner | (33) Ran player id :6417459b-053f-40d0-b2f5-8a26e7f05750, alters and matches stored!
+2026-03-12 22:10:17,918 | INFO | pipeline.faceitclient | -------------------- Retrieving Alters and their matches --------------------
+2026-03-12 22:10:18,368 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:10:18,867 | INFO | pipeline.faceitclient | GET status code: 200
+2026-03-12 22:10:19,220 | INFO | pipeline.faceitclient | Match loaded: 1-64aac5f5-e97f-462f-a97f-a03d141f5629 - Statistics found for game.
+2026-03-12 22:10:19,775 | INFO | pipeline.faceitclient | Match loaded: 1-cf157f23-289b-4ec0-a3e4-f58bce56ea7d - Statistics found for game.
+2026-03-12 22:10:20,217 | INFO | pipeline.faceitclient | Match loaded: 1-5f50bf56-5ffe-4018-9a0f-4057efc62753 - Statistics found for game.
+2026-03-12 22:10:20,244 | WARNING | pipeline.runner | checkpoint triggered due to sudden shutdown
+2026-03-12 22:10:20,245 | WARNING | pipeline.runner | saving recent checkpoint:
+ @player_id 6417459b-053f-40d0-b2f5-8a26e7f05750 
+ @batch count 26

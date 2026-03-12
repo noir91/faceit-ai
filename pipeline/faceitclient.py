@@ -10,9 +10,8 @@ from functools import partial
 import traceback
 import time
 import logging
-
-class RetryExhausted(Exception):
-   pass
+from configs.exceptions import SkippingMatch
+from polars.exceptions import OutOfBoundsError
 
 class FaceitClient():
 
@@ -43,14 +42,14 @@ class FaceitClient():
         while True:
 
             try:
-                retries = 4
+                retries = 5
                 attempt += 1
                 if attempt > retries:
                     break
                 else:
                     result = function(*args, **kwargs)
-
-                    if result == []:
+                    
+                    if len(result) == 0:
                         raise AssertionError("Fetched data from API is empty.")
                     else:
                         return result
@@ -62,12 +61,15 @@ class FaceitClient():
                     ValueError,
                     AssertionError) as e:
                 
-                sleep_time = base_delay * (2 ** attempt)
+                sleep_time = base_delay * (3 ** attempt)
 
                 self.logger.warning("Attempt %s\nRetrying function after %s", attempt, sleep_time)                
                 self.logger.error("Error Type: %s",e)
 
                 time.sleep(sleep_time)
+
+            except SkippingMatch:
+                break
 
 
 
@@ -227,7 +229,8 @@ class FaceitClient():
     def match_randomizer(self, match_ids:list, seed = 42):
         
         if not match_ids:
-            raise ValueError("There were no match IDs found! ")
+            raise AssertionError("There were no match IDs found! ")
+        
         # Randomized Match Ids
         randomized_matches = set()
 
@@ -259,12 +262,16 @@ class FaceitClient():
     Converts expected incoming JSON (Array of objects for faction in teams from statistics for a match api endpoint)
     to Dataframe, computes the aggregate and then coverts it back to json.
         """
-        data = (pl.DataFrame(incoming_json)
-                .cast(pl.Float32)
-                .mean())
+        try:
+            data = (pl.DataFrame(incoming_json)
+                    .cast(pl.Float32)
+                    .mean())
 
-        return data.row(0, named = True)
-
+            return data.row(0, named = True)
+        
+        except (OutOfBoundsError) as e:
+            raise AssertionError("Failed to find aggregates of an empty sequence!") 
+            
     def statistics_transform(self, match_id):
         '''
         Docstring for statistics transform
@@ -295,7 +302,7 @@ class FaceitClient():
 
         if not rounds_data:
             self.logger.warning(f"Skipping match: {match_id} - Failure to get statistics for game.")
-            return None
+            raise SkippingMatch("Skipping message")
         
         for rounds in rounds_data:
             for index, teams in enumerate(rounds.get("teams")):
