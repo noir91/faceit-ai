@@ -8,8 +8,6 @@ class getdata():
         self.batch_flag = True
         self.logger = logging.getLogger(__name__)
 
-
-
     def connect_db(self, host, port, connect = True):
 
         self.client = MongoClient(
@@ -34,7 +32,6 @@ class getdata():
         self.ratings = self.db['ratings']
         self.alters = self.db['alters']
         self.lifetime = self.db['lifetime']
-        self.matches_elo = self.db['matches_elo']
         
         # Batches ready to be stored
         self.matches_batch = []
@@ -42,7 +39,6 @@ class getdata():
         self.ratings_batch = []
         self.alters_batch = []
         self.lifetime_batch = []
-        self.matches_elo_batch = []
 
 
     def store_data(self, batch, collection:str, verbose = False):
@@ -53,17 +49,15 @@ class getdata():
         param input: Batch to store in db
         param collection: collection object name
         param verbose: Allows for preview of data incoming, can make script slow
-        """ 
+        """
+
         if verbose == True:
-            if type(batch) != dict:
-                self.logger.debug(f"Preview of data incoming: \n {pd.DataFrame(batch).head()}")
-            else:
-                self.logger.debug(f"Preview of data incoming: \n {pd.json_normalize(batch).head()}")
-                
+            self.logger.debug(f"Preview of data incoming: \n {pd.DataFrame(batch).head()}")
+        
         #if batch != list:
         #    batch = list(batch)
         try:
-            if collection not in ['matches', 'players', 'ratings', 'alters', 'lifetime', 'matches_elo']:
+            if collection not in ['matches', 'players', 'ratings', 'alters', 'lifetime']:
                 self.logger.error('Enter the correct collection name')
             else:
                 if collection.lower() == "matches":
@@ -93,30 +87,11 @@ class getdata():
                     # skipping duplicates
                     ordered = False)
 
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
-
                 if collection.lower() == "lifetime":
-                    self.lifetime_flag_for_verbose = True
-                    
-                    self.stored = self.lifetime.insert_one(
-                    document = batch)
-                    # skipping duplicates
-                    #ordered = False)
-
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
-
-                if collection.lower() == "matches_elo":
-                    self.lifetime_flag_for_verbose = True
-                    
-                    self.stored = self.matches_elo.insert_many(
+                    self.stored = self.lifetime.insert_many(
                     documents = batch,
                     # skipping duplicates
                     ordered = False)
-
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
-
-           
-                    
 
         # Note: PyMongoError class exception isnt written
 
@@ -125,10 +100,6 @@ class getdata():
             errmsg = e.details['writeErrors'][0]['errmsg']
             self.logger.debug("Error: %s\n", errmsg)
 
-        except errors.DuplicateKeyError as e:
-            self.logger.error("\nTable: %s", collection)
-            errmsg = e
-            self.logger.debug("Error: %s\n", errmsg)
 
 
     def getcol(self, db, col):
@@ -140,7 +111,6 @@ class getdata():
     def querydb(self):
         
         pass
-
 
         
 
