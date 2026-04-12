@@ -13,6 +13,10 @@ import traceback
 import time
 from time import perf_counter
 import logging
+import asyncio
+import aiohttp
+
+import inspect
 
 from configs.exceptions import SkippingMatch, SoftRateLimit, EmptyData
 from polars.exceptions import OutOfBoundsError
@@ -57,9 +61,16 @@ class FaceitClient():
         self.stats_persistence = set()
         self.elo_persistence = set()
         
+        # if control stage is True, it's stage 1 and else stage 2
+        self.control_stage = True
 
-
-    def retry_function(self, function, *args, **kwargs):
+        # Network env variables
+        self.fetch_calls = (self.fetch_statistics_transform, 
+                            self.fetch_matches_elo, 
+                            self.fetch_lifetime_url,
+                            self.fetch_match)
+        
+    async def retry_function(self, function, *args, **kwargs):
 
         """
         Docstring for retry_function
@@ -81,12 +92,15 @@ class FaceitClient():
                     self.fail_overall_total = overall_end - overall_start
                     
                     self.logger.info("Total time FAILED: %s", self.fail_overall_total)
-                    raise Exception("Max Retries Exceeded!!")
+                    raise SkippingMatch("Max Retries Exceeded!!")
                 else:
                     
-                    result = function(*args, **kwargs)
+                    result = await function(*args, **kwargs)
                     
                     # Guards
+                    if inspect.isawaitable(result):
+                        result = await result
+
                     if result is None:
                         return None
 
@@ -97,18 +111,21 @@ class FaceitClient():
                         return result
 
 
-            except (r.exceptions.ConnectionError, 
-                    r.exceptions.Timeout, 
-                    r.exceptions.HTTPError, 
-                    ValueError) as e:
+            except (#aiohttp.ClientConnectionError,
+                    #aiohttp.ClientTimeout,     
+                    r.exceptions.ConnectionError,
+                    r.exceptions.Timeout,
+                    r.exceptions.HTTPError,
+                    ValueError
+                ) as e:
                 
                 self.retry_count +=1
-                sleep_time = base_delay * (3 ** attempt)
+                sleep_time = base_delay * (2** attempt)
 
                 self.logger.warning("Attempt %s\nRetrying function after %s", attempt, sleep_time)                
                 self.logger.error("Error Type: %s",e)
 
-                time.sleep(sleep_time)
+                await asyncio.sleep(sleep_time)
 
             except SkippingMatch as e:
                 self.skip_match = True
@@ -131,12 +148,12 @@ class FaceitClient():
         #except TypeError as te:
         #    print(f"\nTypeError: {te}")
         
-    def alter_function(self, player_id):
+    async def alter_function(self, player_id, session):
         
         try:
-            self.logger.info("%s Retrieving Alters and their matches %s", "-"*20, "-"*20)
+            #self.logger.info("%s Retrieving Alters and their matches %s", "-"*20, "-"*20)
 
-            result = self.retry_function(self.match, player_id, randomized = True)
+            result = await self.retry_function(self.match,player_id, session, randomized = True)
             if result is None:
                 return []
             
@@ -151,9 +168,11 @@ class FaceitClient():
             # in the past 40 days
             
             # IF LESS MATCHES THAN 15 OR EMPTY ALTERS, we return []
+            #if len(alters) < 15 or not alters:
+            #    return []
+            
             if len(alters) < 15 or not alters:
                 return []
-            
             else:
             
             # Storing Alter raw match data from Faceit Data API
@@ -169,18 +188,46 @@ class FaceitClient():
     def collect_N(self):
         """
         collect_N retrieves 'N' player ids, stored in database.
-        """
 
+        :param default: Default tells the function to run in its normal way and fetch seed set players which were
+        used to expand the network. once it's false, it uses the alters not the seed set players, and then fetches matches.
+        """
         # Fetch data from mongodb query
         players = self.dbobj.players
         players_id = [id['_id'] for id in players.find({}, {'_id': 1})]
 
-        indices = {idx: value for idx, value in enumerate(players_id)}   
-        indices_array = np.array([i for i in indices.keys()])
-        
-        return indices_array, players_id
+        indices = {idx: value for idx, value in enumerate(players_id)}
 
-    def match(self, player_id, randomized = False):
+        if not self.control_stage:
+                
+            alters = self.dbobj.alters
+            alters_id = [
+                pid
+                for doc in alters.find({}, {"player_ids": 1, "_id": 0})
+                for pid in doc.get("player_ids", [])
+            ]
+
+            filtered_alter_ids = []
+            players_id = set(players_id)
+
+            for alter in alters_id:
+                if alter not in players_id:
+                    filtered_alter_ids.append(alter)
+
+            indices = {idx: value for idx, value in enumerate(filtered_alter_ids)}
+            indices_array = np.array([i for i in indices.keys()])
+            self.logger.info("Players retrieved from Collect N -> %s", len(indices_array))
+
+            return indices_array, filtered_alter_ids
+        
+        else:
+            indices = {idx: value for idx, value in enumerate(players_id)}
+            indices_array = np.array([i for i in indices.keys()])
+
+            self.logger.info("Players retrieved from Collect N -> %s", len(indices_array))
+            return indices_array[20:], players_id[20:]
+
+    async def match(self, player_id, session, randomized = False):
         """
         Docstring for match
         
@@ -191,72 +238,96 @@ class FaceitClient():
         # API endpoint
         history_url = f"https://open.faceit.com/data/v4/players/{player_id}/history"
         
-        # Extracing UNIX timestamps (epochs)
-        past_40_days =  datetime.now() - timedelta(days = 40)
-        current_time = datetime.now()
+        
+        if self.control_stage:
+            num_matches = 15
+        else:
+            num_matches = 5
 
-        offset = 0
-        limit = 100
+        # Extracing UNIX timestamps (epochs)
+        past_days =  int((datetime.now() - timedelta(days = 60)).timestamp())
+        current_time = int(datetime.now().timestamp())
 
         match_ids = []
         player_ids = []
         all_data = []
 
         try:
-            while True:
-        
+            tasks = []
+            
+            for offset in range(0, 200, 100):
                 # Query parameters
                 params = {
                     "game": "cs2",
-                    "from": past_40_days,
+                    "from": past_days,
                     "to": current_time,
-                    "offset": offset,
-                    "limit": limit}
-                
-                #history_response = r.get(url = history_url,
-                #                        headers = self.headers,
-                #                        params = params,
-                #                        timeout = 3)
-                
-
-                #data = history_response.json()
-
-                history_response, _= self.call_api(endpoint= history_url, params = params)
-                data = history_response.json()
-
-                offset += limit        
-                #if not history_response:
-                #    self.detect_soft_rate_limit(history_response)
+                    "offset": offset }
                     
-                #else:
-            
-                if history_response.status_code == 200:
-                    self.logger.info("GET status code: %s", history_response.status_code)
-                    for item in data.get("items", []):
-                        match_id = item['match_id']
-                        playing_players = item['playing_players']
+                tasks.append(
+                    self.call_api(
+                        url = history_url,
+                        endpoint = 'match',
+                        session = session,
+                        params = params
+                    )
+                )
 
-                        match_ids.append(match_id)
-                        player_ids.append(playing_players)
-
-                        item['_id'] = item.pop('match_id')
-                        all_data.append(item)
+            results = await asyncio.gather(*tasks)
                 
-                else:
-                    history_response.raise_for_status()
-                    self.error_flag = True
+                
+            #history_response = r.get(url = history_url,
+            #                        headers = self.headers,
+            #                        params = params,
+            #                        timeout = 3)
+            
 
-                if offset >= 200:
-                    break
+            #data = history_response.json()
+
+            #data, status,  _= self.call_api(url= history_url, params = params)
+            #offset += limit        
+            #if not history_response:
+            #    self.detect_soft_rate_limit(history_response)
+                
+            #else:
+        
+            
+            for data, status, _ in results:
+                if status == 200:
+                    self.logger.info("GET status code: %s", status)
+
+                    if "errors" in data:
+                        self.logger.warning("Errors in data: %s", data["errors"])
+                        continue
+                    else:
+                        for item in data.get("items", []):
+                            match_id = item['match_id']
+                            playing_players = item['playing_players']
+
+                            match_ids.append(match_id)
+                            player_ids.append(playing_players)
+
+                            item['_id'] = item.pop('match_id')
+                            all_data.append(item)
+            
+            #else:
+            #    history_response.raise_for_status()
+            #    self.error_flag = True
+
+            #if offset >= 200:
+            #    break
+            #if offset >= 200:
+            #    break
 
             # Random Sampling -->
                 # Randomizing Matches
             if randomized == True:
 
                 # Sends a raise to alter function which then handles it as result = [], to skip player
-                if match_ids and len(match_ids) <15:
-                    raise SkippingMatch("Less than 15 Matches Retrieved in Randomizer!")
-                
+                #if match_ids and len(match_ids) <15:
+                #    raise SkippingMatch("Less than 15 Matches Retrieved in Randomizer!")
+
+                if match_ids and len(match_ids) < num_matches:
+                    raise SkippingMatch("Less than 5 Matches Retrieved in Randomizer!")
                 # lists to store ids
                 alter_match_ids = []
                 alter_ids = []
@@ -265,7 +336,7 @@ class FaceitClient():
 
                 # calling randomized mataches func
                 randomized_matches = set(self.match_randomizer(match_ids = match_ids,
-                                seed = 42))
+                                num_matches= num_matches))
                 
                 # getting alter_match_ids from data.json()
                 for single_match_data in all_data:
@@ -290,7 +361,6 @@ class FaceitClient():
                 ]
 
                 #print(len(alters))
-
                 return alters, alter_data 
             else:
 
@@ -304,7 +374,7 @@ class FaceitClient():
 
         
     
-    def match_randomizer(self, match_ids:list, seed = 42):
+    def match_randomizer(self, match_ids:list, num_matches):
         
         if not match_ids:
             raise SkippingMatch("There were no match IDs found! ")            
@@ -312,16 +382,16 @@ class FaceitClient():
         # Randomized Match Ids
         randomized_matches = set()
 
-        # Reproducibility
-        self.rng = np.random.seed(seed = seed)
+        # Randomize
+        default_rng = np.random.default_rng()
 
         # Storing enumerations as indices to sample
         indices = {i: item for i, item in enumerate(match_ids)}   
         indices_array = np.array([i for i in indices.keys()])
 
         # random sampling using numpy
-        rng = np.random.choice(indices_array,
-                            size = 15, # 10 Matches from past 40 days
+        rng = default_rng.choice(indices_array,
+                            size = num_matches, # 10 Matches from past 40 days
                             replace = False # Sampling without replacement
                             )
         
@@ -350,7 +420,7 @@ class FaceitClient():
         except (OutOfBoundsError) as e:
             raise SkippingMatch("Failed to find aggregates of an empty sequence!") 
             
-    def statistics_transform(self, match_id):
+    async def statistics_transform(self, match_id, session, count):
         '''
         Docstring for statistics transform
         
@@ -370,13 +440,13 @@ class FaceitClient():
         #match_data = response.json()
 
         if match_id not in self.stats_persistence:
-            response, latency = self.call_api(endpoint= statistics_url)
-            match_data = response.json()
+            match_data, _, latency = await self.call_api(url= statistics_url, endpoint = 'statistics', session = session, count= count)
+            #match_data = await response.json()
             self.stats_persistence.add(match_id)
 
         else:
             self.logger.info("statistics are persistence, not calling API.")
-            return []
+            return None
         
         #if match_id in self.stats_persistence:
            # self.retry_function(self.matches_elo, match_id)
@@ -449,6 +519,7 @@ class FaceitClient():
             statistics['_id'] = match_id
             statistics['players'] = players_list
             statistics['team_agg'] = agg
+            statistics['stageId'] = "stage_1_"+str(datetime.now().strftime("%Y%m%d_%H%M")) if self.control_stage else "stage_2_"+str(datetime.now().strftime("%Y%m%d_%H%M"))
 
             return statistics
         
@@ -490,7 +561,7 @@ class FaceitClient():
 
                 #data = request.json()
                 
-                response, _= self.call_api(endpoint = url, params =params)
+                response, _= self.call_api(url = url, params =params)
                 data = response.json()
 
                 if not data:
@@ -548,7 +619,7 @@ class FaceitClient():
                 #                params = params,
                 #               timeout = 3)
 
-                response, _ = self.call_api(endpoint = url, params =params)
+                response, _ = self.call_api(url = url, params =params)
                 
                 if status == True:
                     self.logger.info(f"retrieve_ID_members status code: {response.status_code}")
@@ -571,7 +642,7 @@ class FaceitClient():
         except SoftRateLimit as e:
             print(f"Soft Rate Limit Hit! {e}")
 
-    def lifetime_aggregates(self, player_id):
+    async def lifetime_aggregates(self, player_id, session):
 
         """
         Historical aggregates will have a player's historical map pool statistics providing for good features.
@@ -593,8 +664,8 @@ class FaceitClient():
              
             #lifetime_data = resp.json()
             
-            response, _= self.call_api(endpoint= lifetime_url)
-            lifetime_data = response.json()
+            lifetime_data,_ , _= await self.call_api(url= lifetime_url, endpoint = 'lifetime', session = session)
+            #lifetime_data = await response.json()
 
             if not lifetime_data:
                 self.detect_soft_rate_limit(lifetime_data)
@@ -608,7 +679,8 @@ class FaceitClient():
 
                 # renaming player_id with _id for mongodb unique id
                 lifetime_data['_id'] = lifetime_data.pop('player_id')
-                
+                lifetime_data['stageId'] = "stage_1_"+str(datetime.now().strftime("%Y%m%d_%H%M")) if self.control_stage else "stage_2_"+str(datetime.now().strftime("%Y%m%d_%H%M"))
+
                 return lifetime_data
         
         except (ConnectionError,
@@ -622,13 +694,16 @@ class FaceitClient():
             print(f"Error in lifetime aggregates : {e}")
 
 
-    def matches_elo(self, match_id):
+    async def matches_elo(self, match_id, session, count):
         
+        """
+        :param count: used to indicate which player we are iterating through using count
+        """
         matches_elo_url = f"https://open.faceit.com/data/v4/matches/{match_id}"
         
-        response, latency = self.call_api(endpoint= matches_elo_url)
-        match = response.json()
-
+        match, _, latency = await self.call_api(url= matches_elo_url, endpoint = 'elo', session =session, count = count)
+        #match = await response.json()
+        
         self.logger.info('Matches elo API endpoint called for %s', match_id)
         
         try:    
@@ -643,7 +718,6 @@ class FaceitClient():
                 raise SkippingMatch("Skipping match's elo")
             
             self.skip_match = False
-
             for key in list(match.keys()):
                 if key not in {
                     "match_id",
@@ -696,6 +770,7 @@ class FaceitClient():
                                 }:
                                     del player[key]
             match['_id'] = match_id
+            match['stageId'] = "stage_1_"+str(datetime.now().strftime("%Y%m%d_%H%M")) if self.control_stage else "stage_2_"+str(datetime.now().strftime("%Y%m%d_%H%M"))
 
             return match
         
@@ -705,63 +780,77 @@ class FaceitClient():
         except SoftRateLimit as e:
             self.logger.warning('Soft Rate Limit Hit! %s', e)
 
-    def detect_soft_rate_limit(self, data, skip = False):
-        
+    async def detect_soft_rate_limit(self, data, skip = False):
+        empty_count = 0
         #if not self.skip_match:
         if skip or not data or data == []:
-            self.empty_count += 1
+            empty_count += 1
             self.status = 'skip_match' if skip else "rate_limited"
         else:
-            self.empty_count = 0
+            empty_count = 0
             self.status = 'success'
 
-        if self.empty_count >= 3: 
+        if empty_count >= 3: 
             self.status = 'rate_limited'
             raise SoftRateLimit
-            
 
-
-    def call_api(self, endpoint, params = None, session = True):
+    async def call_api(self, url, endpoint= None, session = None, params = None, count = None):
 
         """
-        Records API connection information for testing and optimizing the client for performance.
+        Runs and Records API connection information for testing and optimizing the client for performance.
         
-        :param flag: indicative of starting or stopping a timer for latency 
-        :param session: session object
+        :param url: request from url
+        :param endpoint: points to which fetch api function to run
+        :param session: aiohttp client session object
+        :param params: query parameters for the call
+        :param match_func: matches_func refers to match() function, if call_api is used in it, async wont be used on it.
+        :param count: count is used for tracking the iterating players.
         """
+        start = perf_counter()
         latency = 0
+        endpoints = {'statistics': self.fetch_calls[0], 
+                     'elo': self.fetch_calls[1],
+                     'lifetime': self.fetch_calls[2],
+                     'match': self.fetch_calls[3]}
+        try:            
+            # Match Endpoint logic
+            #if match_func:
+            #    start = perf_counter()
+            #    
+            #    response = self.session.get(url = url, params = params,
+            #                    headers = self.headers, timeout =3)
+            #    data = response.json()
+            # All other endpoints
+            #else:
+            func = endpoints.get(endpoint)
 
-        try:
-            if session:
-                
-                start = perf_counter()
-                response = self.session.get(url = endpoint, params = params,
-                                headers = self.headers, timeout =3)
+            if not endpoint:
+                raise ValueError(f"Invalid endpoint : {endpoint}")
+            data, status = await func(url =url, session = session, params = params, count = count)
 
-                end = perf_counter()
-                
-            else:
-                start = perf_counter()
-                response = r.get(url = endpoint, params = params,
-                                headers = self.headers, timeout =3)
+            #data = await response.json()
+            
+            latency = perf_counter() - start
 
-                end = perf_counter()
-        
-            data = response.json()
-            latency = end - start
-
-            if response.status_code == 429:
+            # Data check and status logic
+            #if match_func:
+            #    if response.status_code == 429:
+            #        self.status = 'rate_limited'
+            #        raise SoftRateLimit("HTTP 429 Error")
+            #else:
+            #if response.status == 429:
+            if isinstance(data, dict) and 'errors' in data:
                 self.status = 'rate_limited'
                 raise SoftRateLimit("HTTP 429 Error")
-            
-            if 'stats' not in endpoint:
+                
+            if endpoint and 'stats' not in endpoint:
                 if isinstance(data, dict) and "errors" in data:
                     self.status = 'rate_limited'
-                    raise SoftRateLimit(data['errors'])
+                    #raise SoftRateLimit(data['errors'])
             
-            self.detect_soft_rate_limit(data)
+            await self.detect_soft_rate_limit(data)
 
-            return response, latency
+            return data, status, latency
 
         finally:
             self.sum_of_requests += 1
@@ -770,8 +859,6 @@ class FaceitClient():
             self.logger.debug("ENDPOINT: %s, LATENCY %s", endpoint, latency)
             
             self.trigger_response(endpoint, latency)
-
-        # FIX RATE LIMIT NOT SHOWING IN RESPONSE LOGS 
     
     def trigger_response(self, endpoint, latency, status_override = None):
         
@@ -785,3 +872,41 @@ class FaceitClient():
     
 
         self.logger.info("Response Latency: %.3f, Status: %s            %s", latency, status_to_log, endpoint)
+
+    async def fetch_statistics_transform(self, url, session, params = None, count = None):
+        """gets statistics in detail from statistics endpoint, returns json object"""
+        self.logger.info("(%s) FETCH statistics -> %s", count, url)
+        async with session.get(url, headers = self.headers, params = params) as response:
+            data = await response.json()
+            status = response.status
+            self.logger.info("(%s) DONE  statistics -> status:%s", count, status)
+            return data, status
+        
+
+    async def fetch_matches_elo(self, url, session, params = None, count = None):
+        """gets elo in detail from matches_elo endpoint, returns json object"""
+        self.logger.info("(%s) FETCH elo -> %s", count, url)
+        async with session.get(url, headers =self.headers, params = params) as response:
+            data = await response.json()
+            status = response.status
+            self.logger.info("(%s) DONE  elo -> status:%s", count, status)
+            return data, status
+
+    async def fetch_lifetime_url(self, url, session, params= None, count = None):
+        """gets lifetime in detail from lifetime endpoint, returns json object"""
+        self.logger.info("FETCH lifetime -> %s", url)
+        async with session.get(url, headers = self.headers, params = params) as response:
+            data = await response.json()
+            status = response.status
+            self.logger.info("DONE  lifetime -> status:%s", status)
+            return data, status
+
+    async def fetch_match(self, url, session, params= None, count = None):
+        """gets matches in detail from match endpoint, returns json object"""
+        self.logger.info("FETCH match -> %s", url)
+        async with session.get(url, headers = self.headers, params = params) as response:
+            data = await response.json()
+            status = response.status
+            self.logger.info("DONE  match -> status:%s", status)
+            return data, status
+

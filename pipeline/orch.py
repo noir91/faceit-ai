@@ -121,15 +121,19 @@ class getdata():
         # Note: PyMongoError class exception isnt written
 
         except errors.BulkWriteError as e:
-            self.logger.error("\nTable: %s", collection)
-            errmsg = e.details['writeErrors'][0]['errmsg']
-            self.logger.debug("Error: %s\n", errmsg)
-
+            #self.logger.debug("\nTable: %s", collection)
+            #errmsg = e.details['writeErrors'][0]['errmsg']
+            #self.logger.error("Error: %s\n", errmsg)
+            write_errors = e.details.get('writeErrors', [])
+            self.logger.warning(f"{len(write_errors)} duplicates skipped in {collection}")
+        
         except errors.DuplicateKeyError as e:
-            self.logger.error("\nTable: %s", collection)
+            self.logger.debug("\nTable: %s", collection)
             errmsg = e
-            self.logger.debug("Error: %s\n", errmsg)
+            self.logger.error("Error: %s\n", errmsg)
 
+        except Exception as e:
+            self.logger.error("Unexpected error in store_data [%s]: %s", collection, e, exc_info=True)
 
     def getcol(self, db, col):
         """

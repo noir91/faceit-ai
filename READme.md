@@ -1,7 +1,7 @@
 ## Faceit AI Predictor Chrome Extension
 
 #### Version
-Current Version: **v0.1.3**
+Current Version: **v0.1.4**
 
 ---
 
@@ -32,9 +32,10 @@ Chrome Extension Inference
 
 ### Current State
 
-- Data collection pipeline **almost complete**
+- Data collection pipeline **complete**
+- Pipeline runner integeration **complete**
+
 - Remaining work:
-  - Pipeline runner integration
   - Model training and evaluation
   - Extension inference integration
 
@@ -88,6 +89,7 @@ current_time - 40_days
 3. For each match **m**:
    - collect all participating players (**alters**)
 4. Use discovered **alters** to expand the dataset by fetching additional matches.
+5. Current approach is to ideally use **5-10** matches per alter.
 
 This gradually builds a **network of players and matches** suitable for training.
 
@@ -128,7 +130,27 @@ This project **is NOT**:
 
 The system predicts **map win probabilities**, not player rankings.
 
----
 
-### Data Source
+#### 20 March 2026
+Recent updates:
+
+- Fixed Retry function making retry attempts on data errors, not network errors:
+    e.g. several player ids were failing to get data, and it was highly predictable which player id will fail to retrieve response from API, poor excecption logic routed an empty response [] data validation error as a networking error and created useless attempts at a "Match not found for **X** player".
+- Introudced a checkpointing system to save progress on failure of the runner script at anypoint.
+- Implementing detailed logs throughout the system for observability. 
+- Introduced a system to record latency per API Call
+    - RPM (Requests per second)
+    - Average Latency
+    - Total Execution Time for Runner Script
+    - Total Retry attempts across API calls
+- Removed unstable GET requests by implementing sessions.
+- /stats and /matches end points now have persistence to avoid redundant API calls.
+- Introduced SoftRateLimit logic, Faceit Data API GET 200 to avoid crash at [] empty responses.
+- Robust Error handling, fixed all previous runner script exceptions which caused crashes.
+- Introduced New functions to capture a richer dataset:
+    - **matches_elo** extracts average elo per lobby, skill level per player, and won map with detailed results.
+    - **lifetime_aggregates** extracts lifetime aggregate statistics of each player, on each of their maps ever played.
+- Fixed checkpoint system failing due to index out of range on last saved checkpoint player id
+- /pipeline/READme.md has been updated with latest workflow and details.
+
 **FACEIT Data API**
