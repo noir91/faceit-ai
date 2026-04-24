@@ -179,7 +179,7 @@ class FaceitClient():
                 return alter_match_ids, alter_data, alters
             
         except SkippingMatch as e:
-            self.logger.warning("Alter Function didn't recieve a match: %s",e)
+            self.logger.warning("%s:  Alter Function didn't recieve a match", e)
             return alter_match_ids, alter_data, alters
         
     def collect_N(self):
@@ -242,7 +242,7 @@ class FaceitClient():
             num_matches = 5
 
         # Extracing UNIX timestamps (epochs)
-        past_days =  int((datetime.now() - timedelta(days = 60)).timestamp())
+        past_days =  int((datetime.now() - timedelta(days = 90)).timestamp())
         current_time = int(datetime.now().timestamp())
 
         match_ids = []
@@ -252,7 +252,7 @@ class FaceitClient():
         try:
             tasks = []
             
-            for offset in range(0, 200, 100):
+            for offset in range(0, 300, 100):
                 # Query parameters
                 params = {
                     "game": "cs2",

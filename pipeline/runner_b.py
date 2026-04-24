@@ -42,6 +42,10 @@ class PipelineRunner():
 
         self.client = FaceitClient(dbobj= self.data,
                                    headers= headers)
+        
+        # Budget to control lifetime via semaphore
+        self.lifetime_semaphore = asyncio.Semaphore(2)  
+
         # Assuming 72 players x 15 matches = 1080 matches
         self.batch_size = 2
         self.max_players = len(list(self.data.players.find({'_id': {"$exists": True}})))
@@ -188,10 +192,14 @@ class PipelineRunner():
                     async with local_semaphore:
                        return await coroutine
 
+                async def throttle_lifetime(): 
+                    async with self.lifetime_semaphore: 
+                        return await self.client.lifetime_aggregates(player_ids[idx], session)       
+                    
                 results = await asyncio.gather(
                     *[throttle(t) for t in stats_tasks],
                     *[throttle(t) for t in elo_tasks],
-                    self.client.lifetime_aggregates(player_ids[idx], session),
+                    throttle_lifetime(),
                     return_exceptions=True
                 )
 
