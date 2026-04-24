@@ -58,8 +58,8 @@ class FaceitClient():
         self.response_details = {}
 
         # Persistence 
-        self.stats_persistence = set()
-        self.elo_persistence = set()
+        #self.stats_persistence = set()
+        #self.elo_persistence = set()
         
         # if control stage is True, it's stage 1 and else stage 2
         self.control_stage = True
@@ -77,113 +77,110 @@ class FaceitClient():
         
         :param self: 
         :param function: an faceit api client function used for retrying
-        """
-        overall_start = perf_counter()
+        """        
+        response, data, status = None, [], None
 
         attempt = 0
         base_delay = 1
+        retries = 5
         while True:
 
             try:
-                retries = 5
-                attempt += 1
                 if attempt > retries:
-                    overall_end = perf_counter()
-                    self.fail_overall_total = overall_end - overall_start
-                    
-                    self.logger.info("Total time FAILED: %s", self.fail_overall_total)
                     raise SkippingMatch("Max Retries Exceeded!!")
+                
                 else:
-                    
-                    result = await function(*args, **kwargs)
+                    await asyncio.sleep(0.2)
+                    response, data, status = await function(*args, **kwargs)
                     
                     # Guards
-                    if inspect.isawaitable(result):
-                        result = await result
+                    if status == 429:
+                        raise aiohttp.ClientResponseError(
+                            request_info=response.request_info,
+                            history=response.history,
+                            status=429,
+                            message="rate limited",
+                            headers=response.headers
+                            )
+                    
+                    if data is None:
+                        data = []
+                        return response, data, status
 
-                    if result is None:
-                        return None
-
-                    if isinstance(result, list) and len(result) == 0:
+                    if isinstance(data, (dict, list)) and len(data) == 0:
                         raise EmptyData("Fetched data from API is empty.")
                     
                     else:
-                        return result
+                        return response, data, status
 
+            except aiohttp.ClientResponseError as e:
+                if e.status == 504:
+                    sleep = 10
+                    await asyncio.sleep(sleep)
+                    self.logger.warning("Server failed to respond in time, retrying in %s", sleep )
 
-            except (#aiohttp.ClientConnectionError,
-                    #aiohttp.ClientTimeout,     
-                    r.exceptions.ConnectionError,
+                if e.status == 429:
+                    attempt += 1
+                    
+                    retry_after = e.headers.get('Retry-After')
+                    if retry_after:
+                        await asyncio.sleep(int(retry_after))
+                        self.logger.warning("Rate limited, sleeping %s seconds", retry_after)
+                    else:
+                        sleep_time = base_delay * (2** attempt)
+
+                        await asyncio.sleep(sleep_time)
+                        self.logger.warning("Rate limited, expbackoff %s seconds", sleep_time)
+                else:
+                    raise
+
+                             
+            except (r.exceptions.ConnectionError,
                     r.exceptions.Timeout,
                     r.exceptions.HTTPError,
-                    ValueError
-                ) as e:
-                
-                self.retry_count +=1
+                    ValueError) as e:
+                attempt +=1
                 sleep_time = base_delay * (2** attempt)
 
                 self.logger.warning("Attempt %s\nRetrying function after %s", attempt, sleep_time)                
                 self.logger.error("Error Type: %s",e)
 
                 await asyncio.sleep(sleep_time)
-
+                
             except SkippingMatch as e:
                 self.skip_match = True
                 self.logger.warning("Error on retry func: %s", e)
-                return None
+                data = []
+                return response, data, status
             
             except EmptyData:
                 self.logger.warning("Empty Data returned.")
-                return None
+                data = []
+                return response, data, status
 
-
-
-         #except Exception as e:
-        #    print(f"Error : {e}")
-        #    traceback.print_exc()
-
-        #except KeyboardInterrupt:
-        #    print("\nStopped by user.")
-        
-        #except TypeError as te:
-        #    print(f"\nTypeError: {te}")
         
     async def alter_function(self, player_id, session):
-        
+        alter_match_ids, alter_data, alters = [], None, None
         try:
-            #self.logger.info("%s Retrieving Alters and their matches %s", "-"*20, "-"*20)
-
-            result = await self.retry_function(self.match,player_id, session, randomized = True)
-            if result is None:
-                return []
-            
+            result = await self.match(player_id, session, randomized = True)
+    
             # Get Match and 10 player ids each
             alters, alter_data = result
-            
             alter_match_ids = [item['_id'] for item in alter_data]
 
-            # Store player ids in mongodb 
-
-            # Control structure to remove any N player_ids which don't have 10 matches
-            # in the past 40 days
-            
-            # IF LESS MATCHES THAN 15 OR EMPTY ALTERS, we return []
-            #if len(alters) < 15 or not alters:
-            #    return []
-            
             if len(alters) < 15 or not alters:
-                return []
+                return alter_match_ids, alter_data, alters
             else:
             
             # Storing Alter raw match data from Faceit Data API
                 self.dbobj.matches_batch.extend(alter_data)
                 self.dbobj.alters_batch.extend(alters)
 
-                return alter_match_ids 
+                return alter_match_ids, alter_data, alters
             
         except SkippingMatch as e:
             self.logger.warning("Alter Function didn't recieve a match: %s",e)
-            return []
+            return alter_match_ids, alter_data, alters
         
     def collect_N(self):
         """
@@ -225,7 +222,7 @@ class FaceitClient():
             indices_array = np.array([i for i in indices.keys()])
 
             self.logger.info("Players retrieved from Collect N -> %s", len(indices_array))
-            return indices_array[20:], players_id[20:]
+            return indices_array, players_id
 
     async def match(self, player_id, session, randomized = False):
         """
@@ -262,7 +259,7 @@ class FaceitClient():
                     "from": past_days,
                     "to": current_time,
                     "offset": offset }
-                    
+                
                 tasks.append(
                     self.call_api(
                         url = history_url,
@@ -273,23 +270,6 @@ class FaceitClient():
                 )
 
             results = await asyncio.gather(*tasks)
-                
-                
-            #history_response = r.get(url = history_url,
-            #                        headers = self.headers,
-            #                        params = params,
-            #                        timeout = 3)
-            
-
-            #data = history_response.json()
-
-            #data, status,  _= self.call_api(url= history_url, params = params)
-            #offset += limit        
-            #if not history_response:
-            #    self.detect_soft_rate_limit(history_response)
-                
-            #else:
-        
             
             for data, status, _ in results:
                 if status == 200:
@@ -309,25 +289,13 @@ class FaceitClient():
                             item['_id'] = item.pop('match_id')
                             all_data.append(item)
             
-            #else:
-            #    history_response.raise_for_status()
-            #    self.error_flag = True
-
-            #if offset >= 200:
-            #    break
-            #if offset >= 200:
-            #    break
-
-            # Random Sampling -->
-                # Randomizing Matches
+            # Randomizing Matches
             if randomized == True:
 
                 # Sends a raise to alter function which then handles it as result = [], to skip player
-                #if match_ids and len(match_ids) <15:
-                #    raise SkippingMatch("Less than 15 Matches Retrieved in Randomizer!")
-
                 if match_ids and len(match_ids) < num_matches:
                     raise SkippingMatch("Less than 5 Matches Retrieved in Randomizer!")
+                
                 # lists to store ids
                 alter_match_ids = []
                 alter_ids = []
@@ -378,28 +346,21 @@ class FaceitClient():
         
         if not match_ids:
             raise SkippingMatch("There were no match IDs found! ")            
+
+        # MongoDB checkup for existing data
+        existing_matches = {doc['_id'] for doc in self.dbobj.matches.find({'_id': {'$in': match_ids}}, {'_id': 1})}
+        filtered_indices = [mid for mid in match_ids if mid not in existing_matches]
         
-        # Randomized Match Ids
-        randomized_matches = set()
-
-        # Randomize
-        default_rng = np.random.default_rng()
-
-        # Storing enumerations as indices to sample
-        indices = {i: item for i, item in enumerate(match_ids)}   
-        indices_array = np.array([i for i in indices.keys()])
-
+        if not filtered_indices:
+            raise SkippingMatch("All matches already exist in DB, nothing new to fetch.")
+        
         # random sampling using numpy
-        rng = default_rng.choice(indices_array,
-                            size = num_matches, # 10 Matches from past 40 days
-                            replace = False # Sampling without replacement
-                            )
-        
-        for k in indices.keys():
-            if k in rng:
-                randomized_matches.add(indices[k])
-            else:
-                continue
+        sample_size = min(num_matches, len(filtered_indices))
+
+        default_rng = np.random.default_rng()
+        sampled_ids = default_rng.choice(len(filtered_indices), size = sample_size, replace= False)
+
+        randomized_matches = {filtered_indices[i] for i in sampled_ids}
 
         return randomized_matches
 
@@ -439,14 +400,14 @@ class FaceitClient():
         #response = r.get(statistics_url, headers = self.headers, timeout = 3)
         #match_data = response.json()
 
-        if match_id not in self.stats_persistence:
-            match_data, _, latency = await self.call_api(url= statistics_url, endpoint = 'statistics', session = session, count= count)
+       # if match_id not in self.stats_persistence:
+        match_data, _, latency = await self.call_api(url= statistics_url, endpoint = 'statistics', session = session, count= count)
             #match_data = await response.json()
-            self.stats_persistence.add(match_id)
+            #self.stats_persistence.add(match_id)
 
-        else:
-            self.logger.info("statistics are persistence, not calling API.")
-            return None
+        #else:
+            #self.logger.info("statistics are persistence, not calling API.")
+            #return None
         
         #if match_id in self.stats_persistence:
            # self.retry_function(self.matches_elo, match_id)
@@ -464,7 +425,7 @@ class FaceitClient():
             
             if not rounds_data:
                 self.skip_match = True
-                self.detect_soft_rate_limit(data = None, skip = True)
+                await self.detect_soft_rate_limit(data = None, skip = True)
                 
                 self.trigger_response(f"stats/{match_id}", latency, status_override= 'skip_match' )
                 self.logger.warning(f"Skipping match: {match_id} - Failure to get statistics for game.")
@@ -550,16 +511,6 @@ class FaceitClient():
             while True:
                 params = {'offset': offset,
                         'limit': limit}
-
-                    
-                #request = r.get(url = url,
-                #                headers = self.headers,
-                #                params= params,
-                #                timeout = 3
-                #                )
-                 
-
-                #data = request.json()
                 
                 response, _= self.call_api(url = url, params =params)
                 data = response.json()
@@ -614,11 +565,6 @@ class FaceitClient():
                         'nickname': nickname,
                         'game': game}
                 
-                #ID_request = r.get(url = url,
-                #                headers = self.headers,
-                #                params = params,
-                #               timeout = 3)
-
                 response, _ = self.call_api(url = url, params =params)
                 
                 if status == True:
@@ -656,19 +602,11 @@ class FaceitClient():
             game_id = 'cs2'
 
             lifetime_url = f"https://open.faceit.com/data/v4/players/{player_id}/stats/{game_id}"
-            
-            #resp = r.get(
-            #    url = lifetime_url,
-            #    headers = self.headers
-            #)
-             
-            #lifetime_data = resp.json()
-            
             lifetime_data,_ , _= await self.call_api(url= lifetime_url, endpoint = 'lifetime', session = session)
             #lifetime_data = await response.json()
 
             if not lifetime_data:
-                self.detect_soft_rate_limit(lifetime_data)
+                await self.detect_soft_rate_limit(lifetime_data)
             
             else:
                 for segments in lifetime_data.get('segments', []):
@@ -710,7 +648,7 @@ class FaceitClient():
 
             if not match:
                 self.skip_match = True
-                self.detect_soft_rate_limit(data = None, skip = True)
+                await self.detect_soft_rate_limit(data = None, skip = True)
 
                 self.trigger_response(f"matches/{match_id}", latency, status_override= 'skip_match')
                 self.logger.warning("Skipping match: %s - Failure to get matches elo for game.", match_id)
@@ -781,6 +719,7 @@ class FaceitClient():
             self.logger.warning('Soft Rate Limit Hit! %s', e)
 
     async def detect_soft_rate_limit(self, data, skip = False):
+
         empty_count = 0
         #if not self.skip_match:
         if skip or not data or data == []:
@@ -816,7 +755,7 @@ class FaceitClient():
             # Match Endpoint logic
             #if match_func:
             #    start = perf_counter()
-            #    
+            #    a
             #    response = self.session.get(url = url, params = params,
             #                    headers = self.headers, timeout =3)
             #    data = response.json()
@@ -826,7 +765,7 @@ class FaceitClient():
 
             if not endpoint:
                 raise ValueError(f"Invalid endpoint : {endpoint}")
-            data, status = await func(url =url, session = session, params = params, count = count)
+            _, data, status = await self.retry_function(func, url =url, session = session, params = params, count = count)
 
             #data = await response.json()
             
@@ -841,7 +780,7 @@ class FaceitClient():
             #if response.status == 429:
             if isinstance(data, dict) and 'errors' in data:
                 self.status = 'rate_limited'
-                raise SoftRateLimit("HTTP 429 Error")
+                #raise SoftRateLimit("HTTP 429 Error")
                 
             if endpoint and 'stats' not in endpoint:
                 if isinstance(data, dict) and "errors" in data:
@@ -875,38 +814,42 @@ class FaceitClient():
 
     async def fetch_statistics_transform(self, url, session, params = None, count = None):
         """gets statistics in detail from statistics endpoint, returns json object"""
+
         self.logger.info("(%s) FETCH statistics -> %s", count, url)
         async with session.get(url, headers = self.headers, params = params) as response:
             data = await response.json()
             status = response.status
             self.logger.info("(%s) DONE  statistics -> status:%s", count, status)
-            return data, status
+            return response, data, status
         
 
     async def fetch_matches_elo(self, url, session, params = None, count = None):
         """gets elo in detail from matches_elo endpoint, returns json object"""
+
         self.logger.info("(%s) FETCH elo -> %s", count, url)
         async with session.get(url, headers =self.headers, params = params) as response:
             data = await response.json()
             status = response.status
-            self.logger.info("(%s) DONE  elo -> status:%s", count, status)
-            return data, status
+            self.logger.info("(%s) DONE  elo -> status:%s", count, status)     
+            return response, data, status
 
     async def fetch_lifetime_url(self, url, session, params= None, count = None):
         """gets lifetime in detail from lifetime endpoint, returns json object"""
+
         self.logger.info("FETCH lifetime -> %s", url)
         async with session.get(url, headers = self.headers, params = params) as response:
             data = await response.json()
             status = response.status
             self.logger.info("DONE  lifetime -> status:%s", status)
-            return data, status
+            return response, data, status
 
     async def fetch_match(self, url, session, params= None, count = None):
         """gets matches in detail from match endpoint, returns json object"""
+        
         self.logger.info("FETCH match -> %s", url)
         async with session.get(url, headers = self.headers, params = params) as response:
             data = await response.json()
             status = response.status
             self.logger.info("DONE  match -> status:%s", status)
-            return data, status
+            return response, data, status
 

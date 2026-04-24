@@ -59,7 +59,7 @@ class getdata():
                 self.logger.debug(f"Preview of data incoming: \n {pd.DataFrame(batch).head()}")
             else:
                 self.logger.debug(f"Preview of data incoming: \n {pd.json_normalize(batch).head()}")
-                
+       
         #if batch != list:
         #    batch = list(batch)
         try:
@@ -68,40 +68,30 @@ class getdata():
             else:
                 if collection.lower() == "matches":
                     self.stored = self.matches.insert_many(
-                    documents = batch,
-                    # skipping duplicates
-                    ordered = False)
+                    documents = batch, ordered = False)
 
                     self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
                 if collection.lower() == "players":
                     self.stored = self.players.insert_many(
-                    documents = batch,
-                    # skipping duplicates
-                    ordered = False)
+                    documents = batch, ordered = False)
 
                     self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
                 if collection.lower() == "ratings":
                     self.stored = self.ratings.insert_many(
-                    documents = batch,
-                    # skipping duplicates
-                    ordered = False)
+                    documents = batch, ordered = False)
 
                     self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
                 if collection.lower() == "alters":
                     self.stored = self.alters.insert_many(
-                    documents = batch,
-                    # skipping duplicates
-                    ordered = False)
+                    documents = batch, ordered = False)
 
                     self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
                 if collection.lower() == "lifetime":
                     self.lifetime_flag_for_verbose = True
                     
-                    self.stored = self.lifetime.insert_one(
-                    document = batch)
-                    # skipping duplicates
-                    #ordered = False)
+                    self.stored = self.lifetime.update_one(
+                    filter= {"_id": batch.get("_id")}, update = {"$set": batch}, upsert = True)
 
                     self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
@@ -109,9 +99,7 @@ class getdata():
                     self.lifetime_flag_for_verbose = True
                     
                     self.stored = self.matches_elo.insert_many(
-                    documents = batch,
-                    # skipping duplicates
-                    ordered = False)
+                    documents = batch, ordered = False)
 
                     self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 

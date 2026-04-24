@@ -2,6 +2,7 @@ from itertools import islice
 from pipeline.orch import getdata
 from pipeline.faceitclient import FaceitClient
 
+import numpy as np
 import time
 import datetime
 from zoneinfo import ZoneInfo
@@ -42,14 +43,21 @@ class PipelineRunner():
         self.client = FaceitClient(dbobj= self.data,
                                    headers= headers)
         # Assuming 72 players x 15 matches = 1080 matches
-        self.batch_size = 30
+        self.batch_size = 2
         self.max_players = len(list(self.data.players.find({'_id': {"$exists": True}})))
 
         self.batch_flag = None
 
-        # Checkpointing Variables
+        # Queue for passing data from producer to consumer
+        self.queue = asyncio.Queue(maxsize = 80)
+
+        # Batch Variables
+        self.batches = []
         self.batch_count = 0
-        self.last_saved_checkpoint_idx = self.most_recent_checkpoint()
+
+        # Checkpointing Variables
+        self.last_checkpoint_upstream = 0
+        self.last_checkpoint_downstream = 0 #self.most_recent_checkpoint()
         self.retrieved_player_id = 0
         self.lifetime_map_scores = 0
 
@@ -71,7 +79,7 @@ class PipelineRunner():
     async def supermatch(self):
         """
         Supermatch default state is to pick from a save, if save not found it starts fetching from scratch.
-        else, start from scratch if default_state = False
+        else, start from scratch if start_from_checkpoint = False
 
         :helper_supermatch(): helper supermatch runs the statistics, lifetime and matches_elo endpoint calls.
         """
@@ -79,51 +87,48 @@ class PipelineRunner():
         async with aiohttp.ClientSession() as session:
 
             start = time.perf_counter()
-
-            self.retrieved_player_id = self.most_recent_checkpoint()
-            if self.retrieved_player_id == 0:
-                default_state = False
+            # Collect remaining players from Lookup 
+            remaining_indices, remaining_pids = self.most_recent_checkpoint()
+        
+            if len(remaining_pids) == 0:
+                start_from_checkpoint = False
                 self.logger.warning("No checkpoint was found!")
+
             else: 
-                default_state = True
+                start_from_checkpoint = True
             try:  
-                # Collect N player_ids
-                indices_array, player_ids = self.client.collect_N()
                 # Get statistics of all the existing matches
                 players_stats = []
                 matches_elo_stats = []
 
-                if default_state:
-                    index = player_ids.index(self.retrieved_player_id)
-                    self.logger.info(len(player_ids))
-                    shortened_player_ids = player_ids[index-1: ]
-                    shortened_indices_array = indices_array[1: index]
-
-                    # This variable allows for tracking of players from checkpoint
-                    indices_array_for_count = indices_array[index-1: ]
-
-                    await self.helper_supermatch(indices_array= shortened_indices_array, 
-                                player_ids= shortened_player_ids, 
-                                count = indices_array_for_count,
+                if start_from_checkpoint:
+                    await self.helper_supermatch(indices_array= remaining_indices, 
+                                player_ids= remaining_pids, 
+                                count = remaining_indices,
                                 stats= (players_stats, matches_elo_stats),
                                 session = session,
-                                default_state = default_state,
+                                start_from_checkpoint = start_from_checkpoint,
                                 start = start
-                                )
+                            )
+                    self.logger.info('Starting from Lookup, remaining pids: %s',len(remaining_pids))
+
                 else:
+                    # Collect N player_ids
+                    indices_array, self.player_ids = self.client.collect_N()
                     indices_array_for_count = indices_array 
                         
                     await self.helper_supermatch(indices_array= indices_array, 
-                                    player_ids= player_ids,
+                                    player_ids= self.player_ids,
                                     count = indices_array_for_count,
                                     stats=(players_stats, matches_elo_stats),
                                     session = session,
-                                    default_state = default_state,
+                                    start_from_checkpoint = start_from_checkpoint,
                                     start = start)  
-                                
-                #end = time.perf_counter()
-                #print(f"Execution time : {end - start:.6f} seconds")
-                        
+        
+            except KeyboardInterrupt:
+                self.logger.error(f"KeyboardInterrupt", exc_info= True)
+                self.checkpointer()
+                
             except Exception as e:
                 self.logger.error(f"Error occured in supermatch: {e}", exc_info= True)
                 self.checkpointer()
@@ -133,25 +138,23 @@ class PipelineRunner():
                 raise BatchError(f"Batch failed processing at batch count: {self.batch_count}")
     
 
-    async def helper_supermatch(self, indices_array, player_ids, count, stats, session, default_state, start):
+    async def helper_supermatch(self, indices_array, player_ids, count, stats, session, start_from_checkpoint, start):
         # accessing player ids for alter func
 
         # Async concurrent workers
-        concurrent_workers = 10
+        concurrent_workers = 6
         semaphore = asyncio.Semaphore(concurrent_workers)
 
         async def process_player(idx):
             async with semaphore:
-
+                
                 # 'success' acts as a flag and also contains alter_match_ids,
                 # to be used by statistics functionlast
                 self.logger.info(
-                    f"({count[idx]}) processing player id :{player_ids[idx]}"
+                    f"({idx}) processing player id :{player_ids[idx]}"
                 )  
 
-                alter_match_ids = await self.client.retry_function(
-                    self.client.alter_function, player_ids[idx], session
-                ) or []
+                alter_match_ids, alter_data, alters = await self.client.alter_function(player_ids[idx], session)
                 
                 alter_match_ids =  list(set(alter_match_ids))
                 n = len(alter_match_ids)
@@ -159,28 +162,35 @@ class PipelineRunner():
                 # THIS IS SKIPPING THE PLAYER DUE TO LESS MATCHES
                 if not alter_match_ids:
                     self.logger.warning(
-                        f"({count[idx]}) Player ID skipped due lesser number of matches in the past 40d!!"
+                        f"({idx}) Player ID skipped due lesser number of matches in the past 40d!!"
                     )
                     return None
 
                 # Processing each match id from the randomizer
                 stats_tasks = [
-                    self.client.retry_function(
-                        self.client.statistics_transform, match_id, session, count[idx]
-                    )
+                    #self.client.retry_function(
+                        self.client.statistics_transform(match_id, session, idx)
+                    #)
                     for match_id in alter_match_ids
                 ]
 
                 elo_tasks = [
-                    self.client.retry_function(
-                        self.client.matches_elo, match_id, session, count[idx]
-                    )
+                    #self.client.retry_function(
+                        self.client.matches_elo(match_id, session, idx)
+                    #)
                     for match_id in alter_match_ids
                 ]
+                
+                local_concurrent_workers = 3
+                local_semaphore = asyncio.Semaphore(local_concurrent_workers)
+
+                async def throttle(coroutine):
+                    async with local_semaphore:
+                       return await coroutine
 
                 results = await asyncio.gather(
-                    *stats_tasks,
-                    *elo_tasks,
+                    *[throttle(t) for t in stats_tasks],
+                    *[throttle(t) for t in elo_tasks],
                     self.client.lifetime_aggregates(player_ids[idx], session),
                     return_exceptions=True
                 )
@@ -189,178 +199,109 @@ class PipelineRunner():
                 elo_results = results[n:2*n]
                 lifetime_result = results[-1]
 
+
                 value_stats = [r for r in stats_results if r and not isinstance(r, Exception)]
                 value_elo = [r for r in elo_results if r and not isinstance(r, Exception)]
 
-                if default_state:
+                if start_from_checkpoint:
                     self.logger.info(
-                        f"({count[idx]}) Ran player id :{player_ids[idx]}"
+                        f"({idx}) Ran player id :{player_ids[idx]}"
                     )  
                 else:
                     self.logger.info(
-                        f"({count[idx]+1}) Ran player id :{player_ids[idx]}"
+                        f"({idx+1}) Ran player id :{player_ids[idx]}"
                     )  
                 
-                return {
+                result =  {
                     "idx": idx,
                     "stats": value_stats,
                     "elo": value_elo,
-                    "lifetime": lifetime_result
+                    "lifetime": lifetime_result,
+                    "matches": alter_data,
+                    "alters": alters
                 }
 
-        # player level asynchronous workers
-        #tasks = []
-        #for idx in indices_array:
-        #    tasks.extend(process_player(idx))
-            # if tasks hits a len of 15, batch unlock --> process it once (one coroutine)
-        print(len(indices_array))
-        tasks = [process_player(idx) for idx in indices_array]
-        batch_count = 0
-    
-        for chunks in self.chunked(tasks, 15):
+                await self.queue.put(result)
+                self.last_checkpoint_upstream = player_ids[idx]
+                
+        async def run():
             
-            results = await asyncio.gather(*chunks, return_exceptions=True)
-            
-            for res in results:
-                if not res:
-                    continue
-                if isinstance(res,Exception):
-                    self.logger.error(f"Chunk error {res}")
+            # consumer
+            consumer = asyncio.create_task(self.batch_processor())
 
-                idx = res['idx']
+            # producer
+            tasks = [process_player(idx) for idx in indices_array]
+            await asyncio.gather(*tasks)
 
-                stats_temp = res['stats']
-                self.data.ratings_batch.extend(stats_temp)
+            # block until 0 items in queue
+            await self.queue.join()
 
-                elo_temp = res['elo']
-                self.data.matches_elo_batch.extend(elo_temp)
+            # consumer stopping
+            consumer.cancel()
 
-                #lifetime api call
-                lifetime_temp = (
-                    res["lifetime"] if not isinstance(res["lifetime"], Exception) else None
-                )
-                if lifetime_temp is not None:
-                    self.data.store_data(batch=lifetime_temp, collection="lifetime", verbose=True)
-                    self.logger.info("Stored Lifetime: %s", lifetime_temp['_id'])
-                #self.batch_processor(lifetime_scores= lifetime_temp)
+            # flushing the remaining batches
+            # if self.batches:
+            #     await self.batch_processor(flush = True)
+            #     self.batches.clear()
+                
+            #     self.logger.info("Remaining batches flushed succesfully!!")
 
-                # Saving last checkpoint for player id
-                self.last_saved_checkpoint_idx = player_ids[idx]
-
-            # running batch processor and clearing state variables from orch.py
-            self.batch_processor(batchId = batch_count)
-
-            for batches in self.data_references.values():
-                batches.clear()
-
-            batch_count += 1
-        #results = await asyncio.gather(*tasks)
-
-        # collecting results
-        # for res in results:
-        #     if not res:
-        #         continue
-
-        #     idx = res["idx"]
-
-        #     # clearing player_stats prevents redundancy
-        #     #stats[0].extend(res["stats"])
-        #     stats_temp = res['stats']
-        #     self.data.ratings_batch.extend(stats_temp)
-        #     #stats[0].clear()
-
-        #     # clearing matches_elo prevents redundancy
-        #     #stats[1].extend(res["elo"])
-        #     elo_temp = res['elo']
-        #     self.data.matches_elo_batch.extend(elo_temp)
-
-        #     #stats[1].clear()
-
-        #     # lifetime api call
-        #     self.lifetime_map_scores = (
-        #         res["lifetime"] if not isinstance(res["lifetime"], Exception) else None
-        #     )
-
-        #     # Saving last checkpoint for player id
-        #     self.last_saved_checkpoint_idx = player_ids[idx]
-
-        #     if default_state:
-        #         await self.batch_processor()
-        #         self.logger.info(
-        #             f"({count[idx]}) Ran player id :{player_ids[idx]}, alters and matches stored!"
-        #         )  
-        #     else:
-        #         await self.batch_processor()
-        #         self.logger.info(
-        #             f"({count[idx]+1}) Ran player id :{player_ids[idx]}, alters and matches stored!"
-        #         ) 
+        await run()
 
         end = time.perf_counter()
         self.execution_time = end - start
         self.logger.info(f"Execution time : {self.execution_time:.4f} seconds")
-    
-    
-    def chunked(self, iterable, batch_size):
 
-            iterables = iter(iterable)
+
+    async def batch_processor(self): #flush = None        
+
+        def store(batch):
+            if batch.get('stats'):
+                self.data.store_data(batch['stats'], 'ratings')
+
+            if batch.get('elo'):
+                self.data.store_data(batch['elo'], 'matches_elo')
+
+            if batch.get('matches'):
+                self.data.store_data(batch['matches'], 'matches')
+
+            if batch.get('alters'):
+                self.data.store_data(batch['alters'], 'alters')
+
+            if isinstance(batch['lifetime'], dict):
+                self.data.store_data(batch['lifetime'], 'lifetime')
+
+        #if not flush:
+        try:
             while True:
-                batch = list(islice(iterables, batch_size))
+                item = await self.queue.get()
+                self.batches.append(item)
+                self.queue.task_done()
+                if len(self.batches) >= self.batch_size:
+                    for batch in self.batches:
+                        if not batch:
+                            continue
 
-                if not batch:
-                    break
-                else:
-                    yield batch
+                        idx = batch['idx']
+                        store(batch)
+                        self.logger.info(f"Player ({idx}) stored to dB successfully!!")
+                        #self.last_checkpoint_downstream = self.player_ids[idx]
 
-    def batch_processor(self, lifetime_scores = None, batchId = None):
-                
-        if lifetime_scores is None:
+                    self.batches.clear() 
+                    self.batch_count += 1
+                    self.logger.info(f"Batch Id ({self.batch_count}) has been successfully processed!!")
 
-            for collection, batches in self.data_references.items():
-                current_batches = list(batches)
+        except Exception as e:
+            self.logger.error(f"batch_processor died: {e}", exc_info=True)
 
-                # Guard
-                if not current_batches:
-                    continue
-                
-                if len(current_batches) >= self.batch_size or self.client.error_flag: # add >= not ==
-                    # batch flag allows to iterate batch count
-                    #self.batch_flag = True
-                    
-                    # chunking batches
-                    for batch in self.chunked(current_batches, self.batch_size):
+            # clearing dirty batch
+            self.batches.clear()
 
-                        # adding batchId to each batch
-                        for item in batch:
-                            item['batchId'] = batchId
-
-                        # storing data into DB 
-                        self.data.store_data(batch = batch,
-                                            collection = collection,
-                                            verbose = True)
-                    #batches.clear()
-            self.logger.info(
-                f"IDs -> {batchId*15}-{(batchId*15)+15}, data stored!"
-            ) 
-            #if self.batch_flag:
-            #    self.batch_count +=1
         # else:
-        #     if lifetime_scores:
-        #         self.data.store_data(
-        #             batch = lifetime_scores,
-        #             collection = 'lifetime',
-        #             verbose = True
-        #         )
-
-        # if self.lifetime_map_scores:
-        #     await self.data.store_data(
-        #         batch=self.lifetime_map_scores,
-        #         collection="lifetime",
-        #         verbose=True
-        #     )
-
-        #self.batch_flag = False
-
-        # for every single batch sent, two fields always go with it batchId, stageId
+        #     for batch in local_batch:
+        #         store(batch)
+        #     self.batch_count += 1
+        #     self.logger.info(f"Batch Id ({self.batch_count}) has been successfully processed!!")  
             
 
     def checkpointer(self):
@@ -372,7 +313,7 @@ class PipelineRunner():
         saves = {}
     
         self.logger.warning('checkpoint triggered due to sudden shutdown')
-        self.logger.warning('saving recent checkpoint:\n @player_id %s \n @batch count %s', self.last_saved_checkpoint_idx, self.batch_count)
+        self.logger.warning('saving recent checkpoint:\n @player_id %s \n @batch count %s', self.last_checkpoint_downstream, self.batch_count)
         
         zt_uae = ZoneInfo("Asia/Dubai")
 
@@ -383,9 +324,10 @@ class PipelineRunner():
         
 
         saves = {"time": str(current_time_uae),
-                "player_id": self.last_saved_checkpoint_idx}
+                "last_player_id_upstream": self.last_checkpoint_upstream,
+                "last_player_id_downstream": self.last_checkpoint_downstream,
+                'batch_Id': self.batch_count}
         
-                #"batch_count": self.batch_count}
         
         # request/response details
         self.runner_response_details = self.client.response_details
@@ -394,7 +336,7 @@ class PipelineRunner():
             rpm = 0
             avg_latency = 0
         else:
-            rpm = (self.client.sum_of_requests/self.client.sum_of_latency) * 60
+            rpm = (self.client.sum_of_requests/self.client.sum_of_latency + 1e-7) * 60
             avg_latency = self.client.sum_of_latency/self.client.sum_of_requests
 
         self.runner_response_details['stats'] = {
@@ -406,57 +348,68 @@ class PipelineRunner():
 
 
 
-        with open(f"checkpoints/checkpoint_saves_{date}.json", "w") as saves_json:
+        with open(f"checkpoints/checkpoint_{date}.json", "w") as saves_json:
             json.dump(saves, saves_json, indent = 4)
 
-        with open(f"response/response_details_{date}.json", "w") as response_json:
+        with open(f"response/response_{date}.json", "w") as response_json:
             json.dump(self.runner_response_details, response_json, indent = 4)
     
     def most_recent_checkpoint(self):
         """
-        Extracts variables from the most recent checkpoint saved.
+        Performs aggregation lookup in MongoDB between lifetime and player collection to extract players which weren't processed by the program.
         
         """
-        try:
-            folder = "checkpoints"
+        # folder = "checkpoints"
 
-            path = Path(folder)
-            file_pattern = "*.json"
-            files = list(path.glob(file_pattern))
+        # path = Path(folder)
+        # file_pattern = "*.json"
+        # files = list(path.glob(file_pattern))
+    
+        # if not files:
+        #     self.logger.warning("No checkpoint found.")
+        #     return 0
 
-            if not files:
-                self.logger.warning("No checkpoint found.")
-                return 0
+        # latest = max(files, key=os.path.getmtime)
 
+        # with open(latest, 'r') as f:
+        #     save = json.load(f)
 
-            timestamps = {idx: {"name":file,
-                                "time":(time.time() - os.path.getctime(file))}
-                        for idx, file in enumerate(files)}
+        # player_id = save.get('last_player_id_downstream', 0)
+
+        # if not player_id:
+        #     return 0
+
+        # self.logger.info("Retrieved most recent checkpoint: %s", player_id)
+
+        lifetime_lookup = [
+            {
+            '$lookup': {
+                'from': 'lifetime',
+                'localField': '_id',
+                'foreignField': '_id',
+                'as': "lifetime_players"}
+            },
+            {
+            '$match': {
+                'lifetime_players': []}
+            },
             
-            min_value = min([time.get("time") for time in timestamps.values()])
-            retrieved_path = str([path 
-                                for path in timestamps.values() 
-                                if path.get("time") == min_value][0]['name'])
-            
-            with open(retrieved_path, 'r') as f:
-                save = json.load(f)
+            {
+                '$project': {'_id': 1}
+            }
+        ]
 
-            if not save['player_id']:
-                self.logger.warning("No checkpoint found.")
-                save['player_id'] = 0
+        filtered_cursor = self.data.players.aggregate(lifetime_lookup)
+        filtered_players = list(filtered_cursor)
+        print("Filtered players:",len(filtered_players))
 
-                return save['player_id']
-            
-            if save['player_id'] != 0:
-                self.logger.info("Retrieved most recent checkpoint : %s", save['player_id'])
-                return save['player_id']
-            
-            else:
-                
-                raise ValueError
+        player_ids = [
+            pid.get("_id") for pid in filtered_players
+        ]
+        indices_array = np.arange(len(player_ids))
 
-        except (ValueError, KeyError) as e:
-            raise NoCheckpoint("No Checkpoint save was found!")
+        return indices_array, player_ids
+        
         
        
     
