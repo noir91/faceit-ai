@@ -8,8 +8,16 @@ from pipeline.runner_b import PipelineRunner
 from dotenv import load_dotenv
 import os
 import asyncio
+import subprocess
 
 load_dotenv()
+
+
+subprocess.run(
+    ['sudo', '-S', 'systemctl', 'start', 'mongod'],
+    input=os.environ['p'].encode(),
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL)
 
 async def main():
     API_KEY = os.environ['API_KEY']
@@ -39,5 +47,19 @@ async def main():
     await runner.supermatch()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
 
+    except SystemExit as e:
+        if e.code == 1:
+            print("SystemExit(1) occurred — retrying once...")
+            
+            try:
+                asyncio.run(main())
+            except SystemExit as e2:
+                print(f"Second run exited with code: {e2.code}")
+        else:
+            raise  # re-raise other exit codes
+
+    except Exception as e:
+        print(f"Unexpected error: {e}")
