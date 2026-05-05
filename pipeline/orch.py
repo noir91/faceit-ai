@@ -70,22 +70,22 @@ class getdata():
                     self.stored = self.matches.insert_many(
                     documents = batch, ordered = False)
 
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
                 if collection.lower() == "players":
                     self.stored = self.players.insert_many(
                     documents = batch, ordered = False)
 
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
                 if collection.lower() == "ratings":
                     self.stored = self.ratings.insert_many(
                     documents = batch, ordered = False)
 
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
                 if collection.lower() == "alters":
                     self.stored = self.alters.insert_many(
                     documents = batch, ordered = False)
 
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
                 if collection.lower() == "lifetime":
                     self.lifetime_flag_for_verbose = True
@@ -93,7 +93,7 @@ class getdata():
                     self.stored = self.lifetime.update_one(
                     filter= {"_id": batch.get("_id")}, update = {"$set": batch}, upsert = True)
 
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
                 if collection.lower() == "matches_elo":
                     self.lifetime_flag_for_verbose = True
@@ -101,7 +101,7 @@ class getdata():
                     self.stored = self.matches_elo.insert_many(
                     documents = batch, ordered = False)
 
-                    self.logger.info("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
            
                     

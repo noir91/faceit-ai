@@ -62,7 +62,7 @@ class FaceitClient():
         #self.elo_persistence = set()
         
         # if control stage is True, it's stage 1 and else stage 2
-        self.control_stage = True
+        self.control_stage = False
 
         # Network env variables
         self.fetch_calls = (self.fetch_statistics_transform, 
@@ -195,27 +195,30 @@ class FaceitClient():
 
         indices = {idx: value for idx, value in enumerate(players_id)}
 
+        # Get a list of stage 1 alter player ids to compare with stage 2 lifetime player ids and returns it for checkpointing at stage 2
         if not self.control_stage:
-                
-            alters = self.dbobj.alters
-            alters_id = [
+        
+            alters_ids = set(
                 pid
-                for doc in alters.find({}, {"player_ids": 1, "_id": 0})
-                for pid in doc.get("player_ids", [])
-            ]
+                for doc in self.dbobj.db['alters'].find({'stageId': {'$regex': '^stage_1_'}}, {'player_ids': 1, '_id': 0})
+                for pid in doc.get('player_ids', [])
+            )
 
-            filtered_alter_ids = []
-            players_id = set(players_id)
+            lifetime_ids = set(
+                doc['_id']
+                for doc in self.dbobj.db['lifetime'].find({'stageId': {'$regex': '^stage_2_'}}, {'_id': 1})
+            )
 
-            for alter in alters_id:
-                if alter not in players_id:
-                    filtered_alter_ids.append(alter)
+            filtered = list(alters_ids - lifetime_ids)
+            len(filtered), len(alters_ids), len(lifetime_ids)
 
-            indices = {idx: value for idx, value in enumerate(filtered_alter_ids)}
+            indices = {idx: value for idx, value in enumerate(filtered)}
             indices_array = np.array([i for i in indices.keys()])
-            self.logger.info("Players retrieved from Collect N -> %s", len(indices_array))
 
-            return indices_array, filtered_alter_ids
+            self.logger.info(f"Players retrieved \n- (S1)Length of alter player ids: %s,\n- (S2)Length of lifetime ids: %s,\n- Length of filtered player id: %s", \
+                        len(alters_ids), len(lifetime_ids), len(filtered))
+            
+            return indices_array, filtered
         
         else:
             indices = {idx: value for idx, value in enumerate(players_id)}

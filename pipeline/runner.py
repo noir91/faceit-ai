@@ -20,6 +20,9 @@ import aiohttp
 
 from time import perf_counter
 from configs.exceptions import SkippingMatch
+
+from typing import Tuple
+
 class PipelineRunner():
     """
     Docstring for PipelineRunner
@@ -47,7 +50,7 @@ class PipelineRunner():
         self.lifetime_semaphore = asyncio.Semaphore(2)  
 
         # Assuming 72 players x 15 matches = 1080 matches
-        self.batch_size = 2
+        self.batch_size = 30
         self.max_players = len(list(self.data.players.find({'_id': {"$exists": True}})))
 
         self.batch_flag = None
@@ -93,6 +96,17 @@ class PipelineRunner():
             start = time.perf_counter()
             # Collect remaining players from Lookup 
             remaining_indices, remaining_pids = self.most_recent_checkpoint()
+
+            # Guard before running, manual intervention
+            while True:
+                prompt = input("You want pipeline to execute? (Y/N): ").lower()
+                
+                if prompt in ['y', 'yes']:
+                    break
+                elif prompt in ['n','no']:
+                    self.logger.info("Exiting...")
+                    sys.exit(0)
+
         
             if len(remaining_pids) == 0:
                 start_from_checkpoint = False
@@ -361,62 +375,92 @@ class PipelineRunner():
 
         with open(f"response/response_{date}.json", "w") as response_json:
             json.dump(self.runner_response_details, response_json, indent = 4)
+
+
+    def backup_func(self, primary: Tuple[str, str], foreign: Tuple[str,str], key_to_merge = 'stageId'):
+        """
+        Allows collections to get mapped with their stageIds if they were missed to be added in the start originally.
+        primary: (collection_to_update, its_join_field)
+        foreign: (collection_to_pull_from, its_join_field)
+        """
+        
+        lookup = [
+            {
+                '$lookup':{
+                    'from': f'{primary[0]}',
+                    'localField': f'{primary[1]}',
+                    'foreignField': f'{foreign[1]}',
+                    'as': 'existing_pids'
+                }
+            }, 
+            {
+                '$set':{
+                    'stageId': {'$arrayElemAt': [f'$existing_pids.{key_to_merge}', 0]} 
+                }
+            },
+            
+            {
+                '$unset': 'existing_pids'
+            },
+
+            {
+                '$merge':{
+                    'into': f'{primary[0]}',
+                    'on': f'{primary[1]}',
+                    'whenMatched': 'merge',
+                    'whenNotMatched': 'discard'
+                }
+            }
+
+            ]
+
+        self.data.db[primary[0]].aggregate(lookup)
     
     def most_recent_checkpoint(self):
         """
         Performs aggregation lookup in MongoDB between lifetime and player collection to extract players which weren't processed by the program.
         
         """
-        # folder = "checkpoints"
 
-        # path = Path(folder)
-        # file_pattern = "*.json"
-        # files = list(path.glob(file_pattern))
+        # outputs stage 2 checkpointer system
+        if not self.client.control_stage:
+            indices_array, player_ids = self.client.collect_N()
+            return indices_array, player_ids
+        
+
+        # outputs stage 1 checkpointer system
+        else:
+            lifetime_lookup = [
+                {
+                '$lookup': {
+                    'from': 'lifetime',
+                    'localField': '_id',
+                    'foreignField': '_id',
+                    'as': "lifetime_players"}
+                },
+
+                {
+                '$match': {
+                    'lifetime_players': []}
+                },
+                
+                {
+                    '$project': {'_id': 1}
+                }]
+
+            filtered_cursor = self.data.players.aggregate(lifetime_lookup)
+            filtered_players = list(filtered_cursor)
+
+            print("Filtered players:",len(filtered_players))
+
+            player_ids = [
+                pid.get("_id") for pid in filtered_players
+            ]
+            indices_array = np.arange(len(player_ids))
+
+            return indices_array, player_ids
     
-        # if not files:
-        #     self.logger.warning("No checkpoint found.")
-        #     return 0
-
-        # latest = max(files, key=os.path.getmtime)
-
-        # with open(latest, 'r') as f:
-        #     save = json.load(f)
-
-        # player_id = save.get('last_player_id_downstream', 0)
-
-        # if not player_id:
-        #     return 0
-
-        # self.logger.info("Retrieved most recent checkpoint: %s", player_id)
-
-        lifetime_lookup = [
-            {
-            '$lookup': {
-                'from': 'lifetime',
-                'localField': '_id',
-                'foreignField': '_id',
-                'as': "lifetime_players"}
-            },
-            {
-            '$match': {
-                'lifetime_players': []}
-            },
-            
-            {
-                '$project': {'_id': 1}
-            }
-        ]
-
-        filtered_cursor = self.data.players.aggregate(lifetime_lookup)
-        filtered_players = list(filtered_cursor)
-        print("Filtered players:",len(filtered_players))
-
-        player_ids = [
-            pid.get("_id") for pid in filtered_players
-        ]
-        indices_array = np.arange(len(player_ids))
-
-        return indices_array, player_ids
+        
         
         
        

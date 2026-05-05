@@ -31,4 +31,8 @@ logs
 response
 log4lab
 
+pipeline/runnersync.py
 
+.VSCodeCounter
+logs
+*.log
