@@ -23,8 +23,6 @@ testscripts
 *__init__.py
 *.ipynb_checkpoints
 *__pycache__
-*.png
-
 # Logs
 checkpoints
 logs

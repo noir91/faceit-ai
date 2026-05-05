@@ -59,7 +59,7 @@ Orchestrates the full pipeline. Manages async workers via nested `asyncio.Semaph
 
 ## Pipeline Workflow
 
-![Workflow](pipeline/workflow.png)
+![Workflow](pipeline/imgs/workflow.png)
 
 The runner coordinates two stages of ego-centric sampling.
 
@@ -73,7 +73,7 @@ Each player is processed as an isolated async task. The outer semaphore controls
 
 ## Async Workers
 
-![Supermatch](pipeline/supermatch.png)
+![Supermatch](pipeline/imgs/supermatch.png)
 
 Two inner loops run per player.
 
@@ -90,6 +90,8 @@ Worker configuration: 6 outer workers, 3 inner workers. 18 API calls in flight a
 Ego-centric probabilistic sampling.
 
 Snowball sampling from a single handpicked seed set would bias the dataset toward a narrow population. Ego-centric sampling seeds from a set of known high-elo players and expands through their match networks, introducing randomness at each layer via the match randomizer.
+
+![Expansion](pipeline/imgs/expansion.png)
 
 | Parameter | Value |
 |---|---|

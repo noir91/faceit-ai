@@ -9,7 +9,7 @@ The final dataset feeds an ML pipeline for player skill estimation and ranking. 
 ---
 
 # System Overview
-![Zoom In](pipeline/imgs/pwf.jpeg)
+![Zoom In](imgs/pwf.jpeg)
 
 ## How to run it
 
