@@ -204,7 +204,7 @@ faceit-ai/
 
 ---
 
-![Cheers to a win!](imgs/dbwrite.png)
+![Cheers to a win!](pipeline/imgs/dbwrite.png)
 
 ## What's Next
 
