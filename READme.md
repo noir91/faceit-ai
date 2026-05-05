@@ -193,10 +193,18 @@ faceit-ai/
     ├── orch.py
     ├── runner.py
     ├── runner_b.py
-    └── workflow.png
+    └── imgs/
+         ├── dbwrite.png
+         ├── expansion.png
+         ├── pwf.jpeg
+         ├── supermatch.png
+         └── workflow.png
+
 ```
 
 ---
+
+![Cheers to a win!](imgs/dbwrite.png)
 
 ## What's Next
 
