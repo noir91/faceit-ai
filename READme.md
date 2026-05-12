@@ -8,7 +8,9 @@ The goal is to help competitive players make better map nominations against the 
 
 ---
 
-## 📂 [Pipeline Documentation](https://github.com/noir91/faceit-ai/tree/main/pipeline)
+## 📂 [Pipeline Documentation](https://github.com/noir91/faceit-ai/tree/main/z)
+## 🌳 [Case Study](https://whyml.com/#/case-studies)
+
 
 ## Current State
 
