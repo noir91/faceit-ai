@@ -855,4 +855,3 @@ class FaceitClient():
             status = response.status
             self.logger.info("DONE  match -> status:%s", status)
             return response, data, status
-

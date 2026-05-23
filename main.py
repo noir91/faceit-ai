@@ -4,7 +4,7 @@ setup_logging()
 
 from pipeline.faceitclient import FaceitClient
 from pipeline.orch import getdata
-from pipeline.runner_b import PipelineRunner
+from pipeline.runner import PipelineRunner
 from dotenv import load_dotenv
 import os
 import asyncio
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     except SystemExit as e:
         if e.code == 1:
             print("SystemExit(1) occurred — retrying once...")
-            
+              
             try:
                 asyncio.run(main())
             except SystemExit as e2:

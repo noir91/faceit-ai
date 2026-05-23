@@ -23,6 +23,8 @@ from configs.exceptions import SkippingMatch
 
 from typing import Tuple
 
+import pickle, os
+
 class PipelineRunner():
     """
     Docstring for PipelineRunner
@@ -73,6 +75,16 @@ class PipelineRunner():
         self.then = None
         self.execution_time = 0
         
+        # Fetch match ids for life time aggregates across unique matche
+        self.match_ids = []
+        self.match_flag = False
+        self.match_concurrent_workers = 10
+        self.match_outer_semaphore = asyncio.Semaphore(self.match_concurrent_workers)
+        self.lfscores_future = []
+        self.lfscore_runtime_cache = {}
+        self.lfscore_set = set()
+
+
         # Request/Response logs
         self.runner_response_details = {}
 
@@ -81,12 +93,13 @@ class PipelineRunner():
                 "ratings":self.data.ratings_batch,
                 "players":self.data.players_batch,
                 #lifetime":self.lifetime_map_scores,
-                "matches_elo":self.data.matches_elo_batch}
-    
+                "matches_elo":self.data.matches_elo_batch,
+                'lfscores': self.data.lfscores_batch}
+        
     async def supermatch(self):
         """
         Supermatch default state is to pick from a save, if save not found it starts fetching from scratch.
-        else, start from scratch if start_from_checkpoint = False
+        else, start from scratch if start_from_checkpoint = Fals
 
         :helper_supermatch(): helper supermatch runs the statistics, lifetime and matches_elo endpoint calls.
         """
@@ -99,13 +112,38 @@ class PipelineRunner():
 
             # Guard before running, manual intervention
             while True:
+                # Main prompt
                 prompt = input("You want pipeline to execute? (Y/N): ").lower()
                 
                 if prompt in ['y', 'yes']:
                     break
                 elif prompt in ['n','no']:
-                    self.logger.info("Exiting...")
-                    sys.exit(0)
+
+                    # Match Lifetime retreival prompt
+                    #self.match_ids = self.collect_match_ids()
+                    #print(f'Total matchIds: {len(self.match_ids)}')
+                    #print(self.match_ids[:1])
+                    prompt = input(" Find Lifetime aggregates for matches? [Y/N]")
+                    
+                    if prompt in ['y', 'yes']:
+                        self.match_flag = True
+                        self.logger.info(" collecting matchIds")
+                        self.match_ids = self.collect_match_ids()
+
+                        # existing lifetime scores lookup
+                        self.logger.info(" collecting lfscores")
+
+                        cache = 'lfscore_set.pkl'
+
+                        if os.path.exists(cache):
+                            with open(cache, 'rb') as f:
+                                self.lfscore_set = pickle.load(f)
+                                break
+                        break
+                            
+                    elif prompt in ['n', 'no']:
+                        self.logger.info("Exiting...")
+                        sys.exit(0)
 
         
             if len(remaining_pids) == 0:
@@ -157,103 +195,108 @@ class PipelineRunner():
     
 
     async def helper_supermatch(self, indices_array, player_ids, count, stats, session, start_from_checkpoint, start):
-        # accessing player ids for alter func
-
-        # Async concurrent workers
-        concurrent_workers = 6
-        semaphore = asyncio.Semaphore(concurrent_workers)
-
-        async def process_player(idx):
-            async with semaphore:
+        async def throttle(coroutine):
+                async with local_semaphore:
+                    return await coroutine
                 
-                # 'success' acts as a flag and also contains alter_match_ids,
-                # to be used by statistics functionlast
-                self.logger.info(
-                    f"({idx}) processing player id :{player_ids[idx]}"
-                )  
+        if self.match_flag == False:
+            # accessing player ids for alter func
+            # Async concurrent workers
+            concurrent_workers = 6
+            semaphore = asyncio.Semaphore(concurrent_workers)
 
-                alter_match_ids, alter_data, alters = await self.client.alter_function(player_ids[idx], session)
-                
-                alter_match_ids =  list(set(alter_match_ids))
-                n = len(alter_match_ids)
-
-                # THIS IS SKIPPING THE PLAYER DUE TO LESS MATCHES
-                if not alter_match_ids:
-                    self.logger.warning(
-                        f"({idx}) Player ID skipped due lesser number of matches in the past 40d!!"
-                    )
-                    return None
-
-                # Processing each match id from the randomizer
-                stats_tasks = [
-                    #self.client.retry_function(
-                        self.client.statistics_transform(match_id, session, idx)
-                    #)
-                    for match_id in alter_match_ids
-                ]
-
-                elo_tasks = [
-                    #self.client.retry_function(
-                        self.client.matches_elo(match_id, session, idx)
-                    #)
-                    for match_id in alter_match_ids
-                ]
-                
-                local_concurrent_workers = 3
-                local_semaphore = asyncio.Semaphore(local_concurrent_workers)
-
-                async def throttle(coroutine):
-                    async with local_semaphore:
-                       return await coroutine
-
-                async def throttle_lifetime(): 
-                    async with self.lifetime_semaphore: 
-                        return await self.client.lifetime_aggregates(player_ids[idx], session)       
+            local_concurrent_workers = 3
+            local_semaphore = asyncio.Semaphore(local_concurrent_workers)
+       
+            async def process_player(idx):
+                async with semaphore:
                     
-                results = await asyncio.gather(
-                    *[throttle(t) for t in stats_tasks],
-                    *[throttle(t) for t in elo_tasks],
-                    throttle_lifetime(),
-                    return_exceptions=True
-                )
-
-                stats_results = results[:n]
-                elo_results = results[n:2*n]
-                lifetime_result = results[-1]
-
-
-                value_stats = [r for r in stats_results if r and not isinstance(r, Exception)]
-                value_elo = [r for r in elo_results if r and not isinstance(r, Exception)]
-
-                if start_from_checkpoint:
+                    # 'success' acts as a flag and also contains alter_match_ids,
+                    # to be used by statistics functionlast
                     self.logger.info(
-                        f"({idx}) Ran player id :{player_ids[idx]}"
+                        f"({idx}) processing player id :{player_ids[idx]}"
                     )  
-                else:
-                    self.logger.info(
-                        f"({idx+1}) Ran player id :{player_ids[idx]}"
-                    )  
-                
-                result =  {
-                    "idx": idx,
-                    "stats": value_stats,
-                    "elo": value_elo,
-                    "lifetime": lifetime_result,
-                    "matches": alter_data,
-                    "alters": alters
-                }
 
-                await self.queue.put(result)
-                self.last_checkpoint_upstream = player_ids[idx]
+                    alter_match_ids, alter_data, alters = await self.client.alter_function(player_ids[idx], session)
+                    
+                    alter_match_ids =  list(set(alter_match_ids))
+                    n = len(alter_match_ids)
+
+                    # THIS IS SKIPPING THE PLAYER DUE TO LESS MATCHES
+                    if not alter_match_ids:
+                        self.logger.warning(
+                            f"({idx}) Player ID skipped due lesser number of matches in the past 40d!!"
+                        )
+                        return None
+
+                    # Processing each match id from the randomizer
+                    stats_tasks = [
+                        #self.client.retry_function(
+                            self.client.statistics_transform(match_id, session, idx)
+                        #)
+                        for match_id in alter_match_ids
+                    ]
+
+                    elo_tasks = [
+                        #self.client.retry_function(
+                            self.client.matches_elo(match_id, session, idx)
+                        #)
+                        for match_id in alter_match_ids
+                    ]
+                    
+                    async def throttle_lifetime(): 
+                        async with self.lifetime_semaphore: 
+                            return await self.client.lifetime_aggregates(player_ids[idx], session)
+
+                      
+                    results = await asyncio.gather(
+                        *[throttle(t) for t in stats_tasks],
+                        *[throttle(t) for t in elo_tasks],
+                        throttle_lifetime(),
+                        return_exceptions=True
+                    )
+
+                    stats_results = results[:n]
+                    elo_results = results[n:2*n]
+                    lifetime_result = results[-1]
+
+
+                    value_stats = [r for r in stats_results if r and not isinstance(r, Exception)]
+                    value_elo = [r for r in elo_results if r and not isinstance(r, Exception)]
+
+                    if start_from_checkpoint:
+                        self.logger.info(
+                            f"({idx}) Ran player id :{player_ids[idx]}"
+                        )  
+                    else:
+                        self.logger.info(
+                            f"({idx+1}) Ran player id :{player_ids[idx]}"
+                        )  
+                    
+                    result =  {
+                        "idx": idx,
+                        "stats": value_stats,
+                        "elo": value_elo,
+                        "lifetime": lifetime_result,
+                        "matches": alter_data,
+                        "alters": alters
+                    }
+
+                    await self.queue.put(result)
+                    self.last_checkpoint_upstream = player_ids[idx]            
                 
-        async def run():
+        async def run(session = False):
             
             # consumer
             consumer = asyncio.create_task(self.batch_processor())
 
             # producer
-            tasks = [process_player(idx) for idx in indices_array]
-            await asyncio.gather(*tasks)
+            if self.match_flag == True:
+                tasks = [self.lifetime_team_agg(mid, session) for mid in range(len(self.match_ids))]
+                await asyncio.gather(*tasks)
+            else:
+                tasks = [process_player(idx) for idx in indices_array]
+                await asyncio.gather(*tasks)
 
             # block until 0 items in queue
             await self.queue.join()
@@ -268,14 +311,14 @@ class PipelineRunner():
                 
             #     self.logger.info("Remaining batches flushed succesfully!!")
 
-        await run()
+        await run(session = session)
 
         end = time.perf_counter()
         self.execution_time = end - start
         self.logger.info(f"Execution time : {self.execution_time:.4f} seconds")
 
 
-    async def batch_processor(self): #flush = None        
+    async def batch_processor(self):        
 
         def store(batch):
             if batch.get('stats'):
@@ -289,6 +332,9 @@ class PipelineRunner():
 
             if batch.get('alters'):
                 self.data.store_data(batch['alters'], 'alters')
+            
+            if batch.get('lfscores'):
+                self.data.store_data([batch['lfscores']], 'lfscores')
 
             if isinstance(batch['lifetime'], dict):
                 self.data.store_data(batch['lifetime'], 'lifetime')
@@ -306,11 +352,15 @@ class PipelineRunner():
 
                         idx = batch['idx']
                         store(batch)
-                        self.logger.info(f"Player ({idx}) stored to dB successfully!!")
+                        if self.match_flag == True:
+                            self.logger.info(f"Match ({idx}) stored to dB successfully!!")
+                        else:
+                            self.logger.info(f"Player ({idx}) stored to dB successfully!!")
                         #self.last_checkpoint_downstream = self.player_ids[idx]
 
                     self.batches.clear() 
                     self.batch_count += 1
+                    self.client.response_details.clear()  # flush after every batch
                     self.logger.info(f"Batch Id ({self.batch_count}) has been successfully processed!!")
 
         except Exception as e:
@@ -318,13 +368,6 @@ class PipelineRunner():
 
             # clearing dirty batch
             self.batches.clear()
-
-        # else:
-        #     for batch in local_batch:
-        #         store(batch)
-        #     self.batch_count += 1
-        #     self.logger.info(f"Batch Id ({self.batch_count}) has been successfully processed!!")  
-            
 
     def checkpointer(self):
         """
@@ -367,6 +410,27 @@ class PipelineRunner():
             'retries_count': self.client.retry_count,
             "total_execution_time": self.execution_time + self.client.fail_overall_total
         }
+
+        if self.match_flag == True:
+            cache = 'lfscore_set.pkl'
+            
+            if not os.path.exists(cache):
+
+                docs = self.data.lfscores.find({}, {
+                                'team_lifetime.faction1._id': 1,
+                                'team_lifetime.faction2._id': 1,
+                                '_id': 0
+                                }).batch_size(20000)
+                self.lfscore_set = set()
+                
+                for doc in docs:
+                    factions = doc['team_lifetime']
+
+                    self.lfscore_set.update([p['_id'] for p in factions['faction1']])
+                    self.lfscore_set.update([p['_id'] for p in factions['faction2']])
+                        
+                with open(cache, 'wb') as f:
+                    pickle.dump(self.lfscore_set, f)
 
 
 
@@ -460,10 +524,200 @@ class PipelineRunner():
 
             return indices_array, player_ids
     
+    async def lifetime_team_agg(self, mid, session):
+        """
+        Fetches lifetime scores of each unique match and their factions, for aggregation to be used in modelling.
+        """
+        n = 5
         
+
+        async with self.match_outer_semaphore:
+            #concurrent_workers = 6
+            # MongoDB lookup to save api calls
+            all_pids = (
+                [pid for pid in self.match_ids[mid]['teams']['faction1']] +
+                [pid for pid in self.match_ids[mid]['teams']['faction2']]
+            )
+
+            # Bulk lookup in one query
+            existing = await asyncio.to_thread(list, self.data.lifetime.find({'_id': {'$in': all_pids}}))
+
+            #existing = set(existing).update(self.lfscore_set)
+            existing_map = {doc['_id']: doc for doc in existing}
+
+            # Split into hits and misses
+            faction1_pids = self.match_ids[mid]['teams']['faction1']
+            faction2_pids = self.match_ids[mid]['teams']['faction2']
+
+            missing_pids = [pid for pid in all_pids 
+                            if pid not in existing_map
+                            and pid not in self.lfscore_set
+                            and pid not in self.lfscore_runtime_cache
+                            ]
+
+            self.logger.info(
+                "(%s) processing matchId : %s", mid, self.match_ids[mid]['_id']
+            )
+
+            local_concurrent_workers = 2
+            local_semaphore = asyncio.Semaphore(local_concurrent_workers)
+
+            async def throttle(coroutine):
+                    async with local_semaphore:
+                        return await coroutine
+                    
+            # API calls only for missing
+            api_tasks = [
+                self.client.lifetime_aggregates(pid, session)
+                for pid in missing_pids
+            ]
+
+            api_results = await asyncio.gather(
+                *[throttle(t) for t in api_tasks],
+                return_exceptions=True
+            )
+
+            api_map = {
+                pid: r for pid, r in zip(missing_pids, api_results)
+                if r and not isinstance(r, Exception)
+            }
+
+            cache_map =  {pid: self.lfscore_runtime_cache[pid] for pid in all_pids if pid in self.lfscore_runtime_cache}
+
+            # Merge db hits + api results
+            full_map = {**existing_map, 
+                        **cache_map,
+                        **api_map}
+
+            # caching
+            self.lfscore_set.update(pid for pid in api_map.keys())
+            self.lfscore_runtime_cache.update(api_map)
+
+            #faction1 = [
+            #    self.client.lifetime_aggregates(pid, session)
+            #    for pid in self.match_ids[mid]['teams']['faction1']
+            #]
+
+            #faction2 = [
+            #    self.client.lifetime_aggregates(pid, session)
+            #    for pid in self.match_ids[mid]['teams']['faction2']
+            #]
+
+            
+            
+            #results = await asyncio.gather(
+            #    *[throttle(t) for t in faction1],
+            #    *[throttle(t) for t in faction2],
+            #    return_exceptions = True
+            #)
+
+            #faction1_lifetimes = results[:n]
+            #faction2_lifetimes = results[n:n*2]
+            
+            # Reconstruct factions
+            value_f1_lifetimes = [full_map[pid] for pid in faction1_pids if pid in full_map]
+            value_f2_lifetimes = [full_map[pid] for pid in faction2_pids if pid in full_map]            
+            
+            self.logger.info(
+                "(%s) Ran matchId : %s",mid, self.match_ids[mid]['_id']
+            )
         
+
+        result = {
+            'idx': self.match_ids[mid],
+            'lfscores': {
+                '_id': self.match_ids[mid]['_id'],
+                'team_lifetime': {
+                    'faction1': value_f1_lifetimes,
+                    'faction2': value_f2_lifetimes
+                }
+            },
+            'lifetime': None  
+        }            
         
-       
+        if len(value_f1_lifetimes) < 5 or len(value_f2_lifetimes) < 5:
+            self.logger.warning(
+                "(%s) Incomplete factions — f1:%d f2:%d matchId:%s",
+                mid, len(value_f1_lifetimes), len(value_f2_lifetimes), self.match_ids[mid]['_id']
+            )
+        await self.queue.put(result)
+
+
+
+        
+    def collect_match_ids(self):
+        """
+        collects match ids and performs transformation on incoming json to seperate
+        players to their respective teams and pass it for fetching.
+        """
+        if self.match_flag == True:
+            pipeline = [
+            {
+                '$lookup': {
+                    'from': 'lfscores',
+                    'localField': '_id',
+                    'foreignField': '_id',
+                    'as': 'existing_scores'
+                }
+            },
+            {
+                '$match': {'existing_scores': []}
+            },
+            {
+                '$project': {'_id': 1, 'teams': 1}
+            }
+        ]
+
+            matches = list(self.data.matches.aggregate(pipeline))
+
+            for match in matches:
+                temp_dict = {'faction1': [], 'faction2': []}
+                for team in match.get('teams'):
+                    for pid in match['teams'][team].get('players'):
+                        temp_dict[team].append(pid['player_id'])
+                match['teams'] = temp_dict
+
+            return matches
+        else:
+        
+            pipeline = [
+            {
+                '$lookup': {
+                    'from': 'lfscores',
+                    'localField': '_id',
+                    'foreignField': '_id',
+                    'as': 'existing_scores'
+                }
+            },
+            {
+                '$match': {
+                    'existing_scores': []
+                }
+            },
+            {
+                "$project": {
+                    "_id": 1,
+                    'teams': 1
+                }
+            }
+            ]   
+
+
+            matches = list(self.data.matches.aggregate(pipeline))
+
+            for match in matches:
+                temp_dict = {
+                        'faction1': [],
+                        'faction2': []
+                    }
+                for teams in match.get('teams'):
+                    for pid in match['teams'][teams].get('players'):
+                            temp_dict[teams].append(pid['player_id'])
+                match['teams'] = temp_dict      
+                    
+            return matches
+    
+        
     
 
             

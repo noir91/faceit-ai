@@ -35,6 +35,7 @@ class getdata():
         self.alters = self.db['alters']
         self.lifetime = self.db['lifetime']
         self.matches_elo = self.db['matches_elo']
+        self.lfscores = self.db['lfscores']
         
         # Batches ready to be stored
         self.matches_batch = []
@@ -43,6 +44,7 @@ class getdata():
         self.alters_batch = []
         self.lifetime_batch = []
         self.matches_elo_batch = []
+        self.lfscores_batch = []
 
 
     def store_data(self, batch, collection:str, verbose = False):
@@ -63,7 +65,7 @@ class getdata():
         #if batch != list:
         #    batch = list(batch)
         try:
-            if collection not in ['matches', 'players', 'ratings', 'alters', 'lifetime', 'matches_elo']:
+            if collection not in ['matches', 'players', 'ratings', 'alters', 'lifetime', 'matches_elo', 'lfscores']:
                 self.logger.error('Enter the correct collection name')
             else:
                 if collection.lower() == "matches":
@@ -103,6 +105,13 @@ class getdata():
 
                     self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
+                if collection.lower() == "lfscores":
+                    self.lifetime_flag_for_verbose = False
+                    
+                    self.stored = self.lfscores.insert_many(
+                    documents = batch, ordered = False)
+
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
            
                     
 

@@ -8,8 +8,8 @@ __pycache__/
 env/
 
 # Data
-data/raw/
-data/tmp/
+#data/raw/
+#data/tmp/
 
 # Secrets
 .env
@@ -17,7 +17,7 @@ data/tmp/
 
 *.csv
 *.txt
-*.ipynb
+#*.ipynb
 *.vscode
 testscripts
 *__init__.py
@@ -34,3 +34,14 @@ pipeline/runnersync.py
 .VSCodeCounter
 logs
 *.log
+/*.parquet
+data/interim
+data/raw
+data/processed
+
+test.ipynb
+lfscores.ipynb
+stamps.ipynb
+
+*.tar.xz
+configs/test.ipynb
