@@ -62,13 +62,14 @@ class FaceitClient():
         #self.elo_persistence = set()
         
         # if control stage is True, it's stage 1 and else stage 2
-        self.control_stage = False
+        self.control_stage = True
 
         # Network env variables
         self.fetch_calls = (self.fetch_statistics_transform, 
                             self.fetch_matches_elo, 
                             self.fetch_lifetime_url,
-                            self.fetch_match)
+                            self.fetch_match,
+                            self.fetch_recent_performance)
         
     async def retry_function(self, function, *args, **kwargs):
 
@@ -200,6 +201,10 @@ class FaceitClient():
         
             alters_ids = set(
                 pid
+                # I am changing alters to players, remember to replace it back -2Aug26
+                # Reason: starting to fetch new data again! using backup from march ig to make
+                # the code fetch players again, i need to write a function tho for that statistical way of
+                # taking stuff.
                 for doc in self.dbobj.db['alters'].find({'stageId': {'$regex': '^stage_1_'}}, {'player_ids': 1, '_id': 0})
                 for pid in doc.get('player_ids', [])
             )
@@ -240,7 +245,7 @@ class FaceitClient():
         
         
         if self.control_stage:
-            num_matches = 15
+            num_matches = 5
         else:
             num_matches = 5
 
@@ -261,7 +266,8 @@ class FaceitClient():
                     "game": "cs2",
                     "from": past_days,
                     "to": current_time,
-                    "offset": offset }
+                    "offset": offset,
+                    'limit' : 100}
                 
                 tasks.append(
                     self.call_api(
@@ -302,6 +308,7 @@ class FaceitClient():
                 # lists to store ids
                 alter_match_ids = []
                 alter_ids = []
+                timestamps = []
 
                 #alter_data = []
 
@@ -319,6 +326,10 @@ class FaceitClient():
                         alter_id = single_match_data['playing_players']
                         alter_ids.append(alter_id)
 
+                        timestamp = {"started_at": single_match_data['started_at'],
+                                     "finished_at": single_match_data['finished_at']}
+                        timestamps.append(timestamp)
+
                         # only raw data can pass from matches which are picked from randomized
                         # matches --> containing the alters
                 
@@ -327,8 +338,10 @@ class FaceitClient():
 
                 # Making an alters output with unique match id and it's alters obtained
                 alters = [
-                    {"_id": alter_match_id, "player_ids": alter_id}
-                    for alter_match_id, alter_id in zip(alter_match_ids, alter_ids)
+                    {"_id": alter_match_id, "player_ids": alter_id, 
+                    "timestamp":timestamp}
+
+                    for alter_match_id, alter_id, timestamp in zip(alter_match_ids, alter_ids, timestamps)
                 ]
 
                 #print(len(alters))
@@ -367,24 +380,110 @@ class FaceitClient():
 
         return randomized_matches
 
-    def convert_json(self, incoming_json):
+    def convert_json(self, incoming_json, sample_size):
         """
     uses polars for faster conversion
 
-    Converts expected incoming JSON (Array of objects for faction in teams from statistics for a match api endpoint)
-    to Dataframe, computes the aggregate and then coverts it back to json.
-        """
-        try:
-            data = (pl.DataFrame(incoming_json)
-                    .cast(pl.Float32)
-                    .mean())
+    Converts expected incoming array of jsons, into a dataframe, 
+    compute the aggregate and then converts it back to json.
 
-            return data.row(0, named = True)
+        """
+        #self.logger.critical(f"TYPE OF INCOMING JSON: {type(incoming_json)}")
+        #self.logger.critical(f'INCOMING JSON: {incoming_json}')
+
+        if not incoming_json or sample_size == 0:
+            return {}
+        try:
+            """
+            Convert nested recent-performance JSON into aggregated player statistics.
+            """
+
+            if not incoming_json:
+                return {}
+
+            # ---------------------------
+            # Flatten incoming structure
+            # ---------------------------
+            df = (
+                pl.DataFrame(list(incoming_json.values()))
+                .explode("statistics")
+                .unnest("statistics")
+                .unnest("player_statistics")
+                .unnest("player_stats")
+                .with_columns(
+                    pl.all()
+                    .exclude(["won", "map"])
+                    .cast(pl.Float64, strict=False)
+                )
+            )
+
+            # ---------------------------
+            # Your existing aggregation
+            # ---------------------------
+            filter = df.select(
+                pl.all().exclude(["won", "map"])
+            ).mean()
+
+            win_filter = df.select(
+                pl.col("won").value_counts()
+            ).unnest("won")
+
+            counts = df["map"].value_counts()
+
+            map_counts = pl.DataFrame({
+                f"{map}_count": [count]
+                for map, count in counts.iter_rows()
+            })
+
+            per_map = (
+                df.group_by("map")
+                .agg(
+                    pl.col("won").mean().alias("wr")
+                )
+            )
+
+            per_map_row = pl.DataFrame({
+                f"{m}_wr": [wr]
+                for m, wr in per_map.iter_rows()
+            })
+
+            overall_wr = df["won"].mean()
+
+            win_ratio = per_map_row.with_columns(
+                pl.lit(overall_wr).alias("win_ratio")
+            )
+
+            df = pl.concat(
+                [filter, map_counts, win_ratio],
+                how="horizontal"
+            )
+
+            return df.row(0, named=True)
         
         except (OutOfBoundsError) as e:
             raise SkippingMatch("Failed to find aggregates of an empty sequence!") 
+
+    def clean_cast(self, incoming_json):
+        """
+        Cleans incoming data into float numbers if strings.
+        """
+
+        try:
+            data = pl.DataFrame(incoming_json)
+
+            filter = data.select(
+                pl.all()
+                .exclude(['player_id', 'started_at'])
+                .cast(pl.Float32)
+            ).unnest('player_stats')
+
+            return filter.row(0, named=True)
+
+        except OutOfBoundsError:
+            raise SkippingMatch("Failed to clean an empty sequence!")
+
             
-    async def statistics_transform(self, match_id, session, count):
+    async def statistics_transform(self, pid,  match_id, session, count):
         '''
         Docstring for statistics transform
         
@@ -396,36 +495,22 @@ class FaceitClient():
 
         Returns the statistics of a match for all players, will be used 
         to store data into 'ratings' collection.
+
+        make a feature which says if the corresponding player_id team won or not. (binary)
+        based on that we will extract win rate in the past time intervals.
+        
+        :param player_id: only store player_stats corresponding to this player_id
+        :param match_id: fetch match statistics
         '''
         statistics_url = f"https://open.faceit.com/data/v4/matches/{match_id}/stats"
 
-        
-        #response = r.get(statistics_url, headers = self.headers, timeout = 3)
-        #match_data = response.json()
-
-       # if match_id not in self.stats_persistence:
         match_data, _, latency = await self.call_api(url= statistics_url, endpoint = 'statistics', session = session, count= count)
-            #match_data = await response.json()
-            #self.stats_persistence.add(match_id)
-
-        #else:
-            #self.logger.info("statistics are persistence, not calling API.")
-            #return None
-        
-        #if match_id in self.stats_persistence:
-           # self.retry_function(self.matches_elo, match_id)
-
-        # Temporary store for all player statistics dictionaries
-        faction1 = []
-        faction2 = []
-        players_list = []
         statistics = {}
-
-        
 
         try:
             rounds_data = match_data.get("rounds")
-            
+            started_at = match_data.get('started_at')
+
             if not rounds_data:
                 self.skip_match = True
                 await self.detect_soft_rate_limit(data = None, skip = True)
@@ -439,51 +524,32 @@ class FaceitClient():
             self.logger.info("Statistics found for game %s", match_id)
 
             for rounds in rounds_data:
-                for index, teams in enumerate(rounds.get("teams")):
-                    for team_players in teams.get('players'):
-                        
-                        # Removes Team Name which is in string, data coming from API
-                        if ('Team' in teams['team_stats']) == True:
+                round_winner = rounds.get("round_stats", {}).get("Winner")
+                map_picked = rounds.get('round_stats', {}).get('Map')
+        
+                for teams in rounds.get("teams", []):
+                    for player in teams.get("players", []):
+        
+                        if 'Team' in teams['team_stats']:
                             del teams['team_stats']['Team']
+        
+                        #if player['nickname'] == True:
+                        #  del player['nickname']
+        
+                        if player['player_id'] == pid:
+                            player_statistics = player
+        
+                            player_statistics['won'] = 1 if round_winner == teams['team_id'] else 0
+                            statistics['player_statistics'] = player_statistics
+            
+            del statistics.get('player_statistics')['nickname']
+            del statistics.get('player_statistics')['player_id']
+                
+            # converting player statistics to float64
+            player_statistics = self.clean_cast(player_statistics)
 
-                        del team_players['nickname']
-                        if index == 0:
-                            # Team(s) stats
-                            faction1_stats = teams['team_stats']
-
-                            # Player(s) stats
-                            #individual_stats_1 = team_players
-                            faction1.append(team_players['player_stats'])
-                        else:
-                            # Team(s) stats
-                            faction2_stats = teams['team_stats']
-    
-                            # Player(s) stats
-                            #individual_stats_2 = team_players
-
-                            faction2.append(team_players['player_stats'])
-                            
-                        players_list.append(team_players)
-
-            # Team(s) aggregates
-            faction1_agg = self.convert_json(faction1)
-            faction1_agg.update(faction1_stats)
-            #faction1_agg.update(individual_stats_1)
-
-            faction2_agg = self.convert_json(faction2)
-            faction2_agg.update(faction2_stats)
-            #faction1_agg.update(individual_stats_2)
-
-
-            agg = {
-                "faction1": faction1_agg,
-                "faction2": faction2_agg
-            }
-
-            statistics['_id'] = match_id
-            statistics['players'] = players_list
-            statistics['team_agg'] = agg
-            statistics['stageId'] = "stage_1_"+str(datetime.now().strftime("%Y%m%d_%H%M")) if self.control_stage else "stage_2_"+str(datetime.now().strftime("%Y%m%d_%H%M"))
+            statistics['map'] = map_picked
+            statistics['started_at'] = started_at
 
             return statistics
         
@@ -493,6 +559,291 @@ class FaceitClient():
         except SoftRateLimit as e:
             self.logger.warning("Soft Rate Limit Hit! %s", e)
 
+    import traceback
+
+    # async def recent_performance(self, match, session, idx):
+    #     """
+    #     Recent performance of an individual player within 15-30 days. 
+    #     This function fetches recent performance for every single alter the ego produces.
+    #     For example, 1 ego -- 15 matches -- 150 players -- recent performance for 150 players.
+    #     15 matches -> one match -> recent performance for 10 players
+
+    #     :param match: alter randomzied matches
+    #     """
+
+    #     # store player id's as reference for cache
+    #     # If the same player shows it self, no need to fetch any calls for him
+    #     # you just replace it's corresponding stat for it.
+
+    #     player_cache = set()
+
+    #     # UNIX timestamps
+    #     # cache existing players 
+    #     # local sempahore which fetches recent performances for all players within each match
+    #     # aggregate all recent performances
+    #     # map match id to all recent performances
+    #     # store it as a json with primary key being match id
+    #     # recent performance to use for one isolation funciton (fetch player's recent based on match)
+
+    #     local_sempahore = asyncio.Semaphore(2)
+    #     async def throttle(coroutine):
+    #         async with local_sempahore:
+    #             return await coroutine
+
+    #     # async def helper(player_id, started_at, time, offset):
+    #     #     """
+    #     #     fetch matches API calls for both time intervals.
+    #     #     """
+    #     #     history_url = f"https://open.faceit.com/data/v4/players/{player_id}/history"
+
+    #     #     params = {
+    #     #         "game": "cs2",
+    #     #         "from": time,
+    #     #         "to": started_at,
+    #     #         "offset": offset,
+    #     #         "limit": 100,
+    #     #     }
+
+    #     #     return [
+    #     #         await self.call_api(
+    #     #             url=history_url,
+    #     #             endpoint="match",
+    #     #             session=session,
+    #     #             params=params,
+    #     #         )
+    #     #     ]
+        
+        
+    #     async def helper_two(results):
+    #         """
+    #         Fetch statistics for both time intervals.
+    #         outputs a dictionary:
+            
+    #         - Match id as key with corresponding value of statistics for the match.
+    #         - sample size of each time interval window.
+
+    #         :param results: match history of either time interval i.e. new 15d, old 15d (30days)
+    #         """
+    #         mIds_15d = []
+
+    #         for data, status, _ in results:
+
+    #             if status == 200:
+    #                 self.logger.info("GET status code: %s", status)
+
+    #                 if "errors" in data:
+    #                     self.logger.warning("Errors in data: %s", data["errors"])
+    #                     continue
+    #                 else:
+    #                     for item in data.get("items", []):
+    #                         match_id = item['match_id']
+    #                         mIds_15d.append(match_id)
+
+    #         # 15 days, 30 days logic goes above convert json
+
+    #         # Faster code, Throttling with a sempahore for 200 possible matches
+    #         stats_tasks = [
+    #             self.statistics_transform(player_id, match_id, session = session, count = None)
+    #             for match_id in mIds_15d
+    #         ]
+    #         # array of dictionaries
+
+    #         stats_results = await asyncio.gather(
+    #             *[throttle(t) for t in stats_tasks],
+    #             return_exceptions= True
+    #         )
+    #         stats_by_id = {
+    #             match_id: {'statistics':[stat]}
+    #             for match_id, stat in zip(mIds_15d, stats_results)
+    #             if stat and not isinstance(stat, Exception)
+    #         }
+    #         # [{}, {}]
+    #         # "string": "dictionary"{}
+    #         #self.logger.critical("helper two sending to convertjson ENDING!: %s", stats_by_id)
+    #         sample_size = len(stats_by_id)
+
+    #         return stats_by_id, sample_size
+        
+
+    #     try:
+    #         if not match:
+    #             self.logger.warning('Recentprf will not continue! no matches obtained from alter!')
+    #             return []
+            
+    #         self.logger.info(f'matches type: {type(match)}')
+    #         #for match in matches:
+
+    #         aggregates = {}
+
+    #         match_id = match.get('_id')
+    #         player_ids = match.get('player_ids')
+    #         timestamp_started_at = match.get('timestamp')['started_at']
+
+    #         #new_15d = int((timestamp_started_at - timedelta(days = 15)).timestamp())
+    #         #old_15d = int((new_15d - timedelta(days = 30)).timestamp())
+
+    #         new_15d = timestamp_started_at - (15 * 24 * 60 * 60)
+    #         old_15d = new_15d - (15 * 24 * 60 * 60)
+
+    #         # Aggregation happens per player and for only that player when considering
+    #         # matches within the time interval.
+
+    #         for player_id in player_ids:
+
+    #             # for caching, id ni lagi wi, if it gets skipped i have to replace it with previous version of it.
+
+            
+
+    #             old_15d_results = await helper(player_id= player_id, 
+    #                                            started_at = new_15d, 
+    #                                            time = old_15d, 
+    #                                            offset = 0)
+
+    #             new_15d_results = await helper(player_id = player_id,
+    #                                             started_at = timestamp_started_at, 
+    #                                             time = new_15d,
+    #                                             offset = 0)
+
+                
+    #             if old_15d_results or new_15d_results is True:
+    #                 stats_new15d, sample_size_new_15d = await helper_two(new_15d_results)
+    #                 stats_old15d, sample_size_old_15d = await helper_two(old_15d_results)
+
+                        
+    #                 # fetch stats of all these games. !!
+    #                 # sort players like p1 p2 p3 p4 p5 (f1), th en p6 p7 p8 p9 p10 (f2) 
+    #                 #   as the output of the aggregation.
+    
+    #                 aggregate_stats_new15d = self.convert_json(stats_new15d, sample_size_new_15d)
+    #                 aggregate_stats_new15d['player_id'] = player_id
+
+    #                 self.logger.critical("15days: %s", len(aggregate_stats_new15d))
+    #                 aggregate_stats_old15d = self.convert_json(stats_old15d, sample_size_old_15d)
+    #                 aggregate_stats_old15d['player_id'] = player_id
+
+    #                 self.logger.critical("30days: %s", len(aggregate_stats_old15d))
+
+    #                 self.logger.info("RECENT fetched %s", player_id)
+    #                 aggregates[player_id] = {
+    #                     'recent_past_15d': aggregate_stats_new15d,
+    #                     'recent_past_30d': aggregate_stats_old15d
+    #                 }
+
+    #             # skipping player due to no matches fetched
+    #             else:
+    #                 aggregates.update({True:player_id})
+                    
+    #                 self.logger.warning("player skipped recentprf  %s", player_id)
+    #                 continue
+
+    #         return #{match_id: aggregates}
+                
+    #     except Exception as e:
+    #         self.logger.error(f'Error at recent performance : {e}')
+    #         self.logger.error(f'Traceback : %s', traceback.print_exc())
+
+    def aggregate_statistics(self, fetched, data, session):
+        """
+        synchronously perform aggregates on fetched data from recent_performance()
+        as a progression of that dependency.
+
+        Uses data from master_fetch as a vocabulary against fetched
+        to map the aggregations
+        """
+        
+
+        return {
+            '_id': 0,
+            'aggregates': {
+                "pid1": {
+                    'recent_15d': 1,
+                    'recent_30d': 2
+                },
+                'pid2': {
+                    'recent_15d': 3,
+                    'recent_30d': 4
+                }}
+        } 
+
+
+
+
+        
+        pass
+    async def recent_performance(self, data, session):
+        """
+        Fetches recent performance stats for one player
+        returns a dictionary.
+        """
+
+        async def throttle(coroutine):
+            async with local_sempahore:
+                return await coroutine
+                
+        # Fetch match history
+
+        PLAYER_ID = data["player_ids"]
+        MIN_STARTED_AT = data["min_started_at"]
+        MAX_STARTED_AT = data["max_started_at"]
+
+        url = f"https://open.faceit.com/data/v4/players/{PLAYER_ID}/history"
+
+        all_matches = []
+        limit = 100
+        offset = 0
+
+        while offset <= 1000:
+            params = {
+                "game": "cs2",
+                "from": MIN_STARTED_AT,
+                "to": MAX_STARTED_AT,
+                "limit": limit,
+                "offset": offset,
+            }
+
+            r, _ = await self.call_api(url = url,                                            
+                                              endpoint = 'match',
+                                              session = session,
+                                              params = params)
+            r.raise_for_status()
+
+            matches = r.json().get("items", [])
+            all_matches.extend(matches)
+
+            if len(matches) < limit:
+                break
+
+        self.logger.info("player %s match history fetched ", PLAYER_ID)
+
+        local_sempahore = asyncio.Semaphore(2)
+        
+
+         #15 days, 30 days logic goes above convert json
+
+            # Faster code, Throttling with a sempahore for 200 possible matches
+        stats_tasks = [
+            self.statistics_transform(PLAYER_ID, 
+                                        _id['match_id'], 
+                                        session = session, 
+                                        count = None)
+            for _id in all_matches
+        ]
+        
+        # array of dictionaries
+        stats_results = await asyncio.gather(
+            *[throttle(t) for t in stats_tasks],
+            return_exceptions= True
+        )
+
+        return stats_results
+
+
+
+
+
+
+
+    
     def retrieve_hub_members(self, hub_id):
         """
         Fetch function, Fetches the Member's nickname from 
@@ -753,7 +1104,8 @@ class FaceitClient():
         endpoints = {'statistics': self.fetch_calls[0], 
                      'elo': self.fetch_calls[1],
                      'lifetime': self.fetch_calls[2],
-                     'match': self.fetch_calls[3]}
+                     'match': self.fetch_calls[3],
+                     'recent': self.fetch_calls[4]}
         try:            
             # Match Endpoint logic
             #if match_func:
@@ -855,3 +1207,14 @@ class FaceitClient():
             status = response.status
             self.logger.info("DONE  match -> status:%s", status)
             return response, data, status
+
+    async def fetch_recent_performance(self, url, session, params= None, count = None):
+            """gets matches in detail from match endpoint, returns json object"""
+            
+            self.logger.info("FETCH match -> %s", url)
+            async with session.get(url, headers = self.headers, params = params) as response:
+                data = await response.json()
+                status = response.status
+                self.logger.info("DONE  recent_perf -> status:%s", status)
+                return response, data, status
+            

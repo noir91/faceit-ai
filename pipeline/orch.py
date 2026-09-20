@@ -33,6 +33,7 @@ class getdata():
         self.players = self.db['players']
         self.ratings = self.db['ratings']
         self.alters = self.db['alters']
+        self.recentprf = self.db['recentprf']
         self.lifetime = self.db['lifetime']
         self.matches_elo = self.db['matches_elo']
         self.lfscores = self.db['lfscores']
@@ -40,6 +41,7 @@ class getdata():
         # Batches ready to be stored
         self.matches_batch = []
         self.players_batch = []
+        self.recentprf_batch = []
         self.ratings_batch = []
         self.alters_batch = []
         self.lifetime_batch = []
@@ -65,7 +67,7 @@ class getdata():
         #if batch != list:
         #    batch = list(batch)
         try:
-            if collection not in ['matches', 'players', 'ratings', 'alters', 'lifetime', 'matches_elo', 'lfscores']:
+            if collection not in ['matches', 'players', 'recentprf', 'ratings', 'alters', 'lifetime', 'matches_elo', 'lfscores']:
                 self.logger.error('Enter the correct collection name')
             else:
                 if collection.lower() == "matches":
@@ -89,6 +91,12 @@ class getdata():
 
                     self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
+                if collection.lower() == "recentprf":
+                    self.stored = self.recentprf.insert_many(
+                    documents = batch, ordered = False)
+            
+                    self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
+                
                 if collection.lower() == "lifetime":
                     self.lifetime_flag_for_verbose = True
                     

@@ -1,5 +1,8 @@
 # OS
 .DS_Store
+*.json
+notebooks
+*.whl
 
 # Python
 __pycache__/

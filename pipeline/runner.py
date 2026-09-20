@@ -24,6 +24,7 @@ from configs.exceptions import SkippingMatch
 from typing import Tuple
 
 import pickle, os
+import polars as pl
 
 class PipelineRunner():
     """
@@ -52,7 +53,7 @@ class PipelineRunner():
         self.lifetime_semaphore = asyncio.Semaphore(2)  
 
         # Assuming 72 players x 15 matches = 1080 matches
-        self.batch_size = 30
+        self.batch_size = 1
         self.max_players = len(list(self.data.players.find({'_id': {"$exists": True}})))
 
         self.batch_flag = None
@@ -85,6 +86,9 @@ class PipelineRunner():
         self.lfscore_set = set()
 
 
+        # Recent performance 
+        self.recent_flag = False
+
         # Request/Response logs
         self.runner_response_details = {}
 
@@ -92,6 +96,7 @@ class PipelineRunner():
                 "matches":self.data.matches_batch,
                 "ratings":self.data.ratings_batch,
                 "players":self.data.players_batch,
+                'recentprf': self.data.recentprf_batch,
                 #lifetime":self.lifetime_map_scores,
                 "matches_elo":self.data.matches_elo_batch,
                 'lfscores': self.data.lfscores_batch}
@@ -116,7 +121,15 @@ class PipelineRunner():
                 prompt = input("You want pipeline to execute? (Y/N): ").lower()
                 
                 if prompt in ['y', 'yes']:
-                    break
+
+                    prompt2 = input('Stage 1 recent performance fetch?')
+
+                    if prompt2 in ['y', 'yes']:
+                        self.recent_flag = True
+                        break
+                    elif prompt2 in ['n', 'no']:
+                        break
+
                 elif prompt in ['n','no']:
 
                     # Match Lifetime retreival prompt
@@ -205,9 +218,96 @@ class PipelineRunner():
             concurrent_workers = 6
             semaphore = asyncio.Semaphore(concurrent_workers)
 
-            local_concurrent_workers = 3
+            local_concurrent_workers = 4 #3
             local_semaphore = asyncio.Semaphore(local_concurrent_workers)
-       
+
+            async def master_function(idx):
+
+                """
+                Orchestrates the collection of player's recent performance.
+                by fetching in async workers, and then aggregating them into their
+                respective 15days to 30days.
+
+                Each async worker does it's own fetching and aggregation of 
+                respective player_id associated to multiple matches, where matches
+                are used to calculate the time period of statistics of player to fetch.
+                
+                """
+                async with semaphore:
+                        
+                    self.logger.info(
+                        f"({idx}) processing player id :{player_ids[idx]}"
+                    ) 
+
+                    # Lookup
+                    alters_collection = self.data.alters
+                    
+                    # Process players
+                
+                    '''
+                    processes matches in batches to avoid out of memory errors
+                    '''
+                    results = {'recentprf': []}
+                    data = alters_collection.find({})
+
+                    master_fetch = (
+                        pl.DataFrame(data)
+                        .explode("player_ids")
+                        .unnest("timestamp")
+                        .group_by("player_ids")
+                        .agg(
+                            pl.struct(
+                                pl.col("_id"),
+                                pl.col("started_at"),
+                                (pl.col("started_at") - 1296000).alias("fifteen_window"),
+                                (pl.col("started_at") - 2592000).alias("thirty_window"),
+                            ).alias("match_ids"),
+
+                            pl.col("started_at").max().alias("max_started_at"),
+
+                            (pl.col("started_at").min() - 2592000).alias("min_started_at"),
+                        )
+                        .to_dicts()
+                    )
+
+                    
+                    async def worker(data, idx):
+                        fetched = await self.client.recent_performance(data, session, idx)
+
+                        aggregated = self.client.aggregate_statistics(
+                            fetched, data, session, idx
+                        )
+
+                        return aggregated
+
+
+                    tasks = [
+                        worker(data, idx)
+                        for idx, data in enumerate(master_fetch)
+                    ]
+
+                    result = await asyncio.gather(
+                        *[throttle(t) for t in tasks],
+                        return_exceptions=True
+                    )
+
+                    value_recent = [
+                        r for r in result
+                        if r and not isinstance(r, Exception)
+                    ]
+
+                    results["recentprf"].extend(value_recent)
+
+                    self.logger.info(
+                        "Batch loaded: %s results",
+                        len(value_recent)
+                    )
+
+                    await self.queue.put(results)
+
+                        
+
+            # Accessing seed players
             async def process_player(idx):
                 async with semaphore:
                     
@@ -220,7 +320,7 @@ class PipelineRunner():
                     alter_match_ids, alter_data, alters = await self.client.alter_function(player_ids[idx], session)
                     
                     alter_match_ids =  list(set(alter_match_ids))
-                    n = len(alter_match_ids)
+                    #n = len(alter_match_ids)
 
                     # THIS IS SKIPPING THE PLAYER DUE TO LESS MATCHES
                     if not alter_match_ids:
@@ -230,12 +330,12 @@ class PipelineRunner():
                         return None
 
                     # Processing each match id from the randomizer
-                    stats_tasks = [
-                        #self.client.retry_function(
-                            self.client.statistics_transform(match_id, session, idx)
-                        #)
-                        for match_id in alter_match_ids
-                    ]
+                    # stats_tasks = [
+                    #     #self.client.retry_function(
+                    #         self.client.statistics_transform(match_id, session, idx)
+                    #     #)
+                    #     for match_id in alter_match_ids
+                    # ]
 
                     elo_tasks = [
                         #self.client.retry_function(
@@ -250,18 +350,15 @@ class PipelineRunner():
 
                       
                     results = await asyncio.gather(
-                        *[throttle(t) for t in stats_tasks],
+                        #*[throttle(t) for t in recent_tasks],
                         *[throttle(t) for t in elo_tasks],
-                        throttle_lifetime(),
                         return_exceptions=True
                     )
+                    
+                    #
+                    elo_results = results #[len(recent_tasks):]
+                    #lifetime_result = results[-1]
 
-                    stats_results = results[:n]
-                    elo_results = results[n:2*n]
-                    lifetime_result = results[-1]
-
-
-                    value_stats = [r for r in stats_results if r and not isinstance(r, Exception)]
                     value_elo = [r for r in elo_results if r and not isinstance(r, Exception)]
 
                     if start_from_checkpoint:
@@ -273,15 +370,16 @@ class PipelineRunner():
                             f"({idx+1}) Ran player id :{player_ids[idx]}"
                         )  
                     
-                    result =  {
+                    result = {
                         "idx": idx,
-                        "stats": value_stats,
+                        #"recentprf": value_recent,
                         "elo": value_elo,
-                        "lifetime": lifetime_result,
+                        #"lifetime": lifetime_result,
                         "matches": alter_data,
                         "alters": alters
                     }
 
+                    
                     await self.queue.put(result)
                     self.last_checkpoint_upstream = player_ids[idx]            
                 
@@ -294,10 +392,16 @@ class PipelineRunner():
             if self.match_flag == True:
                 tasks = [self.lifetime_team_agg(mid, session) for mid in range(len(self.match_ids))]
                 await asyncio.gather(*tasks)
+
+            elif self.recent_flag == True:
+                tasks_recent = [process_player_recent(idx) for idx in indices_array]
+                await asyncio.gather(*tasks_recent)
+                
             else:
                 tasks = [process_player(idx) for idx in indices_array]
                 await asyncio.gather(*tasks)
 
+                
             # block until 0 items in queue
             await self.queue.join()
 
@@ -324,6 +428,9 @@ class PipelineRunner():
             if batch.get('stats'):
                 self.data.store_data(batch['stats'], 'ratings')
 
+            if batch.get('recentprf'):
+                self.data.store_data(batch['recentprf'], 'recentprf')
+
             if batch.get('elo'):
                 self.data.store_data(batch['elo'], 'matches_elo')
 
@@ -333,11 +440,11 @@ class PipelineRunner():
             if batch.get('alters'):
                 self.data.store_data(batch['alters'], 'alters')
             
-            if batch.get('lfscores'):
-                self.data.store_data([batch['lfscores']], 'lfscores')
+            #if batch.get('lfscores'):
+            #    self.data.store_data([batch['lfscores']], 'lfscores')
 
-            if isinstance(batch['lifetime'], dict):
-                self.data.store_data(batch['lifetime'], 'lifetime')
+            #if isinstance(batch['lifetime'], dict):
+            #    self.data.store_data(batch['lifetime'], 'lifetime')
 
         #if not flush:
         try:
@@ -345,12 +452,28 @@ class PipelineRunner():
                 item = await self.queue.get()
                 self.batches.append(item)
                 self.queue.task_done()
+
                 if len(self.batches) >= self.batch_size:
                     for batch in self.batches:
                         if not batch:
                             continue
 
                         idx = batch['idx']
+
+                        # rebuilding players skipped
+                        player_data = {}
+
+                        # for match in batch.get('recentprf'):
+                        #     for key, value in match.items():
+                        #         if key is not True:
+                        #             player_data[key] = value
+
+                        # for match in batch.get('recentprf'):
+                        #     player_id = match.pop(True, None)
+
+                        #     if player_id is not None:
+                        #         match[player_id] = player_data[player_id]
+
                         store(batch)
                         if self.match_flag == True:
                             self.logger.info(f"Match ({idx}) stored to dB successfully!!")
@@ -358,7 +481,9 @@ class PipelineRunner():
                             self.logger.info(f"Player ({idx}) stored to dB successfully!!")
                         #self.last_checkpoint_downstream = self.player_ids[idx]
 
-                    self.batches.clear() 
+                    self.batches.clear()
+                    del player_data
+
                     self.batch_count += 1
                     self.client.response_details.clear()  # flush after every batch
                     self.logger.info(f"Batch Id ({self.batch_count}) has been successfully processed!!")
