@@ -14,6 +14,15 @@ env/
 #data/raw/
 #data/tmp/
 
+*.db
+.ipynb_checkpoints/
+mongobackup*/
+termide*
+__pycache__/
+
+*.png
+*.jpeg
+utils/data.py
 # Secrets
 .env
 *.key

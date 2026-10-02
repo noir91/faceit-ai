@@ -1,4 +1,4 @@
-from pymongo import MongoClient, errors
+from pymongo import MongoClient, errors, UpdateOne
 import pandas as pd
 import logging
 
@@ -92,8 +92,41 @@ class getdata():
                     self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
 
                 if collection.lower() == "recentprf":
-                    self.stored = self.recentprf.insert_many(
-                    documents = batch, ordered = False)
+                    if collection.lower() == "recentprf":
+                        updates_by_player = {}
+
+                        for row in batch:
+                            # Copy so the original feature row remains unchanged.
+                            anchor_data = row.copy()
+
+                            player_id = anchor_data.pop("player_ids")
+                            anchor_id = anchor_data["_id"]
+
+                            updates_by_player.setdefault(player_id, {})[
+                                f"anchors.{anchor_id}"
+                            ] = anchor_data
+
+                        operations = [
+                            UpdateOne(
+                                {"_id": player_id},
+                                {"$set": anchor_updates},
+                                upsert=True,
+                            )
+                            for player_id, anchor_updates in updates_by_player.items()
+                        ]
+
+                        if operations:
+                            self.stored = self.recentprf.bulk_write(
+                                operations,
+                                ordered=False,
+                            )
+
+                            self.logger.info(
+                                "Stored recent performance for %s players",
+                                len(operations),
+                            )
+                    # self.stored = self.recentprf.insert_many(
+                    # documents = batch, ordered = False)
             
                     self.logger.db_write("Data moved sucessfully. \n Database :%s \n Collection:%s", self.db, collection)
                 
@@ -126,6 +159,8 @@ class getdata():
         # Note: PyMongoError class exception isnt written
 
         except errors.BulkWriteError as e:
+            if collection.lower() == "recentprf":
+                raise
             #self.logger.debug("\nTable: %s", collection)
             #errmsg = e.details['writeErrors'][0]['errmsg']
             #self.logger.error("Error: %s\n", errmsg)
@@ -133,11 +168,15 @@ class getdata():
             self.logger.warning(f"{len(write_errors)} duplicates skipped in {collection}")
         
         except errors.DuplicateKeyError as e:
+            if collection.lower() == "recentprf":
+                raise
             self.logger.debug("\nTable: %s", collection)
             errmsg = e
             self.logger.error("Error: %s\n", errmsg)
 
         except Exception as e:
+            if collection.lower() == "recentprf":
+                raise
             self.logger.error("Unexpected error in store_data [%s]: %s", collection, e, exc_info=True)
 
     def getcol(self, db, col):

@@ -221,7 +221,7 @@ class PipelineRunner():
             local_concurrent_workers = 4 #3
             local_semaphore = asyncio.Semaphore(local_concurrent_workers)
 
-            async def master_function(idx):
+            async def master_function():
 
                 """
                 Orchestrates the collection of player's recent performance.
@@ -233,78 +233,157 @@ class PipelineRunner():
                 are used to calculate the time period of statistics of player to fetch.
                 
                 """
-                async with semaphore:
-                        
-                    self.logger.info(
-                        f"({idx}) processing player id :{player_ids[idx]}"
-                    ) 
-
-                    # Lookup
-                    alters_collection = self.data.alters
+                # async with semaphore:
                     
-                    # Process players
+                self.logger.info(
+                    # f"({idx}) processing player id :{player_ids[idx]}"
+                    "processing player "
+                ) 
+
+                # Lookup
+                alters_collection = self.data.alters
                 
-                    '''
-                    processes matches in batches to avoid out of memory errors
-                    '''
-                    results = {'recentprf': []}
-                    data = alters_collection.find({})
+                # Process players
+            
+                '''
+                processes matches in batches to avoid out of memory errors
+                '''
+                results = {'recentprf': []}
+                data = alters_collection.find({})
 
-                    master_fetch = (
-                        pl.DataFrame(data)
-                        .explode("player_ids")
-                        .unnest("timestamp")
-                        .group_by("player_ids")
-                        .agg(
-                            pl.struct(
-                                pl.col("_id"),
-                                pl.col("started_at"),
-                                (pl.col("started_at") - 1296000).alias("fifteen_window"),
-                                (pl.col("started_at") - 2592000).alias("thirty_window"),
-                            ).alias("match_ids"),
+                master_fetch = (
+                    pl.DataFrame(data)
+                    .explode("player_ids")
+                    .unnest("timestamp")
+                    .group_by("player_ids")
+                    .agg(
+                        pl.struct(
+                            pl.col("_id"),
+                            pl.col("started_at"),
+                            (pl.col("started_at") - 1296000).alias("fifteen_window"),
+                            (pl.col("started_at") - 2592000).alias("thirty_window"),
+                        ).alias("match_ids"),
 
-                            pl.col("started_at").max().alias("max_started_at"),
+                        pl.col("started_at").max().alias("max_started_at"),
 
-                            (pl.col("started_at").min() - 2592000).alias("min_started_at"),
-                        )
-                        .to_dicts()
+                        (pl.col("started_at").min() - 2592000).alias("min_started_at"),
+                    )
+                    .to_dicts()
+                )
+
+                
+                async def worker(data, idx = None):
+
+                    match_df = (
+                    pl.DataFrame(data)
+                    #.explode('match_ids')
+                    .unnest('match_ids')
+                    .with_columns(
+                        (pl.col('started_at') - 1296000 ).alias('fifteen_window'),
+                        (pl.col('started_at') - 2592000 ).alias('thirty_window'))
+                    .rename({'started_at':'original_window'})
+
                     )
 
-                    
-                    async def worker(data, idx):
-                        fetched = await self.client.recent_performance(data, session, idx)
+                    fetched = await self.client.recent_performance(data, session)
 
-                        aggregated = self.client.aggregate_statistics(
-                            fetched, data, session, idx
-                        )
-
-                        return aggregated
-
-
-                    tasks = [
-                        worker(data, idx)
-                        for idx, data in enumerate(master_fetch)
-                    ]
-
-                    result = await asyncio.gather(
-                        *[throttle(t) for t in tasks],
-                        return_exceptions=True
+                    aggregated = self.client.aggregate_statistics(
+                        fetched, match_df, session,
                     )
 
-                    value_recent = [
-                        r for r in result
-                        if r and not isinstance(r, Exception)
-                    ]
+                    await self.queue.put({"recentprf": aggregated})
 
-                    results["recentprf"].extend(value_recent)
+                    return aggregated
+
+                total = len(master_fetch)
+                succeeded = 0
+                failed = 0
+                active = 0
+
+                async def tracked_worker(data, idx):
+                    nonlocal succeeded, failed, active
+
+                    player_id = data["player_ids"]
+                    number = idx + 1
+                    started = perf_counter()
+                    active += 1
 
                     self.logger.info(
-                        "Batch loaded: %s results",
-                        len(value_recent)
+                        "[START player %d/%d] id=%s | anchors=%d",
+                        number,
+                        total,
+                        player_id,
+                        len(data["match_ids"]),
                     )
 
-                    await self.queue.put(results)
+                    try:
+                        result = await worker(data, idx)
 
+                    except Exception:
+                        failed += 1
+                        self.logger.exception(
+                            "[FAILED player %d/%d] id=%s | elapsed=%.1fs",
+                            number,
+                            total,
+                            player_id,
+                            perf_counter() - started,
+                        )
+                        raise
+
+                    else:
+                        succeeded += 1
+                        self.logger.info(
+                            "[DONE player %d/%d] id=%s | anchors=%d | elapsed=%.1fs",
+                            number,
+                            total,
+                            player_id,
+                            len(result),
+                            perf_counter() - started,
+                        )
+                        return result
+
+                    finally:
+                        active -= 1
+                        self.logger.info(
+                            "[PROGRESS %d/%d] succeeded=%d | failed=%d | active=%d",
+                            succeeded + failed,
+                            total,
+                            succeeded,
+                            failed,
+                            active,
+                        )
+
+                # tasks = [
+                #     worker(data, idx)
+                #     for idx, data in enumerate(master_fetch)
+                # ]
+
+                # result = await asyncio.gather(
+                #     *[throttle(t) for t in tasks],
+                #     return_exceptions=True
+                # )
+
+                tasks = [
+                    tracked_worker(data, idx)
+                    for idx, data in enumerate(master_fetch)
+                ]
+
+                result = await asyncio.gather(
+                    *[throttle(task) for task in tasks],
+                    return_exceptions=True,
+                )
+
+                value_recent = [
+                    r for r in result
+                    if r and not isinstance(r, Exception)
+                ]
+
+                #results["recentprf"].extend(value_recent)
+
+                self.logger.info(
+                    "Batch loaded: %s results",
+                    len(value_recent)
+                )
                         
 
             # Accessing seed players
@@ -393,9 +472,12 @@ class PipelineRunner():
                 tasks = [self.lifetime_team_agg(mid, session) for mid in range(len(self.match_ids))]
                 await asyncio.gather(*tasks)
 
-            elif self.recent_flag == True:
-                tasks_recent = [process_player_recent(idx) for idx in indices_array]
-                await asyncio.gather(*tasks_recent)
+            #elif self.recent_flag == True:
+                # tasks_recent = [master_function(idx) for idx in indices_array]
+                # await asyncio.gather(*tasks_recent)
+
+            elif self.recent_flag:
+                await master_function()
                 
             else:
                 tasks = [process_player(idx) for idx in indices_array]
@@ -458,8 +540,8 @@ class PipelineRunner():
                         if not batch:
                             continue
 
-                        idx = batch['idx']
-
+                        #idx = batch['idx']
+                        self.logger.info("Batch item stored successfully")
                         # rebuilding players skipped
                         player_data = {}
 
@@ -474,11 +556,9 @@ class PipelineRunner():
                         #     if player_id is not None:
                         #         match[player_id] = player_data[player_id]
 
+                        #store(batch)
                         store(batch)
-                        if self.match_flag == True:
-                            self.logger.info(f"Match ({idx}) stored to dB successfully!!")
-                        else:
-                            self.logger.info(f"Player ({idx}) stored to dB successfully!!")
+                        self.logger.info("Batch item stored successfully")
                         #self.last_checkpoint_downstream = self.player_ids[idx]
 
                     self.batches.clear()

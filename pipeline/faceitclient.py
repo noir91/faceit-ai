@@ -380,36 +380,145 @@ class FaceitClient():
 
         return randomized_matches
 
-    def convert_json(self, incoming_json, sample_size):
+    # def convert_json(self, incoming_json, sample_size):
+    #     """
+    # uses polars for faster conversion
+
+    # Converts expected incoming array of jsons, into a dataframe, 
+    # compute the aggregate and then converts it back to json.
+
+    #     """
+    #     #self.logger.critical(f"TYPE OF INCOMING JSON: {type(incoming_json)}")
+    #     #self.logger.critical(f'INCOMING JSON: {incoming_json}')
+
+    #     if not incoming_json or sample_size == 0:
+    #         return {}
+    #     try:
+    #         """
+    #         Convert nested recent-performance JSON into aggregated player statistics.
+    #         """
+
+    #         if not incoming_json:
+    #             return {}
+
+    #         # ---------------------------
+    #         # Flatten incoming structure
+    #         # ---------------------------
+    #         df = (
+    #             pl.DataFrame(list(incoming_json.values()))
+    #             .explode("statistics")
+    #             .unnest("statistics")
+    #             .unnest("player_statistics")
+    #             .unnest("player_stats")
+    #             .with_columns(
+    #                 pl.all()
+    #                 .exclude(["won", "map"])
+    #                 .cast(pl.Float64, strict=False)
+    #             )
+    #         )
+
+    #         # ---------------------------
+    #         # Your existing aggregation
+    #         # ---------------------------
+    #         filter = df.select(
+    #             pl.all().exclude(["won", "map"])
+    #         ).mean()
+
+    #         win_filter = df.select(
+    #             pl.col("won").value_counts()
+    #         ).unnest("won")
+
+    #         counts = df["map"].value_counts()
+
+    #         map_counts = pl.DataFrame({
+    #             f"{map}_count": [count]
+    #             for map, count in counts.iter_rows()
+    #         })
+
+    #         per_map = (
+    #             df.group_by("map")
+    #             .agg(
+    #                 pl.col("won").mean().alias("wr")
+    #             )
+    #         )
+
+    #         per_map_row = pl.DataFrame({
+    #             f"{m}_wr": [wr]
+    #             for m, wr in per_map.iter_rows()
+    #         })
+
+    #         overall_wr = df["won"].mean()
+
+    #         win_ratio = per_map_row.with_columns(
+    #             pl.lit(overall_wr).alias("win_ratio")
+    #         )
+
+    #         df = pl.concat(
+    #             [filter, map_counts, win_ratio],
+    #             how="horizontal"
+    #         )
+
+    #         return df.row(0, named=True)
+        
+    #     except (OutOfBoundsError) as e:
+    #         raise SkippingMatch("Failed to find aggregates of an empty sequence!") 
+
+    def convert_json(self, incoming_json):
         """
-    uses polars for faster conversion
+        Converts recent-performance windows into aggregated player statistics.
 
-    Converts expected incoming array of jsons, into a dataframe, 
-    compute the aggregate and then converts it back to json.
+        Expected input:
+        - list of dictionaries
+        - each dictionary represents one anchor match for one player
+        - matches_15d contains individual match statistics from past 0-15 days
+        - matches_30d contains individual match statistics from past 15-30 days
 
+        Output:
+        - same number of rows
+        - same player_id, anchor match _id and timestamps/windows
+        - matches_15d and matches_30d replaced by their aggregations
         """
-        #self.logger.critical(f"TYPE OF INCOMING JSON: {type(incoming_json)}")
-        #self.logger.critical(f'INCOMING JSON: {incoming_json}')
 
-        if not incoming_json or sample_size == 0:
-            return {}
-        try:
+        if not incoming_json:
+            return []
+
+        configured_maps = (
+                "de_ancient",
+                "de_anubis",
+                "de_cache",
+                "de_dust2",
+                "de_inferno",
+                "de_mirage",
+                "de_nuke",
+                "de_overpass",
+                "de_vertigo",
+            )
+
+        def aggregate_window(matches):
             """
-            Convert nested recent-performance JSON into aggregated player statistics.
-            """
+            Aggregate one list of individual match statistics into one dictionary.
+            """ 
 
-            if not incoming_json:
-                return {}
 
-            # ---------------------------
-            # Flatten incoming structure
-            # ---------------------------
+            if not matches:
+                return {
+                    **{f"{m}_count": 0 for m in configured_maps},
+                    **{f"{m}_wr": None for m in configured_maps},
+                    "win_ratio": None,
+                }
+
+
+            # -------------------------------------------------
+            # Convert individual match statistics into Polars
+            # One row here = one recent historical match
+            #
+            # player_statistics currently contains the actual
+            # stats as a struct, while map is its own column.
+            # Unnest makes every stat a normal column.
+            # -------------------------------------------------
             df = (
-                pl.DataFrame(list(incoming_json.values()))
-                .explode("statistics")
-                .unnest("statistics")
+                pl.DataFrame(matches)
                 .unnest("player_statistics")
-                .unnest("player_stats")
                 .with_columns(
                     pl.all()
                     .exclude(["won", "map"])
@@ -417,51 +526,97 @@ class FaceitClient():
                 )
             )
 
-            # ---------------------------
-            # Your existing aggregation
-            # ---------------------------
-            filter = df.select(
-                pl.all().exclude(["won", "map"])
-            ).mean()
-
-            win_filter = df.select(
-                pl.col("won").value_counts()
-            ).unnest("won")
-
-            counts = df["map"].value_counts()
-
-            map_counts = pl.DataFrame({
-                f"{map}_count": [count]
-                for map, count in counts.iter_rows()
-            })
-
-            per_map = (
-                df.group_by("map")
-                .agg(
-                    pl.col("won").mean().alias("wr")
+            # -------------------------------------------------
+            # Average all numerical statistics across matches
+            # -------------------------------------------------
+            averages = (
+                df
+                .select(
+                    pl.all().exclude(["won", "map"])
                 )
+                .mean()
+                .row(0, named=True)
             )
 
-            per_map_row = pl.DataFrame({
-                f"{m}_wr": [wr]
-                for m, wr in per_map.iter_rows()
+            # -------------------------------------------------
+            # Number of matches played on each map
+            # -------------------------------------------------
+            map_counts = {f"{m}_count": 0 for m in configured_maps}
+
+            map_counts.update({
+                f"{row['map']}_count": row["len"]
+                for row in (
+                    df.group_by("map")
+                    .len()
+                    .iter_rows(named=True)
+                )
             })
 
+            
+            # -------------------------------------------------
+            # Win rate for each map
+            # -------------------------------------------------
+            map_win_rates = {f"{m}_wr": None for m in configured_maps}
+
+            map_win_rates.update({
+                            f"{row['map']}_wr": row["wr"]
+                            for row in (
+                                df.group_by("map")
+                                .agg(pl.col("won").mean().alias("wr"))
+                                .iter_rows(named=True)
+                )
+            })
+            # -------------------------------------------------
+            # Overall win rate across this entire time window
+            # -------------------------------------------------
             overall_wr = df["won"].mean()
 
-            win_ratio = per_map_row.with_columns(
-                pl.lit(overall_wr).alias("win_ratio")
+            # -------------------------------------------------
+            # One dictionary = aggregation of this whole window
+            # -------------------------------------------------
+            return {
+                **averages,
+                **map_counts,
+                **map_win_rates,
+                "win_ratio": overall_wr,
+            }
+
+        results = []
+
+        # -------------------------------------------------
+        # Each row represents:
+        # one player + one anchor match + its recent windows
+        #
+        # We DO NOT combine rows.
+        # Grain stays exactly the same.
+        # -------------------------------------------------
+        for row in incoming_json:
+
+            converted = row.copy()
+
+            # -------------------------------------------------
+            # Aggregate individual matches in both windows
+            #
+            # Before:
+            # matches_15d = [
+            #     {"player_statistics": {...}, "map": "..."},
+            #     ...
+            # ]
+            #
+            # After:
+            # matches_15d = {aggregated stats}
+            # -------------------------------------------------
+            converted["matches_15d"] = aggregate_window(
+                row.get("matches_15d", [])
             )
 
-            df = pl.concat(
-                [filter, map_counts, win_ratio],
-                how="horizontal"
+            converted["matches_30d"] = aggregate_window(
+                row.get("matches_30d", [])
             )
 
-            return df.row(0, named=True)
-        
-        except (OutOfBoundsError) as e:
-            raise SkippingMatch("Failed to find aggregates of an empty sequence!") 
+            results.append(converted)
+
+        return results
 
     def clean_cast(self, incoming_json):
         """
@@ -474,7 +629,7 @@ class FaceitClient():
             filter = data.select(
                 pl.all()
                 .exclude(['player_id', 'started_at'])
-                .cast(pl.Float32)
+                .cast(pl.Float32, strict=False)
             ).unnest('player_stats')
 
             return filter.row(0, named=True)
@@ -537,16 +692,17 @@ class FaceitClient():
                         #  del player['nickname']
         
                         if player['player_id'] == pid:
+                            statistics['player_id'] =  player['player_id']
                             player_statistics = player
         
                             player_statistics['won'] = 1 if round_winner == teams['team_id'] else 0
                             statistics['player_statistics'] = player_statistics
             
             del statistics.get('player_statistics')['nickname']
-            del statistics.get('player_statistics')['player_id']
+            #del statistics.get('player_statistics')['player_id']
                 
             # converting player statistics to float64
-            player_statistics = self.clean_cast(player_statistics)
+            statistics["player_statistics"] = self.clean_cast(player_statistics)
 
             statistics['map'] = map_picked
             statistics['started_at'] = started_at
@@ -742,7 +898,7 @@ class FaceitClient():
     #         self.logger.error(f'Error at recent performance : {e}')
     #         self.logger.error(f'Traceback : %s', traceback.print_exc())
 
-    def aggregate_statistics(self, fetched, data, session):
+    def aggregate_statistics(self, stats_fetched, match_data, session):
         """
         synchronously perform aggregates on fetched data from recent_performance()
         as a progression of that dependency.
@@ -750,26 +906,60 @@ class FaceitClient():
         Uses data from master_fetch as a vocabulary against fetched
         to map the aggregations
         """
+
+        if stats_fetched.is_empty():
+            return self.convert_json([
+                {
+                    **row,
+                    "matches_15d": [],
+                    "matches_30d": [],
+                }
+                for row in match_data.to_dicts()
+            ])
         
+        matched = (
+            match_data.
+            join(stats_fetched,
+                left_on = 'player_ids',
+                right_on = 'player_id',
+                how = 'inner')
 
-        return {
-            '_id': 0,
-            'aggregates': {
-                "pid1": {
-                    'recent_15d': 1,
-                    'recent_30d': 2
-                },
-                'pid2': {
-                    'recent_15d': 3,
-                    'recent_30d': 4
-                }}
-        } 
+            .filter(
+                (pl.col('stats_started_at') >= pl.col('thirty_window'))
+                & (pl.col('stats_started_at') < pl.col('original_window'))
+            )
+        )
 
-
-
+        windows = (
+            matched
+            .group_by(["player_ids", "_id"])
+            .agg(
+                pl.struct(["player_statistics", "map"])
+                .filter(
+                    pl.col("stats_started_at") >= pl.col("fifteen_window")
+                )
+                .alias("matches_15d"),
+        
+                pl.struct(["player_statistics", "map"])
+                .filter(
+                    pl.col("stats_started_at") < pl.col("fifteen_window")
+                )
+                .alias("matches_30d"),
+            )
+        )
 
         
-        pass
+        result = match_data.join(
+            windows,
+            on = ["player_ids", "_id"],
+            how ='left'
+        )
+
+        # convert json on result 
+
+        aggregated_dict = self.convert_json(result.to_dicts())
+        return aggregated_dict
+    
     async def recent_performance(self, data, session):
         """
         Fetches recent performance stats for one player
@@ -801,21 +991,35 @@ class FaceitClient():
                 "offset": offset,
             }
 
-            r, _ = await self.call_api(url = url,                                            
+            payload, status, _ = await self.call_api(url = url,                                            
                                               endpoint = 'match',
                                               session = session,
                                               params = params)
-            r.raise_for_status()
+            
+            if status != 200:
+                raise RuntimeError(
+                    f"History failed: player={PLAYER_ID}, status={status}"
+                )
+            #r.raise_for_status()
 
-            matches = r.json().get("items", [])
+            # create your joins here
+
+            matches = payload.get("items", [])
             all_matches.extend(matches)
 
             if len(matches) < limit:
-                break
+                 break
 
-        self.logger.info("player %s match history fetched ", PLAYER_ID)
+            offset += limit
+            
+        # self.logger.info("player %s match history fetched ", PLAYER_ID)
+        self.logger.info(
+            "[HISTORY READY] player=%s | matches=%d | fetching statistics",
+            PLAYER_ID,
+            len(all_matches),
+        )
 
-        local_sempahore = asyncio.Semaphore(2)
+        local_sempahore = asyncio.Semaphore(5)
         
 
          #15 days, 30 days logic goes above convert json
@@ -829,19 +1033,74 @@ class FaceitClient():
             for _id in all_matches
         ]
         
+ 
         # array of dictionaries
         stats_results = await asyncio.gather(
             *[throttle(t) for t in stats_tasks],
             return_exceptions= True
         )
 
-        return stats_results
+        # for match, result in zip(all_matches, stats_results):
+        #     if isinstance(result, BaseException):
+        #         raise RuntimeError(
+        #             f"Stats failed: player={PLAYER_ID}, match={match['match_id']}"
+        #         ) from result
 
+        #     if not isinstance(result, dict):
+        #         raise ValueError(
+        #             f"Invalid stats: player={PLAYER_ID}, match={match['match_id']}"
+        #         )
+            
+        # if not stats_results:
+        #             return pl.DataFrame()
+        
+        # return pl.DataFrame(stats_results).rename({'started_at': 'stats_started_at'})
 
+        valid_stats = []
 
+        for match, result in zip(all_matches, stats_results):
+            # Preserve cancellation and other process-control exceptions.
+            if isinstance(result, BaseException) and not isinstance(result, Exception):
+                raise result
 
+            if isinstance(result, Exception) or not isinstance(result, dict) or not result:
+                self.logger.warning(
+                    "[STATS SKIPPED] player=%s | match=%s | %s: %s",
+                    PLAYER_ID,
+                    match["match_id"],
+                    type(result).__name__,
+                    result,
+                )
+                continue
 
+            # Use the timestamp from the history record paired with these stats.
+            result = result.copy()
+            result["started_at"] = match["started_at"]
 
+            valid_stats.append(result)
+
+        skipped = len(stats_results) - len(valid_stats)
+
+        self.logger.info(
+            "[STATS SUMMARY] player=%s | usable=%d | skipped=%d | requested=%d",
+            PLAYER_ID,
+            len(valid_stats),
+            skipped,
+            len(all_matches),
+        )
+
+        if not valid_stats:
+            if all_matches:
+                raise RuntimeError(
+                    f"No usable statistics for player={PLAYER_ID}; "
+                    f"all {len(all_matches)} matches failed"
+                )
+
+            return pl.DataFrame()
+
+        return pl.DataFrame(valid_stats).rename({
+            "started_at": "stats_started_at"
+        })
 
     
     def retrieve_hub_members(self, hub_id):
