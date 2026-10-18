@@ -492,6 +492,7 @@ class FaceitClient():
                 "de_nuke",
                 "de_overpass",
                 "de_vertigo",
+                "de_train"
             )
 
         def aggregate_window(matches):

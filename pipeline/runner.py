@@ -88,6 +88,7 @@ class PipelineRunner():
 
         # Recent performance 
         self.recent_flag = False
+        self.alters_collection = self.data.alters
 
         # Request/Response logs
         self.runner_response_details = {}
@@ -122,13 +123,39 @@ class PipelineRunner():
                 
                 if prompt in ['y', 'yes']:
 
-                    prompt2 = input('Stage 1 recent performance fetch?')
+                    
+                    anchor_ids = [
+                        d["_id"] for d in self.data.recentprf.aggregate([
+                            {"$project": {"k": {"$objectToArray": "$anchors"}}},
+                            {"$unwind": "$k"},
+                            {"$group": {"_id": "$k.k"}},
+                        ], allowDiskUse=True)
+                    ]
 
+                    n_total = self.alters_collection.estimated_document_count()
+                    n_remaining = self.alters_collection.count_documents({"_id": {"$nin": anchor_ids}})
+
+                    # players
+                    n_players = next(self.alters_collection.aggregate([
+                        {"$unwind": "$player_ids"},
+                        {"$group": {"_id": "$player_ids"}},
+                        {"$count": "n"},
+                    ], allowDiskUse=True), {}).get("n", 0)
+                    n_players_done = self.data.recentprf.estimated_document_count()
+                    coverage = 100 * n_players_done / n_players if n_players else 0.0
+
+                    print(f"alters: {n_total} | done: {len(anchor_ids)} | remaining: {n_remaining}")
+                    print(f"players: {n_players} | done: {n_players_done} | remaining: {n_players - n_players_done}")
+                    print(f"player coverage: {coverage:.2f}%")
+                    prompt2 = input('Stage 1 recent performance fetch? : ')
+
+                    
+                    
                     if prompt2 in ['y', 'yes']:
                         self.recent_flag = True
                         break
                     elif prompt2 in ['n', 'no']:
-                        break
+                        sys.exit()
 
                 elif prompt in ['n','no']:
 
@@ -215,10 +242,10 @@ class PipelineRunner():
         if self.match_flag == False:
             # accessing player ids for alter func
             # Async concurrent workers
-            concurrent_workers = 6
+            concurrent_workers = 8
             semaphore = asyncio.Semaphore(concurrent_workers)
 
-            local_concurrent_workers = 4 #3
+            local_concurrent_workers = 5 #3
             local_semaphore = asyncio.Semaphore(local_concurrent_workers)
 
             async def master_function():
@@ -239,9 +266,6 @@ class PipelineRunner():
                     # f"({idx}) processing player id :{player_ids[idx]}"
                     "processing player "
                 ) 
-
-                # Lookup
-                alters_collection = self.data.alters
                 
                 # Process players
             
@@ -249,12 +273,26 @@ class PipelineRunner():
                 processes matches in batches to avoid out of memory errors
                 '''
                 results = {'recentprf': []}
-                data = alters_collection.find({})
+                done_pairs = pl.DataFrame(
+                    list(self.data.recentprf.aggregate([
+                        {"$project": {"player_ids": "$_id", "k": {"$objectToArray": "$anchors"}}},
+                        {"$unwind": "$k"},
+                        {"$project": {"_id": 0, "player_ids": 1, "match_id": "$k.k"}},
+                    ], allowDiskUse=True)),
+                    schema={"player_ids": pl.Utf8, "match_id": pl.Utf8},
+                )
 
+                data = self.alters_collection.find({})
                 master_fetch = (
                     pl.DataFrame(data)
                     .explode("player_ids")
                     .unnest("timestamp")
+                    .join(
+                        done_pairs,
+                        left_on=["player_ids", "_id"],
+                        right_on=["player_ids", "match_id"],
+                        how="anti",
+                    )
                     .group_by("player_ids")
                     .agg(
                         pl.struct(
@@ -383,84 +421,7 @@ class PipelineRunner():
                 self.logger.info(
                     "Batch loaded: %s results",
                     len(value_recent)
-                )
-                        
-
-            # Accessing seed players
-            async def process_player(idx):
-                async with semaphore:
-                    
-                    # 'success' acts as a flag and also contains alter_match_ids,
-                    # to be used by statistics functionlast
-                    self.logger.info(
-                        f"({idx}) processing player id :{player_ids[idx]}"
-                    )  
-
-                    alter_match_ids, alter_data, alters = await self.client.alter_function(player_ids[idx], session)
-                    
-                    alter_match_ids =  list(set(alter_match_ids))
-                    #n = len(alter_match_ids)
-
-                    # THIS IS SKIPPING THE PLAYER DUE TO LESS MATCHES
-                    if not alter_match_ids:
-                        self.logger.warning(
-                            f"({idx}) Player ID skipped due lesser number of matches in the past 40d!!"
-                        )
-                        return None
-
-                    # Processing each match id from the randomizer
-                    # stats_tasks = [
-                    #     #self.client.retry_function(
-                    #         self.client.statistics_transform(match_id, session, idx)
-                    #     #)
-                    #     for match_id in alter_match_ids
-                    # ]
-
-                    elo_tasks = [
-                        #self.client.retry_function(
-                            self.client.matches_elo(match_id, session, idx)
-                        #)
-                        for match_id in alter_match_ids
-                    ]
-                    
-                    async def throttle_lifetime(): 
-                        async with self.lifetime_semaphore: 
-                            return await self.client.lifetime_aggregates(player_ids[idx], session)
-
-                      
-                    results = await asyncio.gather(
-                        #*[throttle(t) for t in recent_tasks],
-                        *[throttle(t) for t in elo_tasks],
-                        return_exceptions=True
-                    )
-                    
-                    #
-                    elo_results = results #[len(recent_tasks):]
-                    #lifetime_result = results[-1]
-
-                    value_elo = [r for r in elo_results if r and not isinstance(r, Exception)]
-
-                    if start_from_checkpoint:
-                        self.logger.info(
-                            f"({idx}) Ran player id :{player_ids[idx]}"
-                        )  
-                    else:
-                        self.logger.info(
-                            f"({idx+1}) Ran player id :{player_ids[idx]}"
-                        )  
-                    
-                    result = {
-                        "idx": idx,
-                        #"recentprf": value_recent,
-                        "elo": value_elo,
-                        #"lifetime": lifetime_result,
-                        "matches": alter_data,
-                        "alters": alters
-                    }
-
-                    
-                    await self.queue.put(result)
-                    self.last_checkpoint_upstream = player_ids[idx]            
+                )            
                 
         async def run(session = False):
             
