@@ -1,0 +1,4 @@
+[core]
+    remote = faceits3
+['remote "faceits3"']
+    url = s3://faceit-ai-bucket
