@@ -62,7 +62,7 @@ class FaceitClient():
         #self.elo_persistence = set()
         
         # if control stage is True, it's stage 1 and else stage 2
-        self.control_stage = True
+        self.control_stage = False
 
         # Network env variables
         self.fetch_calls = (self.fetch_statistics_transform, 
@@ -197,32 +197,60 @@ class FaceitClient():
         indices = {idx: value for idx, value in enumerate(players_id)}
 
         # Get a list of stage 1 alter player ids to compare with stage 2 lifetime player ids and returns it for checkpointing at stage 2
-        if not self.control_stage:
+        # if not self.control_stage:
         
-            alters_ids = set(
-                pid
-                # I am changing alters to players, remember to replace it back -2Aug26
-                # Reason: starting to fetch new data again! using backup from march ig to make
-                # the code fetch players again, i need to write a function tho for that statistical way of
-                # taking stuff.
-                for doc in self.dbobj.db['alters'].find({'stageId': {'$regex': '^stage_1_'}}, {'player_ids': 1, '_id': 0})
-                for pid in doc.get('player_ids', [])
-            )
+        #     alters_ids = set(
+        #         pid
+        #         # I am changing alters to players, remember to replace it back -2Aug26
+        #         # Reason: starting to fetch new data again! using backup from march ig to make
+        #         # the code fetch players again, i need to write a function tho for that statistical way of
+        #         # taking stuff.
+        #         for doc in self.dbobj.db['alters'].find({'stageId': {'$regex': '^stage_1_'}}, {'player_ids': 1, '_id': 0})
+        #         for pid in doc.get('player_ids', [])
+        #     )
 
-            lifetime_ids = set(
-                doc['_id']
-                for doc in self.dbobj.db['lifetime'].find({'stageId': {'$regex': '^stage_2_'}}, {'_id': 1})
-            )
+        #     lifetime_ids = set(
+        #         doc['_id']
+        #         for doc in self.dbobj.db['lifetime'].find({'stageId': {'$regex': '^stage_2_'}}, {'_id': 1})
+        #     )
 
-            filtered = list(alters_ids - lifetime_ids)
-            len(filtered), len(alters_ids), len(lifetime_ids)
+        #     filtered = list(alters_ids - lifetime_ids)
+        #     len(filtered), len(alters_ids), len(lifetime_ids)
 
-            indices = {idx: value for idx, value in enumerate(filtered)}
-            indices_array = np.array([i for i in indices.keys()])
+        #     indices = {idx: value for idx, value in enumerate(filtered)}
+        #     indices_array = np.array([i for i in indices.keys()])
 
-            self.logger.info(f"Players retrieved \n- (S1)Length of alter player ids: %s,\n- (S2)Length of lifetime ids: %s,\n- Length of filtered player id: %s", \
-                        len(alters_ids), len(lifetime_ids), len(filtered))
+        #     self.logger.info(f"Players retrieved \n- (S1)Length of alter player ids: %s,\n- (S2)Length of lifetime ids: %s,\n- Length of filtered player id: %s", \
+        #                 len(alters_ids), len(lifetime_ids), len(filtered))
             
+        #     return indices_array, filtered
+        
+        
+
+        if not self.control_stage:
+            alters_ids = {
+                pid
+                for doc in self.dbobj.alters.find(
+                    {
+                        '$or': [
+                            {'stageId': {'$regex': '^stage_1_'}},
+                            # Your existing untagged alters are from Stage 1.
+                            {'stageId': {'$exists': False}},
+                        ]
+                    },
+                    {'player_ids': 1, '_id': 0},
+                )
+                for pid in doc.get('player_ids', [])
+            }
+
+            filtered = list(alters_ids)
+            indices_array = np.arange(len(filtered))
+
+            self.logger.info(
+                "Stage 2 candidates from stage 1 alters: %s",
+                len(filtered),
+            )
+
             return indices_array, filtered
         
         else:
@@ -337,11 +365,27 @@ class FaceitClient():
                     if index.get('_id') in randomized_matches]
 
                 # Making an alters output with unique match id and it's alters obtained
-                alters = [
-                    {"_id": alter_match_id, "player_ids": alter_id, 
-                    "timestamp":timestamp}
+                # alters = [
+                #     {"_id": alter_match_id, "player_ids": alter_id, 
+                #     "timestamp":timestamp}
 
-                    for alter_match_id, alter_id, timestamp in zip(alter_match_ids, alter_ids, timestamps)
+                #     for alter_match_id, alter_id, timestamp in zip(alter_match_ids, alter_ids, timestamps)
+                # ]
+
+                alters = [
+                    {
+                        "_id": alter_match_id,
+                        "player_ids": alter_id,
+                        "timestamp": timestamp,
+                        "stageId": (
+                            "stage_1_" if self.control_stage else "stage_2_"
+                        ) + datetime.now().strftime("%Y%m%d_%H%M"),
+                    }
+                    for alter_match_id, alter_id, timestamp in zip(
+                        alter_match_ids,
+                        alter_ids,
+                        timestamps,
+                    )
                 ]
 
                 #print(len(alters))
@@ -967,9 +1011,10 @@ class FaceitClient():
         returns a dictionary.
         """
 
-        async def throttle(coroutine):
-            async with local_sempahore:
-                return await coroutine
+        # not needed anymore, stats come from the same call
+        # async def throttle(coroutine):
+        #     async with local_sempahore:
+        #         return await coroutine
                 
         # Fetch match history
 
@@ -977,17 +1022,25 @@ class FaceitClient():
         MIN_STARTED_AT = data["min_started_at"]
         MAX_STARTED_AT = data["max_started_at"]
 
-        url = f"https://open.faceit.com/data/v4/players/{PLAYER_ID}/history"
+        # url = f"https://open.faceit.com/data/v4/players/{PLAYER_ID}/history"
+        url = f"https://open.faceit.com/data/v4/players/{PLAYER_ID}/games/cs2/stats"
 
         all_matches = []
         limit = 100
         offset = 0
 
-        while offset <= 1000:
+        # api rejects offset > 200, so we page back in time by moving "to" down instead
+        to_ms = MAX_STARTED_AT * 1000
+        seen_ids = set()
+
+        # while offset <= 1000:
+        while len(all_matches) <= 1000:
             params = {
-                "game": "cs2",
-                "from": MIN_STARTED_AT,
-                "to": MAX_STARTED_AT,
+                # "game": "cs2",
+                # "from": MIN_STARTED_AT,
+                # "to": MAX_STARTED_AT,
+                "from": MIN_STARTED_AT * 1000,  # this endpoint takes milliseconds
+                "to": to_ms,
                 "limit": limit,
                 "offset": offset,
             }
@@ -1006,12 +1059,35 @@ class FaceitClient():
             # create your joins here
 
             matches = payload.get("items", [])
-            all_matches.extend(matches)
+            # all_matches.extend(matches)
+            for m in matches:
+                mid = (m.get("stats") or {}).get("Match Id")
+                if mid is not None:
+                    if mid in seen_ids:
+                        continue
+                    seen_ids.add(mid)
+                all_matches.append(m)
 
             if len(matches) < limit:
                  break
 
             offset += limit
+
+            # offset can't go past 200, restart from 0 just before the oldest match we have
+            if offset > 200:
+                finished = [
+                    int(m["stats"]["Match Finished At"])
+                    for m in matches
+                    if (m.get("stats") or {}).get("Match Finished At") is not None
+                ]
+                if not finished:
+                    break
+
+                to_ms = min(finished) - 1
+                offset = 0
+
+                if to_ms < MIN_STARTED_AT * 1000:
+                    break
             
         # self.logger.info("player %s match history fetched ", PLAYER_ID)
         self.logger.info(
@@ -1020,26 +1096,26 @@ class FaceitClient():
             len(all_matches),
         )
 
-        local_sempahore = asyncio.Semaphore(5)
+        # local_sempahore = asyncio.Semaphore(5)
         
 
          #15 days, 30 days logic goes above convert json
 
             # Faster code, Throttling with a sempahore for 200 possible matches
-        stats_tasks = [
-            self.statistics_transform(PLAYER_ID, 
-                                        _id['match_id'], 
-                                        session = session, 
-                                        count = None)
-            for _id in all_matches
-        ]
+        # stats_tasks = [
+        #     self.statistics_transform(PLAYER_ID, 
+        #                                 _id['match_id'], 
+        #                                 session = session, 
+        #                                 count = None)
+        #     for _id in all_matches
+        # ]
         
  
         # array of dictionaries
-        stats_results = await asyncio.gather(
-            *[throttle(t) for t in stats_tasks],
-            return_exceptions= True
-        )
+        # stats_results = await asyncio.gather(
+        #     *[throttle(t) for t in stats_tasks],
+        #     return_exceptions= True
+        # )
 
         # for match, result in zip(all_matches, stats_results):
         #     if isinstance(result, BaseException):
@@ -1057,30 +1133,89 @@ class FaceitClient():
         
         # return pl.DataFrame(stats_results).rename({'started_at': 'stats_started_at'})
 
+        # stats we keep from the new endpoint, everything else is dropped
+        KEEP_STATS = (
+            "ADR", "Kills", "Deaths", "Assists", "K/D Ratio", "K/R Ratio",
+            "Headshots", "Headshots %", "MVPs", "Damage",
+            "Double Kills", "Triple Kills", "Quadro Kills", "Penta Kills",
+        )
+
+        def to_float(value):
+            # endpoint returns every stat as a string
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return None
+
         valid_stats = []
 
-        for match, result in zip(all_matches, stats_results):
-            # Preserve cancellation and other process-control exceptions.
-            if isinstance(result, BaseException) and not isinstance(result, Exception):
-                raise result
+        # for match, result in zip(all_matches, stats_results):
+        #     # Preserve cancellation and other process-control exceptions.
+        #     if isinstance(result, BaseException) and not isinstance(result, Exception):
+        #         raise result
 
-            if isinstance(result, Exception) or not isinstance(result, dict) or not result:
+        #     if isinstance(result, Exception) or not isinstance(result, dict) or not result:
+        #         self.logger.warning(
+        #             "[STATS SKIPPED] player=%s | match=%s | %s: %s",
+        #             PLAYER_ID,
+        #             match["match_id"],
+        #             type(result).__name__,
+        #             result,
+        #         )
+        #         continue
+
+        #     # Use the timestamp from the history record paired with these stats.
+        #     result = result.copy()
+        #     result["started_at"] = match["started_at"]
+
+        #     valid_stats.append(result)
+
+        # every record from the new endpoint is already self-contained -> {"stats": {...}}
+        for match in all_matches:
+            record = match.get("stats") or {}
+
+            match_id = record.get("Match Id")
+            map_picked = record.get("Map")
+            result_flag = record.get("Result")
+            finished_ms = record.get("Match Finished At")
+
+            # can't window or label the row without these
+            if map_picked is None or result_flag is None or finished_ms is None:
                 self.logger.warning(
-                    "[STATS SKIPPED] player=%s | match=%s | %s: %s",
+                    "[STATS SKIPPED] player=%s | match=%s | missing map/result/finish time",
                     PLAYER_ID,
-                    match["match_id"],
-                    type(result).__name__,
-                    result,
+                    match_id,
                 )
                 continue
 
-            # Use the timestamp from the history record paired with these stats.
-            result = result.copy()
-            result["started_at"] = match["started_at"]
+            try:
+                # ms -> unix seconds, e.g. 1792328585000 -> 1792328585
+                finished_at = int(finished_ms) // 1000
+                # "Result" is "1" / "0", same as the old 'won'
+                won = float(result_flag)
+            except (TypeError, ValueError):
+                self.logger.warning(
+                    "[STATS SKIPPED] player=%s | match=%s | bad result/finish time",
+                    PLAYER_ID,
+                    match_id,
+                )
+                continue
 
-            valid_stats.append(result)
+            player_statistics = {k: to_float(record.get(k)) for k in KEEP_STATS}
+            player_statistics['won'] = won
 
-        skipped = len(stats_results) - len(valid_stats)
+            # same shape statistics_transform() used to return, so
+            # aggregate_statistics() and convert_json() stay untouched.
+            # finish time (unix seconds) is used as the match timestamp.
+            valid_stats.append({
+                "player_id": PLAYER_ID,
+                "player_statistics": player_statistics,
+                "map": map_picked,
+                "started_at": finished_at,
+            })
+
+        # skipped = len(stats_results) - len(valid_stats)
+        skipped = len(all_matches) - len(valid_stats)
 
         self.logger.info(
             "[STATS SUMMARY] player=%s | usable=%d | skipped=%d | requested=%d",
@@ -1359,6 +1494,7 @@ class FaceitClient():
         :param match_func: matches_func refers to match() function, if call_api is used in it, async wont be used on it.
         :param count: count is used for tracking the iterating players.
         """
+        
         start = perf_counter()
         latency = 0
         endpoints = {'statistics': self.fetch_calls[0], 
@@ -1393,6 +1529,7 @@ class FaceitClient():
             #        raise SoftRateLimit("HTTP 429 Error")
             #else:
             #if response.status == 429:
+            
             if isinstance(data, dict) and 'errors' in data:
                 self.status = 'rate_limited'
                 #raise SoftRateLimit("HTTP 429 Error")
@@ -1401,6 +1538,9 @@ class FaceitClient():
                 if isinstance(data, dict) and "errors" in data:
                     self.status = 'rate_limited'
                     #raise SoftRateLimit(data['errors'])
+
+            if status != 200:
+                self.logger.error("[PLAYER STATS %s] url=%s | params=%s | body=%s", status, url, params, data)
             
             await self.detect_soft_rate_limit(data)
 
